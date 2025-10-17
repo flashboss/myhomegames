@@ -1,0 +1,23 @@
+[
+    {
+        "id": "steam_570",
+        "title": "Dota 2",
+        "summary": "MOBA",
+        "cover": "/covers/dota2.jpg",
+        "command": "/usr/bin/steam",
+        "args": [
+            "-applaunch",
+            "570"
+        ],
+        "allowed_dir": "/usr/bin"
+    },
+    {
+        "id": "egs/fight-night-champion",
+        "title": "Fight Night Champion",
+        "summary": "Boxing game",
+        "cover": "/covers/fightnight.jpg",
+        "command": "/opt/games/fightnight/launcher.sh",
+        "args": [],
+        "allowed_dir": "/opt/games"
+    }
+]
