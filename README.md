@@ -3,8 +3,8 @@
 
 ## myhomegames-server
 
-npm install
-npm run dev
+- npm install
+- npm run dev
 
 ## myhomegames-web
 
@@ -26,7 +26,6 @@ Notes:
 - Environment variables:
   VITE_API_BASE=http://127.0.0.1:4000
   VITE_API_TOKEN=YOUR_API_TOKEN
-
-  npm install
-  npm run dev
+- npm install
+- npm run dev
 
