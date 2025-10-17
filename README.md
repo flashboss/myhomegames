@@ -1,12 +1,12 @@
 # myhomegames
 
 
-myhomegames-server:
+## myhomegames-server
 
 npm install
 npm run dev
 
-myhomegames-web:
+## myhomegames-web
 
 Starter MyHomeGames Web App (React + TypeScript + Tailwind)
 Instructions:
