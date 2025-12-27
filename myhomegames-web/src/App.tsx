@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import Logo from "./components/Logo";
 import Favicon from "./components/Favicon";
-import SearchBar from "./components/SearchBar";
+import Header from "./components/Header";
 
 type GameLibrarySection = {
   key: string;
@@ -115,30 +114,14 @@ export default function App() {
     <>
       <Favicon />
       <div className="min-h-screen bg-[#1a1a1a] text-white">
-      {/* Header Plex-style */}
-      <header className="plex-header">
-        <div className="plex-header-container">
-          {/* Logo a sinistra */}
-          <button
-            onClick={() => {
-              setActiveLibrary(null);
-              setGames([]);
-            }}
-            className="plex-logo-button"
-            aria-label="Home"
-          >
-            <Logo />
-          </button>
-          
-          {/* SearchBar al centro */}
-          <div className="plex-search-container">
-            <SearchBar games={allGames} onGameSelect={handleGameSelect} />
-          </div>
-          
-          {/* Spazio a destra per eventuali elementi futuri */}
-          <div className="plex-header-spacer"></div>
-        </div>
-      </header>
+      <Header 
+        allGames={allGames} 
+        onGameSelect={handleGameSelect}
+        onHomeClick={() => {
+          setActiveLibrary(null);
+          setGames([]);
+        }}
+      />
 
       <div className="flex h-[calc(100vh-57px)]">
         {/* Sidebar Plex-style */}

@@ -68,7 +68,6 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
         <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
           <input
             type="text"
-            placeholder="Search games..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => {
