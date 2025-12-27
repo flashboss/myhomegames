@@ -163,7 +163,6 @@ function GameDetailPage({ allGames, onPlay }: {
       game={game}
       coverUrl={buildCoverUrl(game.cover)}
       onPlay={onPlay}
-      onClose={() => navigate("/")}
     />
   );
 }

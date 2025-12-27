@@ -47,12 +47,17 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     fetchLibraries();
   }, []);
 
-  // Auto-select first library when libraries are loaded and no library is selected
+  // Restore last selected library or auto-select first library when libraries are loaded
   useEffect(() => {
     if (libraries.length > 0 && !activeLibrary) {
-      const firstLibrary = libraries[0];
-      setActiveLibrary(firstLibrary);
-      fetchLibraryGames(firstLibrary.key);
+      // Try to restore last selected library from localStorage
+      const savedLibraryKey = localStorage.getItem("lastSelectedLibrary");
+      const libraryToSelect = savedLibraryKey 
+        ? libraries.find(lib => lib.key === savedLibraryKey) || libraries[0]
+        : libraries[0];
+      
+      setActiveLibrary(libraryToSelect);
+      fetchLibraryGames(libraryToSelect.key);
     }
   }, [libraries]);
 
@@ -104,6 +109,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   }
 
   function onSelectLibrary(s: GameLibrarySection) {
+    // Save selected library to localStorage
+    localStorage.setItem("lastSelectedLibrary", s.key);
     // Update active library immediately for instant visual feedback
     setActiveLibrary(s);
     // Clear previous games immediately

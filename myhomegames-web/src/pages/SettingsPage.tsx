@@ -21,17 +21,6 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       <div className="max-w-4xl mx-auto px-8 py-8">
-        {/* Header with back button */}
-        <button
-          onClick={() => navigate("/")}
-          className="mb-6 text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Back</span>
-        </button>
-
         <div className="bg-[#1a1a1a] rounded-lg shadow-2xl overflow-hidden border border-[#2a2a2a]">
           <div className="p-6 border-b border-[#2a2a2a] bg-[#0d0d0d]">
             <h2 className="text-2xl font-semibold text-white">Settings</h2>

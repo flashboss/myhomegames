@@ -10,24 +10,12 @@ type GameDetailProps = {
   game: GameItem;
   coverUrl: string;
   onPlay: (game: GameItem) => void;
-  onClose: () => void;
 };
 
-export default function GameDetail({ game, coverUrl, onPlay, onClose }: GameDetailProps) {
+export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) {
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       <div className="max-w-7xl mx-auto px-8 py-8">
-        {/* Header with back button */}
-        <button
-          onClick={onClose}
-          className="mb-6 text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Back</span>
-        </button>
-
         <div className="flex flex-col md:flex-row gap-8">
           {/* Cover Image */}
           <div className="flex-shrink-0">
