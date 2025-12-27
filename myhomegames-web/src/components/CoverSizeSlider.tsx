@@ -16,7 +16,7 @@ export default function CoverSizeSlider({ value, onChange, min = 100, max = 200 
         onChange={(e) => onChange(Number(e.target.value))}
         className="cover-size-slider"
         style={{
-          width: '120px',
+          width: '60px',
           height: '4px',
           background: 'rgba(255, 255, 255, 0.2)',
           borderRadius: '2px',
