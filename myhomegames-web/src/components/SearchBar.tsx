@@ -47,8 +47,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
 
   return (
     <div ref={searchRef} className="relative" style={{ width: '100%' }}>
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px', width: '100%' }}>
-        <div style={{ flexShrink: 0, pointerEvents: 'none' }}>
+      <div className="plex-search-container-wrapper">
+        <div className="plex-search-icon-wrapper">
           <svg
             className="text-gray-400"
             fill="none"
@@ -65,17 +65,15 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             />
           </svg>
         </div>
-        <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => {
-              if (filteredGames.length > 0) setIsOpen(true);
-            }}
-            className="plex-search-input w-full"
-          />
-        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onFocus={() => {
+            if (filteredGames.length > 0) setIsOpen(true);
+          }}
+          className="plex-search-input"
+        />
       </div>
 
       {isOpen && filteredGames.length > 0 && (
