@@ -46,8 +46,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
   }, []);
 
   return (
-    <div ref={searchRef} className="relative" style={{ width: '100%' }}>
-      <div className="plex-search-container-wrapper">
+    <div ref={searchRef} className="relative" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div className="plex-search-container-wrapper" style={{ position: 'relative', zIndex: 100 }}>
         <div className="plex-search-icon-wrapper">
           <svg
             className="text-gray-400"
@@ -73,11 +73,28 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             if (filteredGames.length > 0) setIsOpen(true);
           }}
           className="plex-search-input"
+          style={{ position: 'relative', zIndex: 101 }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setIsOpen(false);
+            }
+          }}
         />
       </div>
 
       {isOpen && filteredGames.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 plex-dropdown max-h-96 overflow-y-auto z-50">
+        <div 
+          className="plex-dropdown max-h-96 overflow-y-auto" 
+          style={{ 
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            marginTop: '16px',
+            zIndex: 50,
+            pointerEvents: 'auto'
+          }}
+        >
           {filteredGames.map((game) => (
             <button
               key={game.ratingKey}
@@ -92,7 +109,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                 <img
                   src={game.cover.startsWith("http") ? game.cover : `http://127.0.0.1:4000${game.cover}`}
                   alt={game.title}
-                  className="w-12 h-12 object-cover rounded"
+                  className="object-cover rounded flex-shrink-0"
+                  style={{ width: '32px', height: '48px', minWidth: '32px', minHeight: '48px' }}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
