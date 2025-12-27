@@ -3,7 +3,6 @@
         "id": "egs/fight-night-champion",
         "title": "Fight Night Champion",
         "summary": "Boxing game",
-        "cover": "/covers/fightnight.jpg",
         "command": "/opt/games/fightnight/launcher.sh",
         "args": [],
         "allowed_dir": "/opt/games"
@@ -12,7 +11,6 @@
         "id": "steam_1811260",
         "title": "EA Sports FC 24",
         "summary": "Football simulation",
-        "cover": "/covers/fc24.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -24,7 +22,6 @@
         "id": "steam_1599340",
         "title": "Resident Evil 4",
         "summary": "Survival horror",
-        "cover": "/covers/re4.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -36,7 +33,6 @@
         "id": "steam_1938090",
         "title": "Call of Duty: Modern Warfare III",
         "summary": "Military FPS",
-        "cover": "/covers/mw3.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -48,7 +44,6 @@
         "id": "steam_1517290",
         "title": "Battlefield 2042",
         "summary": "Large-scale FPS",
-        "cover": "/covers/bf2042.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -60,7 +55,6 @@
         "id": "steam_1245620",
         "title": "ELDEN RING",
         "summary": "Action RPG",
-        "cover": "/covers/eldenring.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -72,7 +66,6 @@
         "id": "steam_1086940",
         "title": "Baldur's Gate 3",
         "summary": "Fantasy RPG",
-        "cover": "/covers/bg3.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -84,7 +77,6 @@
         "id": "steam_1888930",
         "title": "The Witcher 3: Wild Hunt",
         "summary": "Fantasy action RPG",
-        "cover": "/covers/witcher3.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",

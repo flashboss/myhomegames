@@ -3,7 +3,6 @@
         "id": "steam_570",
         "title": "Dota 2",
         "summary": "MOBA",
-        "cover": "/covers/dota2.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -15,7 +14,6 @@
         "id": "steam_730",
         "title": "Counter-Strike 2",
         "summary": "Tactical FPS",
-        "cover": "/covers/cs2.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -27,7 +25,6 @@
         "id": "steam_1245620",
         "title": "ELDEN RING",
         "summary": "Action RPG",
-        "cover": "/covers/eldenring.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -39,7 +36,6 @@
         "id": "steam_1086940",
         "title": "Baldur's Gate 3",
         "summary": "Fantasy RPG",
-        "cover": "/covers/bg3.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -51,7 +47,6 @@
         "id": "steam_1174180",
         "title": "Red Dead Redemption 2",
         "summary": "Western adventure",
-        "cover": "/covers/rdr2.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -63,7 +58,6 @@
         "id": "steam_271590",
         "title": "Grand Theft Auto V",
         "summary": "Open world action",
-        "cover": "/covers/gta5.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -75,7 +69,6 @@
         "id": "steam_1888930",
         "title": "The Witcher 3: Wild Hunt",
         "summary": "Fantasy action RPG",
-        "cover": "/covers/witcher3.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -87,7 +80,6 @@
         "id": "steam_1091500",
         "title": "Cyberpunk 2077",
         "summary": "Sci-fi RPG",
-        "cover": "/covers/cyberpunk.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -99,7 +91,6 @@
         "id": "steam_1599340",
         "title": "Resident Evil 4",
         "summary": "Survival horror",
-        "cover": "/covers/re4.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",
@@ -111,7 +102,6 @@
         "id": "steam_1938090",
         "title": "Call of Duty: Modern Warfare III",
         "summary": "Military FPS",
-        "cover": "/covers/mw3.jpg",
         "command": "/usr/bin/steam",
         "args": [
             "-applaunch",

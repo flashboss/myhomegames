@@ -31,6 +31,7 @@ function buildApiUrl(apiBase: string, path: string, params: Record<string, strin
 
 function buildCoverUrl(apiBase: string, cover?: string) {
   if (!cover) return "";
+  // Cover is already a full path from server (e.g., /covers/gameId)
   return buildApiUrl(apiBase, cover);
 }
 

@@ -16,6 +16,7 @@ const API_TOKEN = process.env.API_TOKEN || 'changeme';
 const PORT = process.env.PORT || 4000;
 const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID || '';
 const IGDB_CLIENT_SECRET = process.env.IGDB_CLIENT_SECRET || '';
+const METADATA_PATH = process.env.METADATA_PATH || path.join(process.env.HOME || process.env.USERPROFILE || '', 'Library', 'Application Support', 'MyHomeGames');
 
 // Simple token auth middleware
 function requireToken(req, res, next) {
@@ -70,11 +71,33 @@ app.get('/libraries', requireToken, (req, res) => {
   res.json({ libraries: libs });
 });
 
+// Endpoint: serve game cover image (public, no auth required for images)
+app.get('/covers/:gameId', (req, res) => {
+  const gameId = decodeURIComponent(req.params.gameId);
+  const coverPath = path.join(METADATA_PATH, gameId, 'cover.webp');
+  
+  // Check if file exists
+  if (!fs.existsSync(coverPath)) {
+    return res.status(404).json({ error: 'Cover not found' });
+  }
+  
+  // Set appropriate content type for webp
+  res.type('image/webp');
+  res.sendFile(coverPath);
+});
+
 // Endpoint: list games by library
 app.get('/libraries/:id/games', requireToken, (req, res) => {
   const libraryId = req.params.id;
   const libraryGames = gamesByLibrary[libraryId] || [];
-  res.json({ games: libraryGames.map(g => ({ id: g.id, title: g.title, summary: g.summary || '', cover: g.cover || '' })) });
+  res.json({ 
+    games: libraryGames.map(g => ({ 
+      id: g.id, 
+      title: g.title, 
+      summary: g.summary || '', 
+      cover: `/covers/${encodeURIComponent(g.id)}` 
+    })) 
+  });
 });
 
 // Endpoint: launcher — launches a whitelisted command for a game
