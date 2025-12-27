@@ -43,7 +43,7 @@ export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl }
               </div>
             )}
           </div>
-          <div className="truncate" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', fontSize: '0.95rem', fontWeight: 500, color: '#f8f8f8', backgroundColor: 'transparent', padding: 0 }}>
+          <div className="truncate" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', fontSize: '0.85rem', fontWeight: 500, color: '#f8f8f8', backgroundColor: 'transparent', padding: 0 }}>
             {it.title}
           </div>
         </div>

@@ -88,11 +88,12 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           style={{ 
             position: 'absolute',
             top: '100%',
-            left: 0,
-            right: 0,
-            marginTop: '16px',
+            left: '138px',
+            marginTop: '0px',
             zIndex: 50,
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            maxWidth: '500px',
+            width: 'calc(100% - 276px)'
           }}
         >
           {filteredGames.map((game) => (
@@ -103,7 +104,14 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                 setSearchQuery("");
                 setIsOpen(false);
               }}
-              className="w-full plex-dropdown-item flex items-center gap-3"
+              className="w-full plex-dropdown-item"
+              style={{ 
+                padding: '12px 16px',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '12px'
+              }}
             >
               {game.cover && (
                 <img
@@ -116,7 +124,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                   }}
                 />
               )}
-              <div className="flex-1 min-w-0">
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="text-white text-sm font-medium truncate">{game.title}</div>
                 {game.summary && (
                   <div className="text-gray-400 text-xs truncate mt-1">{game.summary}</div>
