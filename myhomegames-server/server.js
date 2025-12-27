@@ -6,6 +6,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const https = require('https');
 
 const app = express();
 app.use(express.json());
@@ -13,6 +14,8 @@ app.use(cors());
 
 const API_TOKEN = process.env.API_TOKEN || 'changeme';
 const PORT = process.env.PORT || 4000;
+const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID || '';
+const IGDB_CLIENT_SECRET = process.env.IGDB_CLIENT_SECRET || '';
 
 // Simple token auth middleware
 function requireToken(req, res, next) {
@@ -120,6 +123,116 @@ app.get('/launcher', requireToken, (req, res) => {
 app.post('/reload-games', requireToken, (req, res) => {
   loadGames();
   res.json({ status: 'reloaded', count: games.length });
+});
+
+// IGDB Access Token cache
+let igdbAccessToken = null;
+let igdbTokenExpiry = 0;
+
+async function getIGDBAccessToken() {
+  if (igdbAccessToken && Date.now() < igdbTokenExpiry) {
+    return igdbAccessToken;
+  }
+
+  if (!IGDB_CLIENT_ID || !IGDB_CLIENT_SECRET) {
+    throw new Error('IGDB credentials not configured');
+  }
+
+  return new Promise((resolve, reject) => {
+    const postData = `client_id=${IGDB_CLIENT_ID}&client_secret=${IGDB_CLIENT_SECRET}&grant_type=client_credentials`;
+    
+    const options = {
+      hostname: 'id.twitch.tv',
+      path: '/oauth2/token',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.access_token) {
+            igdbAccessToken = json.access_token;
+            igdbTokenExpiry = Date.now() + (json.expires_in * 1000) - 60000; // Refresh 1 min before expiry
+            resolve(igdbAccessToken);
+          } else {
+            reject(new Error('Failed to get IGDB access token'));
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
+// Endpoint: search games on IGDB
+app.get('/igdb/search', requireToken, async (req, res) => {
+  const query = req.query.q;
+  if (!query || query.trim() === '') {
+    return res.status(400).json({ error: 'Missing search query' });
+  }
+
+  try {
+    const accessToken = await getIGDBAccessToken();
+    
+    const postData = `search "${query}"; fields id,name,summary,cover.url,first_release_date; limit 20;`;
+    
+    const options = {
+      hostname: 'api.igdb.com',
+      path: '/v4/games',
+      method: 'POST',
+      headers: {
+        'Client-ID': IGDB_CLIENT_ID,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'text/plain',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const igdbReq = https.request(options, (igdbRes) => {
+      let data = '';
+      igdbRes.on('data', (chunk) => { data += chunk; });
+      igdbRes.on('end', () => {
+        try {
+          const games = JSON.parse(data);
+          // Transform cover URLs to full URLs
+          const transformed = games.map(game => ({
+            id: game.id,
+            name: game.name,
+            summary: game.summary || '',
+            cover: game.cover ? `https:${game.cover.url.replace('t_thumb', 't_cover_big')}` : null,
+            releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000).getFullYear() : null
+          }));
+          res.json({ games: transformed });
+        } catch (e) {
+          console.error('Error parsing IGDB response:', e);
+          res.status(500).json({ error: 'Failed to parse IGDB response' });
+        }
+      });
+    });
+
+    igdbReq.on('error', (err) => {
+      console.error('IGDB request error:', err);
+      res.status(500).json({ error: 'Failed to search IGDB', detail: err.message });
+    });
+
+    igdbReq.write(postData);
+    igdbReq.end();
+  } catch (err) {
+    console.error('IGDB search error:', err);
+    res.status(500).json({ error: 'Failed to search IGDB', detail: err.message });
+  }
 });
 
 app.listen(PORT, () => console.log(`MyHomeGames server listening on :${PORT}`));

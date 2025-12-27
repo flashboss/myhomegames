@@ -4,6 +4,8 @@ import Favicon from "./components/Favicon";
 import Header from "./components/Header";
 import LibrariesBar from "./components/LibrariesBar";
 import GameDetail from "./components/GameDetail";
+import Settings from "./components/Settings";
+import AddGame from "./components/AddGame";
 
 type GameLibrarySection = {
   key: string;
@@ -37,6 +39,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [playerUrl, setPlayerUrl] = useState<string | null>(null);
   const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [addGameOpen, setAddGameOpen] = useState(false);
 
   useEffect(() => {
     fetchLibraries();
@@ -123,7 +127,10 @@ export default function App() {
         onHomeClick={() => {
           setActiveLibrary(null);
           setGames([]);
+          setSelectedGame(null);
         }}
+        onSettingsClick={() => setSettingsOpen(true)}
+        onAddGameClick={() => setAddGameOpen(true)}
       />
 
       <LibrariesBar 
@@ -193,6 +200,21 @@ export default function App() {
           </main>
         </div>
       )}
+
+      {/* Settings Modal */}
+      <Settings isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+
+      {/* Add Game Modal */}
+      <AddGame
+        isOpen={addGameOpen}
+        onClose={() => setAddGameOpen(false)}
+        onGameSelected={(game) => {
+          console.log("Game selected from IGDB:", game);
+          // TODO: Implement game addition logic
+        }}
+        apiBase={API_BASE}
+        apiToken={API_TOKEN}
+      />
 
       {/* Modal Plex-style */}
       {playerUrl && (
