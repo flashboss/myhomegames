@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import Favicon from "./components/Favicon";
 import Header from "./components/Header";
+import LibrariesBar from "./components/LibrariesBar";
 
 type GameLibrarySection = {
   key: string;
@@ -123,36 +124,17 @@ export default function App() {
         }}
       />
 
-      <div className="flex h-[calc(100vh-57px)]">
-        {/* Sidebar Plex-style */}
-        <aside className="w-64 bg-[#0d0d0d] border-r border-[#2a2a2a] overflow-y-auto">
-          <div className="p-4">
-            {loading && libraries.length === 0 ? (
-              <div className="text-sm text-gray-500">Loading libraries…</div>
-            ) : (
-              <ul className="space-y-1">
-                {libraries.map((s) => (
-                  <li key={s.key}>
-                    <button
-                      className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                        activeLibrary?.key === s.key
-                          ? "bg-[#E5A00D] text-black font-medium"
-                          : "text-gray-300 hover:bg-[#2a2a2a] hover:text-white"
-                      }`}
-                      onClick={() => onSelectLibrary(s)}
-                    >
-                      <div className="text-sm">{s.title}</div>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {error && <div className="mt-4 text-sm text-red-400">{error}</div>}
-          </div>
-        </aside>
+      <LibrariesBar 
+        libraries={libraries}
+        activeLibrary={activeLibrary}
+        onSelectLibrary={onSelectLibrary}
+        loading={loading}
+        error={error}
+      />
 
-        {/* Main content Plex-style */}
-        <main className="flex-1 overflow-y-auto bg-[#1a1a1a]">
+      {/* Main content Plex-style */}
+      <div className="h-[calc(100vh-57px-57px)] overflow-y-auto bg-[#1a1a1a]">
+        <main className="flex-1">
           {!activeLibrary ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-gray-400 text-center">
@@ -161,7 +143,6 @@ export default function App() {
             </div>
           ) : (
             <div className="p-8">
-              <h2 className="text-2xl font-semibold mb-6 text-white">{activeLibrary.title}</h2>
               {loading ? (
                 <div className="text-sm text-gray-400">Loading games…</div>
               ) : games.length === 0 ? (

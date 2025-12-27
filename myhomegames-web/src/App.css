@@ -120,3 +120,66 @@
 .plex-dropdown-item:hover {
   background-color: rgba(255, 255, 255, 0.08);
 }
+
+/* Plex-style Libraries Bar */
+.plex-libraries-bar {
+  background-color: transparent;
+  padding: 0;
+  position: sticky;
+  top: 64px;
+  z-index: 90;
+}
+
+.plex-libraries-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.plex-libraries-container::-webkit-scrollbar {
+  display: none;
+}
+
+.plex-library-button {
+  padding: 16px 24px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+
+.plex-library-button:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+.plex-library-active {
+  color: #E5A00D;
+  border-bottom-color: #E5A00D;
+  font-weight: 600;
+}
+
+.plex-libraries-loading {
+  padding: 16px 24px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+}
+
+.plex-libraries-error {
+  padding: 16px 24px;
+  color: #ef4444;
+  font-size: 14px;
+  margin-left: auto;
+}
