@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingsPage";
 import AddGamePage from "./pages/AddGamePage";
+import AddGame from "./components/AddGame";
 import GameDetail from "./components/GameDetail";
 
 type GameItem = {
@@ -33,6 +34,7 @@ function buildCoverUrl(cover?: string) {
 function AppContent() {
   const [allGames, setAllGames] = useState<GameItem[]>([]);
   const [playerUrl, setPlayerUrl] = useState<string | null>(null);
+  const [addGameOpen, setAddGameOpen] = useState(false);
   const navigate = useNavigate();
 
   function openLauncher(item: GameItem) {
@@ -51,13 +53,13 @@ function AppContent() {
   return (
     <>
       <Favicon />
-      <div className="min-h-screen bg-[#1a1a1a] text-white">
+      <div className="min-h-screen bg-[#1a1a1a] text-white" style={{ position: 'relative' }}>
         <Header 
           allGames={allGames} 
           onGameSelect={handleGameSelect}
           onHomeClick={() => navigate("/")}
           onSettingsClick={() => navigate("/settings")}
-          onAddGameClick={() => navigate("/add-game")}
+          onAddGameClick={() => setAddGameOpen(true)}
         />
 
         <Routes>
@@ -106,6 +108,18 @@ function AppContent() {
             } 
           />
         </Routes>
+
+        {/* Add Game Modal */}
+        <AddGame
+          isOpen={addGameOpen}
+          onClose={() => setAddGameOpen(false)}
+          onGameSelected={(game) => {
+            console.log("Game selected from IGDB:", game);
+            // TODO: Implement game addition logic
+          }}
+          apiBase={API_BASE}
+          apiToken={API_TOKEN}
+        />
 
         {/* Modal Plex-style for launcher */}
         {playerUrl && (

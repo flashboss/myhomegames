@@ -32,13 +32,23 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
       return;
     }
 
+    // Handle ESC key to close modal
+    function handleEscKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    document.addEventListener('keydown', handleEscKey);
+
     // Clear timeout on unmount
     return () => {
+      document.removeEventListener('keydown', handleEscKey);
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     // Clear previous timeout
@@ -93,21 +103,27 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
-      onClick={onClose}
+      style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999,
+        margin: 0,
+        padding: 0
+      }}
     >
       <div
         className="bg-[#1a1a1a] w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden border border-[#2a2a2a] max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-[#2a2a2a] flex items-center justify-between bg-[#0d0d0d]">
+        <div className="p-6 border-b border-[#2a2a2a] bg-[#0d0d0d]">
           <h2 className="text-xl font-semibold text-white">Add Game</h2>
-          <button
-            className="text-gray-400 hover:text-white transition-colors text-sm px-3 py-1 rounded hover:bg-[#2a2a2a]"
-            onClick={onClose}
-          >
-            ✕ Close
-          </button>
         </div>
 
         <div className="p-6 flex-1 overflow-hidden flex flex-col">
