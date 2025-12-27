@@ -42,6 +42,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [coverSize, setCoverSize] = useState(150);
 
   useEffect(() => {
     fetchLibraries();
@@ -134,6 +135,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         onSelectLibrary={onSelectLibrary}
         loading={loading}
         error={error}
+        coverSize={coverSize}
+        onCoverSizeChange={setCoverSize}
       />
 
       <div className="h-[calc(100vh-57px-57px)] overflow-y-auto bg-[#1a1a1a]">
@@ -154,6 +157,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
                   apiBase={apiBase}
                   onGameClick={handleGameClick}
                   buildCoverUrl={buildCoverUrl}
+                  coverSize={coverSize}
                 />
               )}
             </div>

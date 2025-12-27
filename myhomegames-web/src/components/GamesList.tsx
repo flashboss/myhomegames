@@ -11,20 +11,21 @@ type GamesListProps = {
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
+  coverSize?: number;
 };
 
-export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl }: GamesListProps) {
+export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl, coverSize = 150 }: GamesListProps) {
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">No games found</div>;
   }
 
   return (
-    <div style={{ maxWidth: '100%', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 150px)', gap: '40px', justifyContent: 'center' }}>
+    <div style={{ maxWidth: '100%', margin: '0 auto', display: 'grid', gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)`, gap: '40px', justifyContent: 'center' }}>
       {games.map((it) => (
         <div
           key={it.ratingKey}
           className="group cursor-pointer"
-          style={{ width: '150px', minWidth: '150px', flexShrink: 0 }}
+          style={{ width: `${coverSize}px`, minWidth: `${coverSize}px`, flexShrink: 0 }}
           onClick={() => onGameClick(it)}
         >
           <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">

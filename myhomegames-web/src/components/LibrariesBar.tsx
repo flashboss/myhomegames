@@ -4,15 +4,19 @@ type GameLibrarySection = {
   type: string;
 };
 
+import CoverSizeSlider from "./CoverSizeSlider";
+
 type LibrariesBarProps = {
   libraries: GameLibrarySection[];
   activeLibrary: GameLibrarySection | null;
   onSelectLibrary: (library: GameLibrarySection) => void;
   loading: boolean;
   error: string | null;
+  coverSize?: number;
+  onCoverSizeChange?: (size: number) => void;
 };
 
-export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary, loading, error }: LibrariesBarProps) {
+export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary, loading, error, coverSize = 150, onCoverSizeChange }: LibrariesBarProps) {
   return (
     <div className="plex-libraries-bar">
       <div className="plex-libraries-container">
@@ -31,6 +35,11 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
         )}
         {error && <div className="plex-libraries-error">{error}</div>}
       </div>
+      {onCoverSizeChange && (
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+          <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
+        </div>
+      )}
     </div>
   );
 }
