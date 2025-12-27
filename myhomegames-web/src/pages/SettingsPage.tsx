@@ -45,12 +45,6 @@ export default function SettingsPage() {
 
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => navigate("/")}
-                className="px-4 py-2 text-gray-300 hover:text-white transition-colors rounded hover:bg-[#2a2a2a]"
-              >
-                Cancel
-              </button>
-              <button
                 onClick={handleSave}
                 className="px-4 py-2 bg-[#E5A00D] hover:bg-[#F5B041] text-black font-semibold rounded transition-colors"
               >

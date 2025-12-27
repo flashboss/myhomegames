@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import LibrariesBar from "../components/LibrariesBar";
 
 type GameLibrarySection = {
@@ -36,7 +35,6 @@ function buildCoverUrl(apiBase: string, cover?: string) {
 }
 
 export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGamesLoaded }: HomePageProps) {
-  const navigate = useNavigate();
   const [libraries, setLibraries] = useState<GameLibrarySection[]>([]);
   const [activeLibrary, setActiveLibrary] = useState<GameLibrarySection | null>(null);
   const [games, setGames] = useState<GameItem[]>([]);
@@ -124,7 +122,6 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
 
   function handleGameClick(game: GameItem) {
     onGameClick(game);
-    navigate(`/game/${game.ratingKey}`);
   }
 
   return (
