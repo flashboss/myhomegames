@@ -24,19 +24,39 @@ function requireToken(req, res, next) {
   next();
 }
 
-// Load games whitelist from JSON
-const GAMES_FILE = path.join(__dirname, 'games.json');
-let games = [];
-function loadGames() {
+// Load games whitelist from JSON files (one per library)
+const GAMES_DIR = __dirname;
+let allGames = {}; // Store all games by ID for launcher
+let gamesByLibrary = {}; // Store games grouped by library
+
+function loadGamesForLibrary(libraryKey) {
+  const fileName = `games-${libraryKey}.json`;
+  const filePath = path.join(GAMES_DIR, fileName);
   try {
-    const txt = fs.readFileSync(GAMES_FILE, 'utf8');
-    games = JSON.parse(txt);
+    const txt = fs.readFileSync(filePath, 'utf8');
+    const games = JSON.parse(txt);
+    // Store games for this library
+    gamesByLibrary[libraryKey] = games;
+    // Add to allGames for launcher lookup
+    games.forEach(game => {
+      allGames[game.id] = game;
+    });
+    return games;
   } catch (e) {
-    console.error('Failed to load games.json:', e.message);
-    games = [];
+    console.error(`Failed to load ${fileName}:`, e.message);
+    return [];
   }
 }
-loadGames();
+
+function loadAllGames() {
+  // Load games for each library
+  const libraries = ['consigliati', 'libreria', 'raccolte', 'categorie'];
+  libraries.forEach(lib => {
+    loadGamesForLibrary(lib);
+  });
+}
+
+loadAllGames();
 
 // Endpoint: list libraries (simple grouped view)
 app.get('/libraries', requireToken, (req, res) => {
@@ -52,8 +72,9 @@ app.get('/libraries', requireToken, (req, res) => {
 
 // Endpoint: list games by library
 app.get('/libraries/:id/games', requireToken, (req, res) => {
-  // In this starter we return all games; real impl should filter by library id
-  res.json({ games: games.map(g => ({ id: g.id, title: g.title, summary: g.summary || '', cover: g.cover || '' })) });
+  const libraryId = req.params.id;
+  const libraryGames = gamesByLibrary[libraryId] || [];
+  res.json({ games: libraryGames.map(g => ({ id: g.id, title: g.title, summary: g.summary || '', cover: g.cover || '' })) });
 });
 
 // Endpoint: launcher — launches a whitelisted command for a game
@@ -61,7 +82,7 @@ app.get('/launcher', requireToken, (req, res) => {
   const gameId = req.query.gameId;
   if (!gameId) return res.status(400).json({ error: 'Missing gameId' });
 
-  const entry = games.find(g => g.id === String(gameId));
+  const entry = allGames[String(gameId)];
   if (!entry) return res.status(404).json({ error: 'Game not found' });
 
   // For safety: 'command' is an absolute path to the executable and 'args' is an array
@@ -121,8 +142,11 @@ app.get('/launcher', requireToken, (req, res) => {
 
 // Reload games list (admin endpoint) — protected by token
 app.post('/reload-games', requireToken, (req, res) => {
-  loadGames();
-  res.json({ status: 'reloaded', count: games.length });
+  allGames = {};
+  gamesByLibrary = {};
+  loadAllGames();
+  const totalCount = Object.keys(allGames).length;
+  res.json({ status: 'reloaded', count: totalCount });
 });
 
 // IGDB Access Token cache
@@ -236,3 +260,4 @@ app.get('/igdb/search', requireToken, async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`MyHomeGames server listening on :${PORT}`));
+

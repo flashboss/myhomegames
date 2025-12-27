@@ -47,6 +47,15 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     fetchLibraries();
   }, []);
 
+  // Auto-select first library when libraries are loaded and no library is selected
+  useEffect(() => {
+    if (libraries.length > 0 && !activeLibrary) {
+      const firstLibrary = libraries[0];
+      setActiveLibrary(firstLibrary);
+      fetchLibraryGames(firstLibrary.key);
+    }
+  }, [libraries]);
+
   async function fetchLibraries() {
     setLoading(true);
     setError(null);
@@ -95,7 +104,14 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   }
 
   function onSelectLibrary(s: GameLibrarySection) {
+    // Update active library immediately for instant visual feedback
     setActiveLibrary(s);
+    // Clear previous games immediately
+    setGames([]);
+    // Set loading state immediately
+    setLoading(true);
+    setError(null);
+    // Then fetch new games
     fetchLibraryGames(s.key);
   }
 
