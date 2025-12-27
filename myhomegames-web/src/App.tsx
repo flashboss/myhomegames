@@ -3,6 +3,7 @@ import "./App.css";
 import Favicon from "./components/Favicon";
 import Header from "./components/Header";
 import LibrariesBar from "./components/LibrariesBar";
+import GameDetail from "./components/GameDetail";
 
 type GameLibrarySection = {
   key: string;
@@ -35,6 +36,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [playerUrl, setPlayerUrl] = useState<string | null>(null);
+  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
 
   useEffect(() => {
     fetchLibraries();
@@ -108,7 +110,7 @@ export default function App() {
   }
 
   function handleGameSelect(game: GameItem) {
-    openLauncher(game);
+    setSelectedGame(game);
   }
 
   return (
@@ -133,61 +135,64 @@ export default function App() {
       />
 
       {/* Main content Plex-style */}
-      <div className="h-[calc(100vh-57px-57px)] overflow-y-auto bg-[#1a1a1a]">
-        <main className="flex-1">
-          {!activeLibrary ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-gray-400 text-center">
-                <div className="text-2xl mb-2">🎮</div>
+      {selectedGame ? (
+        <GameDetail
+          game={selectedGame}
+          coverUrl={buildCoverUrl(selectedGame.cover)}
+          onPlay={openLauncher}
+          onClose={() => setSelectedGame(null)}
+        />
+      ) : (
+        <div className="h-[calc(100vh-57px-57px)] overflow-y-auto bg-[#1a1a1a]">
+          <main className="flex-1">
+            {!activeLibrary ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-gray-400 text-center">
+                  <div className="text-2xl mb-2">🎮</div>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="p-8">
-              {loading ? (
-                <div className="text-sm text-gray-400">Loading games…</div>
-              ) : games.length === 0 ? (
-                <div className="text-gray-400">No games found</div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
-                  {games.map((it) => (
-                    <div
-                      key={it.ratingKey}
-                      className="group cursor-pointer"
-                      onClick={() => openLauncher(it)}
-                    >
-                      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">
-                        {it.cover ? (
-                          <img
-                            src={buildCoverUrl(it.cover)}
-                            alt={it.title}
-                            className="object-cover w-full h-full"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <div className="text-gray-500 text-4xl">🎮</div>
-                          </div>
-                        )}
-                        {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <div className="bg-[#E5A00D] text-black px-4 py-2 rounded font-medium text-sm">
-                            Play
-                          </div>
+            ) : (
+              <div className="p-8">
+                {loading ? (
+                  <div className="text-sm text-gray-400">Loading games…</div>
+                ) : games.length === 0 ? (
+                  <div className="text-gray-400">No games found</div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+                    {games.map((it) => (
+                      <div
+                        key={it.ratingKey}
+                        className="group cursor-pointer"
+                        onClick={() => setSelectedGame(it)}
+                      >
+                        <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">
+                          {it.cover ? (
+                            <img
+                              src={buildCoverUrl(it.cover)}
+                              alt={it.title}
+                              className="object-cover w-full h-full"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <div className="text-gray-500 text-4xl">🎮</div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-300 group-hover:text-white transition-colors truncate">
+                          {it.title}
                         </div>
                       </div>
-                      <div className="text-sm text-gray-300 group-hover:text-white transition-colors truncate">
-                        {it.title}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </main>
-      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </main>
+        </div>
+      )}
 
       {/* Modal Plex-style */}
       {playerUrl && (
