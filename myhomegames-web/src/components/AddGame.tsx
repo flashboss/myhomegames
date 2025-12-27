@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 type IGDBGame = {
   id: number;
@@ -90,7 +91,7 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
       onClick={onClose}
@@ -173,7 +174,8 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

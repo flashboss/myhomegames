@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 type SettingsProps = {
   isOpen: boolean;
@@ -25,9 +26,9 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
       onClick={onClose}
     >
       <div
@@ -77,7 +78,8 @@ export default function Settings({ isOpen, onClose }: SettingsProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
