@@ -162,7 +162,7 @@
   line-height: 1.5;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
   border-bottom: 2px solid transparent;
   position: relative;
   box-sizing: border-box;
@@ -174,16 +174,29 @@
 
 .plex-library-active {
   color: #E5A00D;
-  border-bottom: 2px solid #E5A00D;
+  border-bottom: none !important;
   font-weight: 600;
   line-height: 1.5;
   padding: 16px 24px;
   box-sizing: border-box;
-  transition: border-bottom-color 0.2s ease;
+  position: relative;
+  transform: translateY(-1px);
+  transition: color 0.2s ease;
 }
 
-.plex-library-active:hover {
-  border-bottom-color: rgba(255, 255, 255, 1);
+.plex-library-active::after {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #E5A00D;
+  transition: background-color 0.2s ease;
+}
+
+.plex-library-active:hover::after {
+  background-color: rgba(255, 255, 255, 1);
 }
 
 .plex-libraries-loading {
