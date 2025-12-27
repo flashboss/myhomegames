@@ -150,11 +150,12 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               ) : games.length === 0 ? (
                 <div className="text-gray-400">No games found</div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+                <div className="flex flex-wrap gap-4" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                   {games.map((it) => (
                     <div
                       key={it.ratingKey}
                       className="group cursor-pointer"
+                      style={{ width: '150px', minWidth: '150px', flexShrink: 0 }}
                       onClick={() => handleGameClick(it)}
                     >
                       <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">
