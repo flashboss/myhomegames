@@ -149,7 +149,7 @@
 
 /* Plex-style Libraries Bar */
 .plex-libraries-bar {
-  background-color: transparent;
+  background-color: #1a1a1a;
   padding: 0;
   position: sticky;
   top: 64px;
