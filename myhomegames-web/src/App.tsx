@@ -1,4 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import "./App.css";
+import Logo from "./components/Logo";
+import Favicon from "./components/Favicon";
+import SearchBar from "./components/SearchBar";
 
 type GameLibrarySection = {
   key: string;
@@ -19,7 +23,6 @@ const API_TOKEN = import.meta.env.VITE_API_TOKEN || ""; // Your API token
 
 function buildApiUrl(path: string, params: Record<string, string | number | boolean> = {}) {
   const u = new URL(path, API_BASE);
-  u.searchParams.set("X-Auth-Token", API_TOKEN);
   Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));
   return u.toString();
 }
@@ -28,6 +31,7 @@ export default function App() {
   const [libraries, setLibraries] = useState<GameLibrarySection[]>([]);
   const [activeLibrary, setActiveLibrary] = useState<GameLibrarySection | null>(null);
   const [games, setGames] = useState<GameItem[]>([]);
+  const [allGames, setAllGames] = useState<GameItem[]>([]); // All games across all libraries for search
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [playerUrl, setPlayerUrl] = useState<string | null>(null);
@@ -41,7 +45,12 @@ export default function App() {
     setError(null);
     try {
       const url = buildApiUrl("/libraries");
-      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      const res = await fetch(url, { 
+        headers: { 
+          Accept: "application/json",
+          "X-Auth-Token": API_TOKEN
+        } 
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const libs = (json.libraries || []) as any[];
@@ -59,12 +68,23 @@ export default function App() {
     setError(null);
     try {
       const url = buildApiUrl(`/libraries/${sectionKey}/games`, { sort: "title" });
-      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      const res = await fetch(url, { 
+        headers: { 
+          Accept: "application/json",
+          "X-Auth-Token": API_TOKEN
+        } 
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const items = (json.games || []) as any[];
       const parsed = items.map((v) => ({ ratingKey: v.id, title: v.title, summary: v.summary, cover: v.cover, duration: v.duration }));
       setGames(parsed);
+      // Add to allGames for search (avoid duplicates)
+      setAllGames((prev: GameItem[]) => {
+        const existingIds = new Set(prev.map((g: GameItem) => g.ratingKey));
+        const newGames = parsed.filter((g: GameItem) => !existingIds.has(g.ratingKey));
+        return [...prev, ...newGames];
+      });
     } catch (err: any) {
       setError(String(err.message || err));
     } finally {
@@ -83,88 +103,154 @@ export default function App() {
   }
 
   function openLauncher(item: GameItem) {
-    const launchUrl = buildApiUrl(`/launcher?gameId=${item.ratingKey}`);
+    const launchUrl = buildApiUrl(`/launcher`, { gameId: item.ratingKey, token: API_TOKEN });
     setPlayerUrl(launchUrl);
   }
 
+  function handleGameSelect(game: GameItem) {
+    openLauncher(game);
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="flex items-center gap-4 p-4 shadow bg-white">
-        <h1 className="text-xl font-semibold">MyHomeGames Web App</h1>
-        <div className="ml-auto text-sm text-gray-600">Server: <span className="font-mono">{API_BASE}</span></div>
+    <>
+      <Favicon />
+      <div className="min-h-screen bg-[#1a1a1a] text-white">
+      {/* Header Plex-style */}
+      <header className="plex-header">
+        <div className="plex-header-container">
+          {/* Logo a sinistra */}
+          <button
+            onClick={() => {
+              setActiveLibrary(null);
+              setGames([]);
+            }}
+            className="plex-logo-button"
+            aria-label="Home"
+          >
+            <Logo />
+          </button>
+          
+          {/* SearchBar al centro */}
+          <div className="plex-search-container">
+            <SearchBar games={allGames} onGameSelect={handleGameSelect} />
+          </div>
+          
+          {/* Spazio a destra per eventuali elementi futuri */}
+          <div className="plex-header-spacer"></div>
+        </div>
       </header>
 
-      <div className="flex">
-        <aside className="w-64 p-4 border-r bg-white">
-          <h2 className="font-medium mb-2">Game Libraries</h2>
-          {loading && libraries.length === 0 ? (
-            <div className="text-sm text-gray-500">Loading libraries…</div>
-          ) : (
-            <ul className="space-y-2">
-              {libraries.map((s) => (
-                <li key={s.key}>
-                  <button
-                    className={`w-full text-left px-3 py-2 rounded ${activeLibrary?.key === s.key ? "bg-blue-50" : "hover:bg-gray-100"}`}
-                    onClick={() => onSelectLibrary(s)}
-                  >
-                    <div className="text-sm font-semibold">{s.title}</div>
-                    <div className="text-xs text-gray-500">{s.type}</div>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {error && <div className="mt-4 text-sm text-red-600">{error}</div>}
+      <div className="flex h-[calc(100vh-57px)]">
+        {/* Sidebar Plex-style */}
+        <aside className="w-64 bg-[#0d0d0d] border-r border-[#2a2a2a] overflow-y-auto">
+          <div className="p-4">
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Libraries</h2>
+            {loading && libraries.length === 0 ? (
+              <div className="text-sm text-gray-500">Loading libraries…</div>
+            ) : (
+              <ul className="space-y-1">
+                {libraries.map((s) => (
+                  <li key={s.key}>
+                    <button
+                      className={`w-full text-left px-3 py-2 rounded transition-colors ${
+                        activeLibrary?.key === s.key
+                          ? "bg-[#E5A00D] text-black font-medium"
+                          : "text-gray-300 hover:bg-[#2a2a2a] hover:text-white"
+                      }`}
+                      onClick={() => onSelectLibrary(s)}
+                    >
+                      <div className="text-sm">{s.title}</div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {error && <div className="mt-4 text-sm text-red-400">{error}</div>}
+          </div>
         </aside>
 
-        <main className="flex-1 p-6">
+        {/* Main content Plex-style */}
+        <main className="flex-1 overflow-y-auto bg-[#1a1a1a]">
           {!activeLibrary ? (
-            <div className="text-gray-600">Seleziona una libreria di giochi a sinistra.</div>
+            <div className="flex items-center justify-center h-full">
+              <div className="text-gray-400 text-center">
+                <div className="text-2xl mb-2">🎮</div>
+                <div>Select a library to view games</div>
+              </div>
+            </div>
           ) : (
-            <>
-              <h2 className="text-lg font-semibold mb-4">{activeLibrary.title}</h2>
+            <div className="p-8">
+              <h2 className="text-2xl font-semibold mb-6 text-white">{activeLibrary.title}</h2>
               {loading ? (
-                <div className="text-sm text-gray-500">Loading games…</div>
+                <div className="text-sm text-gray-400">Loading games…</div>
+              ) : games.length === 0 ? (
+                <div className="text-gray-400">No games found</div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
                   {games.map((it) => (
-                    <div key={it.ratingKey} className="bg-white rounded shadow-sm overflow-hidden">
-                      <div className="h-40 bg-gray-100 flex items-center justify-center">
+                    <div
+                      key={it.ratingKey}
+                      className="group cursor-pointer"
+                      onClick={() => openLauncher(it)}
+                    >
+                      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">
                         {it.cover ? (
-                          <img src={buildCoverUrl(it.cover)} alt={it.title} className="object-cover h-full w-full" />
+                          <img
+                            src={buildCoverUrl(it.cover)}
+                            alt={it.title}
+                            className="object-cover w-full h-full"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
                         ) : (
-                          <div className="text-sm text-gray-500">No image</div>
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="text-gray-500 text-4xl">🎮</div>
+                          </div>
                         )}
-                      </div>
-                      <div className="p-2">
-                        <div className="font-medium text-sm truncate">{it.title}</div>
-                        <div className="text-xs text-gray-500 mt-1">{it.summary ? it.summary.slice(0, 80) + (it.summary.length > 80 ? "…" : "") : ""}</div>
-                        <div className="mt-2 flex gap-2">
-                          <button className="px-2 py-1 text-xs border rounded" onClick={() => openLauncher(it)}>
-                            Launch Game
-                          </button>
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <div className="bg-[#E5A00D] text-black px-4 py-2 rounded font-medium text-sm">
+                            Play
+                          </div>
                         </div>
+                      </div>
+                      <div className="text-sm text-gray-300 group-hover:text-white transition-colors truncate">
+                        {it.title}
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </>
+            </div>
           )}
         </main>
       </div>
 
+      {/* Modal Plex-style */}
       {playerUrl && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center" onClick={() => setPlayerUrl(null)}>
-          <div className="bg-white w-11/12 h-4/5 rounded shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="p-2 border-b flex items-center justify-between">
-              <div>Game Launcher</div>
-              <button className="text-sm" onClick={() => setPlayerUrl(null)}>Close</button>
+        <div
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+          onClick={() => setPlayerUrl(null)}
+        >
+          <div
+            className="bg-[#1a1a1a] w-11/12 h-4/5 rounded-lg shadow-2xl overflow-hidden border border-[#2a2a2a]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-[#2a2a2a] flex items-center justify-between bg-[#0d0d0d]">
+              <div className="text-white font-medium">Game Launcher</div>
+              <button
+                className="text-gray-400 hover:text-white transition-colors text-sm px-3 py-1 rounded hover:bg-[#2a2a2a]"
+                onClick={() => setPlayerUrl(null)}
+              >
+                ✕ Close
+              </button>
             </div>
             <iframe src={playerUrl} title="Game Launcher" className="w-full h-full border-0" />
           </div>
         </div>
       )}
     </div>
+    </>
   );
 }
