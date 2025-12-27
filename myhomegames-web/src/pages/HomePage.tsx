@@ -144,13 +144,13 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               </div>
             </div>
           ) : (
-            <div style={{ paddingTop: '22px', paddingBottom: '32px', paddingLeft: '32px', paddingRight: '32px', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ paddingTop: '22px', paddingBottom: '32px' }}>
               {loading ? (
-                <div className="text-sm text-gray-400">Loading games…</div>
+                <div className="text-sm text-gray-400 text-center">Loading games…</div>
               ) : games.length === 0 ? (
-                <div className="text-gray-400">No games found</div>
+                <div className="text-gray-400 text-center">No games found</div>
               ) : (
-                <div className="flex flex-wrap" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: '40px' }}>
+                <div style={{ maxWidth: '100%', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 150px)', gap: '40px', justifyContent: 'center' }}>
                   {games.map((it) => (
                     <div
                       key={it.ratingKey}
