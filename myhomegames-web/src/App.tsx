@@ -127,7 +127,6 @@ export default function App() {
         {/* Sidebar Plex-style */}
         <aside className="w-64 bg-[#0d0d0d] border-r border-[#2a2a2a] overflow-y-auto">
           <div className="p-4">
-            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Libraries</h2>
             {loading && libraries.length === 0 ? (
               <div className="text-sm text-gray-500">Loading libraries…</div>
             ) : (
@@ -158,7 +157,6 @@ export default function App() {
             <div className="flex items-center justify-center h-full">
               <div className="text-gray-400 text-center">
                 <div className="text-2xl mb-2">🎮</div>
-                <div>Select a library to view games</div>
               </div>
             </div>
           ) : (

@@ -39,8 +39,10 @@ loadGames();
 app.get('/libraries', requireToken, (req, res) => {
   // example: grouping by libraryType
   const libs = [
-    { key: 'library_1', title: 'PC Games', type: 'games' },
-    { key: 'library_2', title: 'Retro', type: 'games' }
+    { key: 'consigliati', title: 'Consigliati', type: 'games' },
+    { key: 'libreria', title: 'Libreria', type: 'games' },
+    { key: 'raccolte', title: 'Raccolte', type: 'games' },
+    { key: 'categorie', title: 'Categorie', type: 'games' }
   ];
   res.json({ libraries: libs });
 });
@@ -74,17 +76,43 @@ app.get('/launcher', requireToken, (req, res) => {
   }
 
   // Spawn process without shell to avoid injection
+  let responseSent = false;
+  
   try {
     const child = spawn(command, args, {
       detached: true,
       stdio: 'ignore'
     });
-    child.unref();
+    
+    // Handle spawn errors (e.g., command not found) - this happens synchronously
+    child.on('error', (err) => {
+      console.error('Failed to spawn process:', err);
+      if (!responseSent) {
+        responseSent = true;
+        const errorMessage = err.code === 'ENOENT' 
+          ? `Command not found: ${command}. Please check if the executable exists.`
+          : err.message;
+        return res.status(500).json({ 
+          error: 'Launch failed', 
+          detail: errorMessage
+        });
+      }
+    });
 
-    return res.json({ status: 'launched', pid: child.pid });
+    // Only send success response if spawn succeeded
+    child.once('spawn', () => {
+      if (!responseSent) {
+        responseSent = true;
+        child.unref();
+        return res.json({ status: 'launched', pid: child.pid });
+      }
+    });
   } catch (e) {
     console.error('Launch failed', e);
-    return res.status(500).json({ error: 'Launch failed', detail: e.message });
+    if (!responseSent) {
+      responseSent = true;
+      return res.status(500).json({ error: 'Launch failed', detail: e.message });
+    }
   }
 });
 
