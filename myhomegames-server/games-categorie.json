@@ -1,6 +1,6 @@
 [
     {
-        "id": "egs/fight-night-champion",
+        "id": "egs_fight-night-champion",
         "title": "Fight Night Champion",
         "summary": "Boxing game",
         "command": "/opt/games/fightnight/launcher.sh",
