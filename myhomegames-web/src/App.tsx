@@ -200,7 +200,6 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-[#2a2a2a] flex items-center justify-between bg-[#0d0d0d]">
-              <div className="text-white font-medium">Game Launcher</div>
               <button
                 className="text-gray-400 hover:text-white transition-colors text-sm px-3 py-1 rounded hover:bg-[#2a2a2a]"
                 onClick={() => setPlayerUrl(null)}
