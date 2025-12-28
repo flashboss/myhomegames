@@ -148,7 +148,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             pointerEvents: 'auto',
             maxWidth: '500px',
             width: 'calc(100% - 276px)',
-            maxHeight: '400px',
+            maxHeight: 'calc(100vh - 150px)',
             overflowY: 'auto',
             overflowX: 'hidden'
           }}
