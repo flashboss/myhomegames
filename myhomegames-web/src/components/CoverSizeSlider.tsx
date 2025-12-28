@@ -7,7 +7,7 @@ type CoverSizeSliderProps = {
 
 export default function CoverSizeSlider({ value, onChange, min = 100, max = 200 }: CoverSizeSliderProps) {
   return (
-    <div className="flex items-center gap-3" style={{ paddingRight: '24px' }}>
+    <div className="flex items-center gap-3" style={{ paddingRight: '0px' }}>
       <input
         type="range"
         min={min}

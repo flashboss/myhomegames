@@ -5,6 +5,9 @@ type GameLibrarySection = {
 };
 
 import CoverSizeSlider from "./CoverSizeSlider";
+import ViewModeSelector from "./ViewModeSelector";
+
+export type ViewMode = 'grid' | 'detail' | 'table';
 
 type LibrariesBarProps = {
   libraries: GameLibrarySection[];
@@ -14,9 +17,11 @@ type LibrariesBarProps = {
   error: string | null;
   coverSize?: number;
   onCoverSizeChange?: (size: number) => void;
+  viewMode?: ViewMode;
+  onViewModeChange?: (mode: ViewMode) => void;
 };
 
-export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary, loading, error, coverSize = 150, onCoverSizeChange }: LibrariesBarProps) {
+export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary, loading, error, coverSize = 150, onCoverSizeChange, viewMode = 'grid', onViewModeChange }: LibrariesBarProps) {
   return (
     <div className="plex-libraries-bar">
       <div className="plex-libraries-container">
@@ -35,11 +40,14 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
         )}
         {error && <div className="plex-libraries-error">{error}</div>}
       </div>
-      {onCoverSizeChange && (
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0px' }}>
+        {onCoverSizeChange && (
           <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
-        </div>
-      )}
+        )}
+        {onViewModeChange && (
+          <ViewModeSelector value={viewMode} onChange={onViewModeChange} />
+        )}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import LibrariesBar from "../components/LibrariesBar";
+import type { ViewMode } from "../components/LibrariesBar";
 import GamesList from "../components/GamesList";
 
 type GameLibrarySection = {
@@ -46,6 +47,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coverSize, setCoverSize] = useState(150);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
   useEffect(() => {
     fetchLibraries();
@@ -149,6 +151,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         error={error}
         coverSize={coverSize}
         onCoverSizeChange={setCoverSize}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       <div className="h-[calc(100vh-57px-57px)] overflow-y-auto bg-[#1a1a1a]">
