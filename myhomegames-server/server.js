@@ -95,7 +95,10 @@ app.get('/libraries/:id/games', requireToken, (req, res) => {
       id: g.id, 
       title: g.title, 
       summary: g.summary || '', 
-      cover: `/covers/${encodeURIComponent(g.id)}` 
+      cover: `/covers/${encodeURIComponent(g.id)}`,
+      day: g.day || null,
+      month: g.month || null,
+      year: g.year || null
     })) 
   });
 });

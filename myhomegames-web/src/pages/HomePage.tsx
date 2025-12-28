@@ -14,6 +14,9 @@ type GameItem = {
   summary?: string;
   cover?: string;
   duration?: number;
+  day?: number | null;
+  month?: number | null;
+  year?: number | null;
 };
 
 type HomePageProps = {
@@ -99,7 +102,16 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const items = (json.games || []) as any[];
-      const parsed = items.map((v) => ({ ratingKey: v.id, title: v.title, summary: v.summary, cover: v.cover, duration: v.duration }));
+      const parsed = items.map((v) => ({ 
+        ratingKey: v.id, 
+        title: v.title, 
+        summary: v.summary, 
+        cover: v.cover, 
+        duration: v.duration,
+        day: v.day,
+        month: v.month,
+        year: v.year
+      }));
       setGames(parsed);
       onGamesLoaded(parsed);
     } catch (err: any) {

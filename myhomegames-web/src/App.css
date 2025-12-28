@@ -6,7 +6,9 @@
 /* Plex-style Header */
 .plex-header {
   background-color: #0d0d0d;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 8px solid #1a1a1a;
+  border-left: 8px solid #1a1a1a;
+  border-right: 8px solid #1a1a1a;
   padding: 0;
   height: 64px;
   position: sticky;
@@ -141,6 +143,8 @@
   font-size: 14px;
   transition: background-color 0.15s ease;
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .plex-dropdown-item:hover {

@@ -8,7 +8,10 @@
             "-applaunch",
             "271590"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 14,
+        "month": 4,
+        "year": 2015
     },
     {
         "id": "steam_1174180",
@@ -19,7 +22,10 @@
             "-applaunch",
             "1174180"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 5,
+        "month": 11,
+        "year": 2019
     },
     {
         "id": "steam_1091500",
@@ -30,7 +36,10 @@
             "-applaunch",
             "1091500"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 10,
+        "month": 12,
+        "year": 2020
     },
     {
         "id": "steam_1888930",
@@ -41,7 +50,10 @@
             "-applaunch",
             "1888930"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 19,
+        "month": 5,
+        "year": 2015
     },
     {
         "id": "steam_1245620",
@@ -52,7 +64,10 @@
             "-applaunch",
             "1245620"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 25,
+        "month": 2,
+        "year": 2022
     },
     {
         "id": "steam_1086940",
@@ -63,7 +78,10 @@
             "-applaunch",
             "1086940"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 3,
+        "month": 8,
+        "year": 2023
     },
     {
         "id": "steam_1599340",
@@ -74,7 +92,10 @@
             "-applaunch",
             "1599340"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 24,
+        "month": 3,
+        "year": 2023
     },
     {
         "id": "steam_730",
@@ -85,7 +106,10 @@
             "-applaunch",
             "730"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 27,
+        "month": 9,
+        "year": 2023
     },
     {
         "id": "steam_570",
@@ -96,7 +120,10 @@
             "-applaunch",
             "570"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 9,
+        "month": 7,
+        "year": 2013
     },
     {
         "id": "steam_1938090",
@@ -107,7 +134,10 @@
             "-applaunch",
             "1938090"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 10,
+        "month": 11,
+        "year": 2023
     },
     {
         "id": "steam_1517290",
@@ -118,7 +148,10 @@
             "-applaunch",
             "1517290"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 19,
+        "month": 11,
+        "year": 2021
     },
     {
         "id": "steam_1811260",
@@ -129,7 +162,10 @@
             "-applaunch",
             "1811260"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 29,
+        "month": 9,
+        "year": 2023
     },
     {
         "id": "steam_252490",
@@ -140,7 +176,10 @@
             "-applaunch",
             "252490"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 8,
+        "month": 2,
+        "year": 2018
     },
     {
         "id": "steam_440",
@@ -151,6 +190,9 @@
             "-applaunch",
             "440"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 10,
+        "month": 10,
+        "year": 2007
     }
 ]

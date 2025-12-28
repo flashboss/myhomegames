@@ -5,7 +5,10 @@
         "summary": "Boxing game",
         "command": "/opt/games/fightnight/launcher.sh",
         "args": [],
-        "allowed_dir": "/opt/games"
+        "allowed_dir": "/opt/games",
+        "day": 1,
+        "month": 3,
+        "year": 2011
     },
     {
         "id": "steam_1811260",
@@ -16,7 +19,10 @@
             "-applaunch",
             "1811260"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 29,
+        "month": 9,
+        "year": 2023
     },
     {
         "id": "steam_1599340",
@@ -27,7 +33,10 @@
             "-applaunch",
             "1599340"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 24,
+        "month": 3,
+        "year": 2023
     },
     {
         "id": "steam_1938090",
@@ -38,7 +47,10 @@
             "-applaunch",
             "1938090"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 10,
+        "month": 11,
+        "year": 2023
     },
     {
         "id": "steam_1517290",
@@ -49,7 +61,10 @@
             "-applaunch",
             "1517290"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 19,
+        "month": 11,
+        "year": 2021
     },
     {
         "id": "steam_1245620",
@@ -60,7 +75,10 @@
             "-applaunch",
             "1245620"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 25,
+        "month": 2,
+        "year": 2022
     },
     {
         "id": "steam_1086940",
@@ -71,7 +89,10 @@
             "-applaunch",
             "1086940"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 3,
+        "month": 8,
+        "year": 2023
     },
     {
         "id": "steam_1888930",
@@ -82,6 +103,9 @@
             "-applaunch",
             "1888930"
         ],
-        "allowed_dir": "/usr/bin"
+        "allowed_dir": "/usr/bin",
+        "day": 19,
+        "month": 5,
+        "year": 2015
     }
 ]

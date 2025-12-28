@@ -15,6 +15,9 @@ type GameItem = {
   summary?: string;
   cover?: string;
   duration?: number;
+  day?: number | null;
+  month?: number | null;
+  year?: number | null;
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
