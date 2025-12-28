@@ -16,7 +16,6 @@ type GameItem = {
   title: string;
   summary?: string;
   cover?: string;
-  duration?: number;
   day?: number | null;
   month?: number | null;
   year?: number | null;
@@ -134,7 +133,6 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         title: v.title, 
         summary: v.summary, 
         cover: v.cover, 
-        duration: v.duration,
         day: v.day,
         month: v.month,
         year: v.year,
@@ -184,7 +182,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         onViewModeChange={handleViewModeChange}
       />
 
-      <div className="h-[calc(100vh-57px-57px)] overflow-y-auto bg-[#1a1a1a]">
+      <div className={`h-[calc(100vh-57px-57px)] bg-[#1a1a1a] ${viewMode === 'table' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
         <main className="flex-1">
           {!activeLibrary ? (
             <div className="flex items-center justify-center h-full">
@@ -193,7 +191,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               </div>
             </div>
           ) : (
-            <div style={{ paddingTop: '22px', paddingBottom: '32px' }}>
+            <div style={{ paddingTop: viewMode === 'table' ? '0' : '22px', paddingBottom: viewMode === 'table' ? '0' : '32px' }}>
               {loading ? (
                 <div className="text-sm text-gray-400 text-center">Loading games…</div>
               ) : (

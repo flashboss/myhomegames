@@ -4,7 +4,6 @@ type GameItem = {
   title: string;
   summary?: string;
   cover?: string;
-  duration?: number;
   day?: number | null;
   month?: number | null;
   year?: number | null;
@@ -18,22 +17,41 @@ type GamesListTableProps = {
   onGameClick: (game: GameItem) => void;
 };
 
-type SortField = 'title' | 'summary' | 'year';
+type SortField = 'title' | 'summary' | 'year' | 'stars';
 type SortDirection = 'asc' | 'desc';
 
 type ColumnVisibility = {
   title: boolean;
   summary: boolean;
   releaseDate: boolean;
+  year: boolean;
+  stars: boolean;
 };
 
 export default function GamesListTable({ games, onGameClick }: GamesListTableProps) {
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
-    title: true,
-    summary: true,
-    releaseDate: true
+  // Load saved sort state from localStorage
+  const loadSortState = (): { field: SortField | null; direction: SortDirection } => {
+    const savedField = localStorage.getItem('tableSortField');
+    const savedDirection = localStorage.getItem('tableSortDirection');
+    return {
+      field: savedField ? (savedField as SortField) : null,
+      direction: savedDirection ? (savedDirection as SortDirection) : 'asc'
+    };
+  };
+
+  const savedSortState = loadSortState();
+  const [sortField, setSortField] = useState<SortField | null>(savedSortState.field);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(savedSortState.direction);
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(() => {
+    const saved = localStorage.getItem('tableColumnVisibility');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return { title: true, summary: true, releaseDate: true, year: false, stars: false };
+      }
+    }
+    return { title: true, summary: true, releaseDate: true };
   });
   const [showColumnMenu, setShowColumnMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -49,6 +67,22 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Save sort state to localStorage when it changes
+  useEffect(() => {
+    if (sortField) {
+      localStorage.setItem('tableSortField', sortField);
+      localStorage.setItem('tableSortDirection', sortDirection);
+    } else {
+      localStorage.removeItem('tableSortField');
+      localStorage.removeItem('tableSortDirection');
+    }
+  }, [sortField, sortDirection]);
+
+  // Save column visibility to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('tableColumnVisibility', JSON.stringify(columnVisibility));
+  }, [columnVisibility]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -78,6 +112,10 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
         aValue = a.year ?? 0;
         bValue = b.year ?? 0;
         break;
+      case 'stars':
+        aValue = a.stars ?? 0;
+        bValue = b.stars ?? 0;
+        break;
     }
 
     if (aValue === null && bValue === null) return 0;
@@ -94,7 +132,7 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
   }
 
   const getSortIcon = (field: SortField) => {
-    if (sortField !== field) return '⇅';
+    if (sortField !== field) return '';
     return sortDirection === 'asc' ? '↑' : '↓';
   };
 
@@ -106,14 +144,17 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
   };
 
   return (
-    <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0 24px' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
+    <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0 24px', height: 'calc(100vh - 114px - 22px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#1a1a1a' }}>
+          <tr>
             <th style={{ 
               padding: '12px 16px', 
               textAlign: 'left', 
-              width: '40px'
+              width: '40px',
+              borderRight: '2px solid #1a1a1a',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)'
             }}>
               <div style={{ position: 'relative' }} ref={menuRef}>
                 <button
@@ -189,7 +230,9 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                     {[
                       { key: 'title' as keyof ColumnVisibility, label: 'Title' },
                       { key: 'summary' as keyof ColumnVisibility, label: 'Summary' },
-                      { key: 'releaseDate' as keyof ColumnVisibility, label: 'Release Date' }
+                      { key: 'releaseDate' as keyof ColumnVisibility, label: 'Release Date' },
+                      { key: 'year' as keyof ColumnVisibility, label: 'Year' },
+                      { key: 'stars' as keyof ColumnVisibility, label: 'Stars' }
                     ].map((col) => (
                       <label
                         key={col.key}
@@ -237,7 +280,10 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   textTransform: 'uppercase',
                   cursor: 'pointer',
                   userSelect: 'none',
-                  transition: 'color 0.2s ease'
+                  transition: 'color 0.2s ease',
+                  position: 'relative',
+                  borderRight: '2px solid #1a1a1a',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
@@ -246,7 +292,8 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
                 }}
               >
-                Title {getSortIcon('title')}
+                <span>Title</span>
+                <span style={{ position: 'absolute', right: '16px', bottom: '12px' }}>{getSortIcon('title')}</span>
               </th>
             )}
             {columnVisibility.summary && (
@@ -261,7 +308,10 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   textTransform: 'uppercase',
                   cursor: 'pointer',
                   userSelect: 'none',
-                  transition: 'color 0.2s ease'
+                  transition: 'color 0.2s ease',
+                  position: 'relative',
+                  borderRight: '2px solid #1a1a1a',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
@@ -270,7 +320,8 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
                 }}
               >
-                Summary {getSortIcon('summary')}
+                <span>Summary</span>
+                <span style={{ position: 'absolute', right: '16px', bottom: '12px' }}>{getSortIcon('summary')}</span>
               </th>
             )}
             {columnVisibility.releaseDate && (
@@ -285,7 +336,9 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   textTransform: 'uppercase',
                   cursor: 'pointer',
                   userSelect: 'none',
-                  transition: 'color 0.2s ease'
+                  transition: 'color 0.2s ease',
+                  position: 'relative',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
@@ -294,7 +347,63 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
                 }}
               >
-                Release Date {getSortIcon('year')}
+                <span>Release Date</span>
+                <span style={{ position: 'absolute', right: '16px', bottom: '12px' }}>{getSortIcon('year')}</span>
+              </th>
+            )}
+            {columnVisibility.stars && (
+              <th 
+                onClick={() => handleSort('stars')}
+                style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'left', 
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  transition: 'color 0.2s ease',
+                  position: 'relative',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  borderRight: columnVisibility.year ? '2px solid #1a1a1a' : 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                }}
+              >
+                <span>Stars</span>
+                <span style={{ position: 'absolute', right: '16px', bottom: '12px' }}>{getSortIcon('stars')}</span>
+              </th>
+            )}
+            {columnVisibility.year && (
+              <th 
+                onClick={() => handleSort('year')}
+                style={{ 
+                  padding: '12px 16px', 
+                  textAlign: 'left', 
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  transition: 'color 0.2s ease',
+                  position: 'relative',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                }}
+              >
+                <span>Year</span>
+                <span style={{ position: 'absolute', right: '16px', bottom: '12px' }}>{getSortIcon('year')}</span>
               </th>
             )}
           </tr>
@@ -302,21 +411,20 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
         <tbody>
           {sortedGames.map((it, index) => {
             const isEven = index % 2 === 0;
-            const baseBackgroundColor = isEven ? 'transparent' : 'rgba(255, 255, 255, 0.02)';
+            const rowBackgroundColor = isEven ? 'transparent' : 'rgba(255, 255, 255, 0.02)';
 
             return (
               <tr
                 key={it.ratingKey}
                 className="cursor-pointer"
                 style={{
-                  transition: 'background-color 0.2s ease',
-                  backgroundColor: baseBackgroundColor
+                  transition: 'background-color 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = baseBackgroundColor;
+                  e.currentTarget.style.backgroundColor = 'transparent';
                 }}
                 onClick={() => onGameClick(it)}
               >
@@ -330,8 +438,17 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', 
                   fontSize: '0.95rem', 
                   fontWeight: 600, 
-                  color: '#f8f8f8'
-                }}>
+                  color: '#f8f8f8',
+                  backgroundColor: rowBackgroundColor,
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = rowBackgroundColor;
+                }}
+                >
                   {it.title}
                 </td>
               )}
@@ -339,8 +456,17 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                 <td style={{ 
                   padding: '12px 16px',
                   fontSize: '0.9rem', 
-                  color: 'rgba(255, 255, 255, 0.7)'
-                }}>
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: rowBackgroundColor,
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = rowBackgroundColor;
+                }}
+                >
                   {it.summary || '-'}
                 </td>
               )}
@@ -348,8 +474,17 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                 <td style={{ 
                   padding: '12px 16px',
                   fontSize: '0.85rem', 
-                  color: 'rgba(255, 255, 255, 0.6)'
-                }}>
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  backgroundColor: rowBackgroundColor,
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = rowBackgroundColor;
+                }}
+                >
                   {(it.year !== null && it.year !== undefined) 
                     ? (it.day !== null && it.day !== undefined && it.month !== null && it.month !== undefined
                         ? `${it.day}/${it.month}/${it.year}`
@@ -357,11 +492,48 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                     : '-'}
                 </td>
               )}
+              {columnVisibility.stars && (
+                <td style={{ 
+                  padding: '12px 16px',
+                  fontSize: '0.85rem', 
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  backgroundColor: rowBackgroundColor,
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = rowBackgroundColor;
+                }}
+                >
+                  {it.stars !== null && it.stars !== undefined ? it.stars.toString() : '-'}
+                </td>
+              )}
+              {columnVisibility.year && (
+                <td style={{ 
+                  padding: '12px 16px',
+                  fontSize: '0.85rem', 
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  backgroundColor: rowBackgroundColor,
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = rowBackgroundColor;
+                }}
+                >
+                  {it.year !== null && it.year !== undefined ? it.year.toString() : '-'}
+                </td>
+              )}
             </tr>
             );
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

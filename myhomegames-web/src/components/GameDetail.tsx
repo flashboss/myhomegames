@@ -6,7 +6,6 @@ type GameItem = {
   title: string;
   summary?: string;
   cover?: string;
-  duration?: number;
   stars?: number | null;
 };
 
