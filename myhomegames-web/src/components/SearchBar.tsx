@@ -167,20 +167,6 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
               overflowY: 'auto',
               overflowX: 'hidden'
             }}
-            onWheel={(e) => {
-              const target = e.currentTarget;
-              const isAtTop = target.scrollTop === 0;
-              const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 1;
-              
-              // If we're at the top and scrolling up, or at the bottom and scrolling down,
-              // allow body scrolling
-              if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
-                // Don't stop propagation, allow body scrolling
-                return;
-              }
-              // Otherwise stop propagation to scroll only the popup
-              e.stopPropagation();
-            }}
           >
             {filteredGames.map((game, index) => {
             const showPlaceholder = !game.cover || imageErrors.has(game.ratingKey);
@@ -264,22 +250,22 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                 }}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: 'rgba(229, 160, 13, 0.2)',
-                  border: '1px solid rgba(229, 160, 13, 0.5)',
+                  backgroundColor: '#E5A00D',
+                  border: '1px solid #E5A00D',
                   borderRadius: '6px',
-                  color: '#E5A00D',
+                  color: '#000000',
                   fontSize: '0.875rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(229, 160, 13, 0.3)';
-                  e.currentTarget.style.borderColor = 'rgba(229, 160, 13, 0.7)';
+                  e.currentTarget.style.backgroundColor = '#F5B041';
+                  e.currentTarget.style.borderColor = '#F5B041';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(229, 160, 13, 0.2)';
-                  e.currentTarget.style.borderColor = 'rgba(229, 160, 13, 0.5)';
+                  e.currentTarget.style.backgroundColor = '#E5A00D';
+                  e.currentTarget.style.borderColor = '#E5A00D';
                 }}
               >
                 View all results ({allFilteredGames.length})
