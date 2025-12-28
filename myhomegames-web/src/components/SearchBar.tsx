@@ -43,7 +43,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
     }
     setAllFilteredGames(filtered); // Save all results
     setFilteredGames(filtered.slice(0, 10)); // Limit to 10 results
-    setIsOpen(filtered.length > 0);
+    setIsOpen(true); // Always show dropdown when there's a search query (even if no results)
   }, [searchQuery, games]);
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => {
-            if (filteredGames.length > 0) setIsOpen(true);
+            if (searchQuery.trim() !== "") setIsOpen(true);
           }}
           className="plex-search-input"
           style={{ position: 'relative', zIndex: 101, paddingRight: searchQuery ? '36px' : undefined }}
@@ -242,7 +242,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             );
           })}
           </div>
-          {allFilteredGames.length > 10 && (
+          {allFilteredGames.length > 0 && (
             <div style={{ 
               padding: '12px 16px', 
               display: 'flex', 
@@ -290,8 +290,24 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
       )}
 
       {isOpen && searchQuery.trim() !== "" && filteredGames.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 plex-dropdown p-4 text-center text-gray-400 text-sm z-50">
-          No games found
+        <div 
+          className="plex-dropdown" 
+          style={{ 
+            position: 'absolute',
+            top: '100%',
+            left: '138px',
+            marginTop: '0px',
+            zIndex: 50,
+            pointerEvents: 'auto',
+            maxWidth: '500px',
+            width: 'calc(100% - 276px)',
+            padding: '16px',
+            textAlign: 'center',
+            color: 'rgba(255, 255, 255, 0.6)',
+            fontSize: '0.875rem'
+          }}
+        >
+          No results found for the term "{searchQuery}"
         </div>
       )}
     </div>
