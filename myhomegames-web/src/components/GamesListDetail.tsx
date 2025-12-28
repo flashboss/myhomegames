@@ -16,10 +16,11 @@ type GamesListDetailProps = {
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
-  coverSize?: number;
 };
 
-export default function GamesListDetail({ games, apiBase, onGameClick, buildCoverUrl, coverSize = 150 }: GamesListDetailProps) {
+const FIXED_COVER_SIZE = 100; // Dimensione fissa corrispondente al minimo del cursore
+
+export default function GamesListDetail({ games, apiBase, onGameClick, buildCoverUrl }: GamesListDetailProps) {
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">No games found</div>;
   }
@@ -49,10 +50,10 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
           <div 
             className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0"
             style={{ 
-              width: `${coverSize}px`, 
-              height: `${coverSize * 1.5}px`,
-              minWidth: `${coverSize}px`,
-              minHeight: `${coverSize * 1.5}px`
+              width: `${FIXED_COVER_SIZE}px`, 
+              height: `${FIXED_COVER_SIZE * 1.5}px`,
+              minWidth: `${FIXED_COVER_SIZE}px`,
+              minHeight: `${FIXED_COVER_SIZE * 1.5}px`
             }}
           >
             {it.cover ? (

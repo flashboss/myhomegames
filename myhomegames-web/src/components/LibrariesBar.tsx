@@ -41,7 +41,7 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
         {error && <div className="plex-libraries-error">{error}</div>}
       </div>
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0px', transform: 'translateY(-2px)' }}>
-        {onCoverSizeChange && (
+        {onCoverSizeChange && viewMode === 'grid' && (
           <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
         )}
         {onViewModeChange && (

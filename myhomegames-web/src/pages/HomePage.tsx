@@ -51,6 +51,25 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   const [coverSize, setCoverSize] = useState(150);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
+  // Funzione per salvare la vista per una libreria
+  const saveViewModeForLibrary = (libraryKey: string, mode: ViewMode) => {
+    localStorage.setItem(`viewMode_${libraryKey}`, mode);
+  };
+
+  // Funzione per caricare la vista salvata per una libreria
+  const loadViewModeForLibrary = (libraryKey: string): ViewMode => {
+    const saved = localStorage.getItem(`viewMode_${libraryKey}`);
+    return (saved as ViewMode) || 'grid';
+  };
+
+  // Handler per cambiare la vista
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    if (activeLibrary) {
+      saveViewModeForLibrary(activeLibrary.key, mode);
+    }
+  };
+
   useEffect(() => {
     fetchLibraries();
   }, []);
@@ -65,6 +84,9 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         : libraries[0];
       
       setActiveLibrary(libraryToSelect);
+      // Carica la vista salvata per questa libreria
+      const savedViewMode = loadViewModeForLibrary(libraryToSelect.key);
+      setViewMode(savedViewMode);
       fetchLibraryGames(libraryToSelect.key);
     }
   }, [libraries]);
@@ -130,6 +152,9 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     localStorage.setItem("lastSelectedLibrary", s.key);
     // Update active library immediately for instant visual feedback
     setActiveLibrary(s);
+    // Carica la vista salvata per questa libreria
+    const savedViewMode = loadViewModeForLibrary(s.key);
+    setViewMode(savedViewMode);
     // Clear previous games immediately
     setGames([]);
     // Set loading state immediately
@@ -154,7 +179,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         coverSize={coverSize}
         onCoverSizeChange={setCoverSize}
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
+        onViewModeChange={handleViewModeChange}
       />
 
       <div className="h-[calc(100vh-57px-57px)] overflow-y-auto bg-[#1a1a1a]">
@@ -186,7 +211,6 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
                       apiBase={apiBase}
                       onGameClick={handleGameClick}
                       buildCoverUrl={buildCoverUrl}
-                      coverSize={coverSize}
                     />
                   )}
                   {viewMode === 'table' && (
