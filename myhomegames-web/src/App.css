@@ -178,7 +178,6 @@
   gap: 0;
   padding: 0;
   overflow-x: auto;
-  scrollbar-width: none;
   -ms-overflow-style: none;
   position: absolute;
   left: 50%;
@@ -193,10 +192,6 @@
   gap: 0px;
   flex-shrink: 0;
   margin-left: auto;
-}
-
-.plex-libraries-container::-webkit-scrollbar {
-  display: none;
 }
 
 .plex-library-button {
