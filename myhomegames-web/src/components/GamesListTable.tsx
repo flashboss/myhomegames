@@ -149,13 +149,13 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
         <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
           <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#1a1a1a' }}>
           <tr>
-            <th style={{ 
-              padding: '12px 16px', 
-              textAlign: 'left', 
-              width: '40px',
-              borderRight: '2px solid #1a1a1a',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)'
-            }}>
+                    <th style={{ 
+                      padding: '12px 4px', 
+                      textAlign: 'left', 
+                      width: '24px',
+                      borderRight: '2px solid #1a1a1a',
+                      backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                    }}>
               <div style={{ position: 'relative' }} ref={menuRef}>
                 <button
                   onClick={() => setShowColumnMenu(!showColumnMenu)}
@@ -164,10 +164,10 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                     border: 'none',
                     color: 'rgba(255, 255, 255, 0.7)',
                     cursor: 'pointer',
-                    padding: '4px 8px',
+                    padding: '4px 2px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px',
+                    gap: '2px',
                     borderRadius: '4px',
                     transition: 'all 0.2s ease'
                   }}
@@ -338,6 +338,7 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   userSelect: 'none',
                   transition: 'color 0.2s ease',
                   position: 'relative',
+                  borderRight: (columnVisibility.stars || columnVisibility.year) ? '2px solid #1a1a1a' : 'none',
                   backgroundColor: 'rgba(59, 130, 246, 0.1)'
                 }}
                 onMouseEnter={(e) => {
@@ -428,10 +429,10 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                 }}
                 onClick={() => onGameClick(it)}
               >
-              <td style={{ 
-                padding: '12px 16px',
-                width: '40px'
-              }}></td>
+                        <td style={{ 
+                          padding: '12px 4px',
+                          width: '24px'
+                        }}></td>
               {columnVisibility.title && (
                 <td style={{ 
                   padding: '12px 16px',
@@ -476,7 +477,8 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                   fontSize: '0.85rem', 
                   color: 'rgba(255, 255, 255, 0.6)',
                   backgroundColor: rowBackgroundColor,
-                  transition: 'background-color 0.2s ease'
+                  transition: 'background-color 0.2s ease',
+                  borderRight: (columnVisibility.stars || columnVisibility.year) ? '2px solid #1a1a1a' : 'none'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
