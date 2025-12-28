@@ -86,7 +86,7 @@ app.get("/libraries", requireToken, (req, res) => {
 // Endpoint: serve game cover image (public, no auth required for images)
 app.get("/covers/:gameId", (req, res) => {
   const gameId = decodeURIComponent(req.params.gameId);
-  const coverPath = path.join(METADATA_PATH, gameId, "cover.webp");
+  const coverPath = path.join(METADATA_PATH, "content", gameId, "cover.webp");
 
   // Check if file exists
   if (!fs.existsSync(coverPath)) {

@@ -16,6 +16,7 @@ beforeAll(() => {
   // Create test metadata directory structure
   fs.mkdirSync(testMetadataPath, { recursive: true });
   fs.mkdirSync(path.join(testMetadataPath, 'metadata'), { recursive: true });
+  fs.mkdirSync(path.join(testMetadataPath, 'content'), { recursive: true });
   
   // Copy test fixtures to test metadata directory
   const fixturesDir = path.join(__dirname, 'fixtures');
@@ -36,9 +37,9 @@ beforeAll(() => {
     fs.copyFileSync(settingsSource, settingsDest);
   }
   
-  // Create a test cover image directory
+  // Create a test cover image directory in content folder
   const testGameId = 'test_game_1';
-  const coverDir = path.join(testMetadataPath, testGameId);
+  const coverDir = path.join(testMetadataPath, 'content', testGameId);
   fs.mkdirSync(coverDir, { recursive: true });
   // Create a dummy cover file (empty file for testing)
   fs.writeFileSync(path.join(coverDir, 'cover.webp'), 'fake webp data');

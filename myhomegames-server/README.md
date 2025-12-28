@@ -45,8 +45,9 @@ ${METADATA_PATH}/
 │   ├── games-libreria.json         # Main library
 │   ├── games-raccolte.json         # Collections library
 │   └── games-categorie.json        # Categories library
-└── ${gameId}/                       # Per-game metadata directories
-    └── cover.webp                   # Game cover image
+└── content/                         # Game content (covers, etc.)
+    └── ${gameId}/                   # Per-game content directories
+        └── cover.webp               # Game cover image
 ```
 
 #### Persistent Data Files
@@ -62,9 +63,12 @@ On first run, you may need to create the metadata directory structure:
 
 ```bash
 mkdir -p "${METADATA_PATH}/metadata"
+mkdir -p "${METADATA_PATH}/content"
 ```
 
 Then create the required JSON files or copy them from a backup. The server will create default settings if `settings.json` doesn't exist.
+
+**Note**: If you're migrating from an older version, you'll need to move existing game cover directories from `${METADATA_PATH}/${gameId}/` to `${METADATA_PATH}/content/${gameId}/`.
 
 ## Running the Server
 
