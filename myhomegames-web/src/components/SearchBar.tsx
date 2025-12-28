@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "./CoverPlaceholder";
 import "./SearchBar.css";
 
@@ -20,6 +21,7 @@ type SearchBarProps = {
 };
 
 export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [filteredGames, setFilteredGames] = useState<GameItem[]>([]);
@@ -95,6 +97,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           onFocus={() => {
             if (searchQuery.trim() !== "") setIsOpen(true);
           }}
+          placeholder={t("search.placeholder")}
           className={`plex-search-input search-input-with-padding ${
             searchQuery ? "has-query" : ""
           }`}
@@ -210,7 +213,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                 }}
                 className="search-view-all-button"
               >
-                View all results ({allFilteredGames.length})
+                {t("search.viewAllResults", { count: allFilteredGames.length })}
               </button>
             </div>
           )}
@@ -219,7 +222,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
 
       {isOpen && searchQuery.trim() !== "" && filteredGames.length === 0 && (
         <div className="plex-dropdown search-no-results">
-          No results found for the term "{searchQuery}"
+          {t("search.noResults", { query: searchQuery })}
         </div>
       )}
     </div>

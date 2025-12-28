@@ -73,12 +73,12 @@ loadAllGames();
 
 // Endpoint: list libraries (simple grouped view)
 app.get("/libraries", requireToken, (req, res) => {
-  // example: grouping by libraryType
+  // Return only keys - titles will be translated on the client side
   const libs = [
-    { key: "consigliati", title: "Recommended", type: "games" },
-    { key: "libreria", title: "Library", type: "games" },
-    { key: "raccolte", title: "Collections", type: "games" },
-    { key: "categorie", title: "Categories", type: "games" },
+    { key: "consigliati", type: "games" },
+    { key: "libreria", type: "games" },
+    { key: "raccolte", type: "games" },
+    { key: "categorie", type: "games" },
   ];
   res.json({ libraries: libs });
 });

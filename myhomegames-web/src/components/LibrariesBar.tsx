@@ -1,10 +1,11 @@
+import { useTranslation } from "react-i18next";
 import CoverSizeSlider from "./CoverSizeSlider";
 import ViewModeSelector from "./ViewModeSelector";
 import "./LibrariesBar.css";
 
 type GameLibrarySection = {
   key: string;
-  title: string;
+  title?: string; // Optional, will be translated using key
   type: string;
 };
 
@@ -33,12 +34,14 @@ export default function LibrariesBar({
   viewMode = "grid",
   onViewModeChange,
 }: LibrariesBarProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="plex-libraries-bar">
       <div className="plex-libraries-bar-container">
         <div className="plex-libraries-container">
           {loading && libraries.length === 0 ? (
-            <div className="plex-libraries-loading">Loading libraries…</div>
+            <div className="plex-libraries-loading">{t("home.loadingLibraries")}</div>
           ) : (
             libraries.map((s) => (
               <button
@@ -48,7 +51,7 @@ export default function LibrariesBar({
                 }`}
                 onClick={() => onSelectLibrary(s)}
               >
-                {s.title}
+                {s.title || t(`libraries.${s.key}`)}
               </button>
             ))
           )}

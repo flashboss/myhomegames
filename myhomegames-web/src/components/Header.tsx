@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
 
@@ -27,6 +28,8 @@ export default function Header({
   onSettingsClick,
   onAddGameClick,
 }: HeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <header className="plex-header">
       <div className="plex-header-container">
@@ -34,7 +37,7 @@ export default function Header({
         <button
           onClick={onHomeClick}
           className="plex-logo-button"
-          aria-label="Home"
+          aria-label={t("header.home")}
         >
           <Logo />
         </button>
@@ -48,7 +51,7 @@ export default function Header({
         <div className="plex-header-actions">
           <button
             className="plex-header-button"
-            aria-label="Add Game"
+            aria-label={t("header.addGame")}
             onClick={onAddGameClick}
           >
             <svg
@@ -68,7 +71,7 @@ export default function Header({
           </button>
           <button
             className="plex-header-button"
-            aria-label="Settings"
+            aria-label={t("header.settings")}
             onClick={onSettingsClick}
           >
             <svg
@@ -91,7 +94,7 @@ export default function Header({
               />
             </svg>
           </button>
-          <button className="plex-header-button" aria-label="Account">
+          <button className="plex-header-button" aria-label={t("header.account")}>
             <svg
               width="20"
               height="20"

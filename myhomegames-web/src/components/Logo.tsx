@@ -16,18 +16,18 @@ export default function Logo() {
         rx="5"
         fill="url(#logoGradient)"
       />
-      <text
-        x="45"
-        y="25"
-        font-family="Arial Narrow, Arial, sans-serif"
-        font-size="10"
-        font-weight="bold"
-        fill="black"
-        text-anchor="middle"
-        dominant-baseline="middle"
-      >
-        MyHomeGames
-      </text>
+        <text
+          x="45"
+          y="25"
+          fontFamily="Arial Narrow, Arial, sans-serif"
+          fontSize="10"
+          fontWeight="bold"
+          fill="black"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          MyHomeGames
+        </text>
       {/* Gradient definition */}
       <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">

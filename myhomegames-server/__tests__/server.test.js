@@ -76,9 +76,9 @@ describe('GET /libraries', () => {
     
     response.body.libraries.forEach(lib => {
       expect(lib).toHaveProperty('key');
-      expect(lib).toHaveProperty('title');
       expect(lib).toHaveProperty('type');
       expect(lib.type).toBe('games');
+      // Title is no longer returned by server - it's translated on client using react-i18next
     });
   });
 });

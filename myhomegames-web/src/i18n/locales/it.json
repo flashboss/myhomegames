@@ -1,0 +1,74 @@
+{
+  "libraries": {
+    "consigliati": "Consigliati",
+    "libreria": "Libreria",
+    "raccolte": "Raccolte",
+    "categorie": "Categorie"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "Configura le preferenze dell'applicazione",
+    "general": "Generale",
+    "version": "Versione",
+    "language": "Lingua",
+    "selectLanguage": "Seleziona la lingua dell'applicazione",
+    "save": "Salva",
+    "saving": "Salvataggio...",
+    "english": "Inglese",
+    "italian": "Italiano"
+  },
+  "header": {
+    "home": "Home",
+    "addGame": "Aggiungi Gioco",
+    "settings": "Impostazioni",
+    "account": "Account"
+  },
+  "search": {
+    "noResults": "Nessun risultato trovato per il termine \"{{query}}\"",
+    "viewAllResults": "Visualizza tutti i risultati ({{count}})",
+    "placeholder": "Cerca giochi..."
+  },
+  "searchResults": {
+    "title": "Risultati della ricerca: \"{{query}}\"",
+    "foundGames_one": "Trovato {{count}} gioco",
+    "foundGames_other": "Trovati {{count}} giochi",
+    "noResults": "Nessun risultato trovato",
+    "goBack": "Torna alla home"
+  },
+  "home": {
+    "loadingGames": "Caricamento giochi…",
+    "loadingLibraries": "Caricamento librerie…"
+  },
+  "addGame": {
+    "title": "Aggiungi Gioco",
+    "searchPlaceholder": "Cerca un gioco...",
+    "loading": "Ricerca in corso...",
+    "noResults": "Nessun gioco trovato",
+    "typeToSearch": "Digita almeno 2 caratteri per cercare",
+    "error": "Errore nella ricerca dei giochi"
+  },
+  "viewMode": {
+    "grid": "Vista Griglia",
+    "detail": "Vista Dettaglio",
+    "table": "Vista Tabella"
+  },
+  "table": {
+    "columns": "Colonne",
+    "title": "Titolo",
+    "summary": "Riassunto",
+    "releaseDate": "Data di Rilascio",
+    "year": "Anno",
+    "stars": "Stelle",
+    "noGames": "Nessun gioco trovato"
+  },
+  "gameDetail": {
+    "notFound": "Gioco non trovato",
+    "goBack": "Torna alla home"
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "close": "Chiudi"
+  }
+}
+

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import LibrariesBar from "../components/LibrariesBar";
 import type { ViewMode } from "../components/LibrariesBar";
 import GamesList from "../components/GamesList";
@@ -9,7 +10,7 @@ import "./HomePage.css";
 
 type GameLibrarySection = {
   key: string;
-  title: string;
+  title?: string; // Optional, will be translated using key
   type: string;
 };
 
@@ -53,6 +54,7 @@ export default function HomePage({
   onGameClick,
   onGamesLoaded,
 }: HomePageProps) {
+  const { t } = useTranslation();
   const [libraries, setLibraries] = useState<GameLibrarySection[]>([]);
   const [activeLibrary, setActiveLibrary] = useState<GameLibrarySection | null>(
     null
@@ -122,7 +124,7 @@ export default function HomePage({
       const libs = (json.libraries || []) as any[];
       const parsed = libs.map((d) => ({
         key: d.key,
-        title: d.title,
+        title: d.title, // Optional, will be translated using key in LibrariesBar
         type: d.type,
       }));
       setLibraries(parsed);
@@ -222,7 +224,7 @@ export default function HomePage({
               >
                 {loading ? (
                   <div className="text-sm text-gray-400 text-center">
-                    Loading games…
+                    {t("home.loadingGames")}
                   </div>
                 ) : (
                   <>

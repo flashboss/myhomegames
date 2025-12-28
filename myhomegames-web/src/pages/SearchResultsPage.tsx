@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import SearchResultsList from "../components/SearchResultsList";
 import "./SearchResultsPage.css";
 
@@ -24,6 +25,7 @@ export default function SearchResultsPage({
   buildCoverUrl,
   onGameClick,
 }: SearchResultsPageProps) {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -35,12 +37,12 @@ export default function SearchResultsPage({
     return (
       <div className="bg-[#1a1a1a] text-white flex items-center justify-center search-results-page-empty">
         <div className="text-center">
-          <div className="text-gray-400 mb-4">No results found</div>
+          <div className="text-gray-400 mb-4">{t("searchResults.noResults")}</div>
           <button
             onClick={() => navigate("/")}
             className="text-[#E5A00D] hover:text-[#F5B041] transition-colors"
           >
-            Go back to home
+            {t("searchResults.goBack")}
           </button>
         </div>
       </div>
@@ -52,10 +54,10 @@ export default function SearchResultsPage({
       <div className="search-results-header">
         <div className="search-results-header-content">
           <div className="search-results-title">
-            Search results: "{searchQuery}"
+            {t("searchResults.title", { query: searchQuery })}
           </div>
           <div className="search-results-count">
-            Found {games.length} {games.length === 1 ? "game" : "games"}
+            {t("searchResults.foundGames", { count: games.length })}
           </div>
         </div>
       </div>

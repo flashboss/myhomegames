@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import "./GamesListTable.css";
 
 type GameItem = {
@@ -36,6 +37,8 @@ export default function GamesListTable({
   itemRefs,
   scrollContainerRef,
 }: GamesListTableProps) {
+  const { t, i18n } = useTranslation();
+  
   // Load saved sort state from localStorage
   const loadSortState = (): {
     field: SortField | null;
@@ -152,8 +155,35 @@ export default function GamesListTable({
     return 0;
   });
 
+  // Column definitions with translations
+  const columnDefinitions = useMemo(
+    () => [
+      {
+        key: "title" as keyof ColumnVisibility,
+        label: t("table.title"),
+      },
+      {
+        key: "summary" as keyof ColumnVisibility,
+        label: t("table.summary"),
+      },
+      {
+        key: "releaseDate" as keyof ColumnVisibility,
+        label: t("table.releaseDate"),
+      },
+      {
+        key: "year" as keyof ColumnVisibility,
+        label: t("table.year"),
+      },
+      {
+        key: "stars" as keyof ColumnVisibility,
+        label: t("table.stars"),
+      },
+    ],
+    [t, i18n.language]
+  );
+
   if (games.length === 0) {
-    return <div className="text-gray-400 text-center">No games found</div>;
+    return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
   const getSortIcon = (field: SortField) => {
@@ -218,30 +248,9 @@ export default function GamesListTable({
                   {showColumnMenu && (
                     <div className="games-table-column-menu-popup">
                       <div className="games-table-column-menu-header">
-                        Columns
+                        {t("table.columns")}
                       </div>
-                      {[
-                        {
-                          key: "title" as keyof ColumnVisibility,
-                          label: "Title",
-                        },
-                        {
-                          key: "summary" as keyof ColumnVisibility,
-                          label: "Summary",
-                        },
-                        {
-                          key: "releaseDate" as keyof ColumnVisibility,
-                          label: "Release Date",
-                        },
-                        {
-                          key: "year" as keyof ColumnVisibility,
-                          label: "Year",
-                        },
-                        {
-                          key: "stars" as keyof ColumnVisibility,
-                          label: "Stars",
-                        },
-                      ].map((col) => (
+                      {columnDefinitions.map((col) => (
                         <label
                           key={col.key}
                           className="games-table-column-menu-item"
@@ -263,7 +272,7 @@ export default function GamesListTable({
                   onClick={() => handleSort("title")}
                   className="has-border-right"
                 >
-                  <span>Title</span>
+                  <span>{t("table.title")}</span>
                   <span className="sort-indicator">{getSortIcon("title")}</span>
                 </th>
               )}
@@ -272,7 +281,7 @@ export default function GamesListTable({
                   onClick={() => handleSort("summary")}
                   className="has-border-right"
                 >
-                  <span>Summary</span>
+                  <span>{t("table.summary")}</span>
                   <span className="sort-indicator">
                     {getSortIcon("summary")}
                   </span>
@@ -287,7 +296,7 @@ export default function GamesListTable({
                       : ""
                   }
                 >
-                  <span>Release Date</span>
+                  <span>{t("table.releaseDate")}</span>
                   <span className="sort-indicator">{getSortIcon("year")}</span>
                 </th>
               )}
@@ -296,13 +305,13 @@ export default function GamesListTable({
                   onClick={() => handleSort("stars")}
                   className={columnVisibility.year ? "has-border-right" : ""}
                 >
-                  <span>Stars</span>
+                  <span>{t("table.stars")}</span>
                   <span className="sort-indicator">{getSortIcon("stars")}</span>
                 </th>
               )}
               {columnVisibility.year && (
                 <th onClick={() => handleSort("year")}>
-                  <span>Year</span>
+                  <span>{t("table.year")}</span>
                   <span className="sort-indicator">{getSortIcon("year")}</span>
                 </th>
               )}

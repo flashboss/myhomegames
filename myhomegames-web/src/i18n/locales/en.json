@@ -1,0 +1,74 @@
+{
+  "libraries": {
+    "consigliati": "Recommended",
+    "libreria": "Library",
+    "raccolte": "Collections",
+    "categorie": "Categories"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure application preferences",
+    "general": "General",
+    "version": "Version",
+    "language": "Language",
+    "selectLanguage": "Select the application language",
+    "save": "Save",
+    "saving": "Saving...",
+    "english": "English",
+    "italian": "Italiano"
+  },
+  "header": {
+    "home": "Home",
+    "addGame": "Add Game",
+    "settings": "Settings",
+    "account": "Account"
+  },
+  "search": {
+    "noResults": "No results found for the term \"{{query}}\"",
+    "viewAllResults": "View all results ({{count}})",
+    "placeholder": "Search games..."
+  },
+  "searchResults": {
+    "title": "Search results: \"{{query}}\"",
+    "foundGames_one": "Found {{count}} game",
+    "foundGames_other": "Found {{count}} games",
+    "noResults": "No results found",
+    "goBack": "Go back to home"
+  },
+  "home": {
+    "loadingGames": "Loading games…",
+    "loadingLibraries": "Loading libraries…"
+  },
+  "addGame": {
+    "title": "Add Game",
+    "searchPlaceholder": "Search for a game...",
+    "loading": "Searching...",
+    "noResults": "No games found",
+    "typeToSearch": "Type at least 2 characters to search",
+    "error": "Error searching games"
+  },
+  "viewMode": {
+    "grid": "Grid View",
+    "detail": "Detail View",
+    "table": "Table View"
+  },
+  "table": {
+    "columns": "Columns",
+    "title": "Title",
+    "summary": "Summary",
+    "releaseDate": "Release Date",
+    "year": "Year",
+    "stars": "Stars",
+    "noGames": "No games found"
+  },
+  "gameDetail": {
+    "notFound": "Game not found",
+    "goBack": "Go back to home"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "close": "Close"
+  }
+}
+

@@ -6,6 +6,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "./App.css";
 import Favicon from "./components/Favicon";
 import Header from "./components/Header";
@@ -195,6 +196,7 @@ function GameDetailPage({
   allGames: GameItem[];
   onPlay: (game: GameItem) => void;
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { gameId } = useParams<{ gameId: string }>();
   const game = allGames.find((g) => g.ratingKey === gameId);
@@ -206,12 +208,12 @@ function GameDetailPage({
         style={{ width: "100%", height: "100%" }}
       >
         <div className="text-center">
-          <div className="text-gray-400 mb-4">Game not found</div>
+          <div className="text-gray-400 mb-4">{t("gameDetail.notFound")}</div>
           <button
             onClick={() => navigate("/")}
             className="text-[#E5A00D] hover:text-[#F5B041] transition-colors"
           >
-            Go back to home
+            {t("gameDetail.goBack")}
           </button>
         </div>
       </div>

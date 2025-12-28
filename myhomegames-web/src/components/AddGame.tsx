@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 
 type IGDBGame = {
   id: number;
@@ -24,6 +25,7 @@ export default function AddGame({
   apiBase,
   apiToken,
 }: AddGameProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<IGDBGame[]>([]);
   const [loading, setLoading] = useState(false);
@@ -129,7 +131,7 @@ export default function AddGame({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 border-b border-[#2a2a2a] bg-[#0d0d0d]">
-          <h2 className="text-xl font-semibold text-white">Add Game</h2>
+          <h2 className="text-xl font-semibold text-white">{t("addGame.title")}</h2>
         </div>
 
         <div className="p-6 flex-1 overflow-hidden flex flex-col">
@@ -138,24 +140,24 @@ export default function AddGame({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for a game..."
+              placeholder={t("addGame.searchPlaceholder")}
               className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#E5A00D] transition-colors"
               autoFocus
             />
           </div>
 
-          {error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
+          {error && <div className="mb-4 text-red-400 text-sm">{t("addGame.error")}: {error}</div>}
 
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="text-center text-gray-400 py-8">Searching...</div>
+              <div className="text-center text-gray-400 py-8">{t("addGame.loading")}</div>
             ) : results.length === 0 && searchQuery.trim().length >= 2 ? (
               <div className="text-center text-gray-400 py-8">
-                No games found
+                {t("addGame.noResults")}
               </div>
             ) : results.length === 0 ? (
               <div className="text-center text-gray-400 py-8">
-                Type at least 2 characters to search
+                {t("addGame.typeToSearch")}
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3">

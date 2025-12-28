@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import "./ViewModeSelector.css";
 
 type ViewMode = "grid" | "detail" | "table";
@@ -12,15 +13,20 @@ export default function ViewModeSelector({
   value,
   onChange,
 }: ViewModeSelectorProps) {
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [iconHover, setIconHover] = useState(false);
   const selectorRef = useRef<HTMLDivElement>(null);
 
-  const modes: { key: ViewMode; label: string; icon: string }[] = [
-    { key: "grid", label: "Grid View", icon: "⊞" },
-    { key: "detail", label: "Detail View", icon: "☰" },
-    { key: "table", label: "Table View", icon: "☷" },
-  ];
+  // Recreate modes array when language changes
+  const modes: { key: ViewMode; label: string; icon: string }[] = useMemo(
+    () => [
+      { key: "grid", label: t("viewMode.grid"), icon: "⊞" },
+      { key: "detail", label: t("viewMode.detail"), icon: "☰" },
+      { key: "table", label: t("viewMode.table"), icon: "☷" },
+    ],
+    [t, i18n.language]
+  );
 
   const currentMode = modes.find((m) => m.key === value) || modes[0];
 
