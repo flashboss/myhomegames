@@ -16,25 +16,18 @@ export default function Logo() {
         rx="5"
         fill="url(#logoGradient)"
       />
-      {/* Left buttons */}
-      <circle cx="14" cy="25" r="3" fill="#0d0d0d" />
-      <circle cx="14" cy="32" r="3" fill="#0d0d0d" />
-      {/* Right buttons */}
-      <circle cx="76" cy="25" r="3" fill="#0d0d0d" />
-      <circle cx="76" cy="32" r="3" fill="#0d0d0d" />
-      {/* D-pad */}
-      <rect x="26" y="22" width="3" height="6" fill="#0d0d0d" />
-      <rect x="24.5" y="24" width="6" height="3" fill="#0d0d0d" />
-      {/* Additional decorative elements */}
-      <rect
-        x="38"
-        y="22"
-        width="14"
-        height="6"
-        rx="2"
-        fill="#0d0d0d"
-        opacity="0.3"
-      />
+      <text
+        x="45"
+        y="25"
+        font-family="Arial Narrow, Arial, sans-serif"
+        font-size="10"
+        font-weight="bold"
+        fill="black"
+        text-anchor="middle"
+        dominant-baseline="middle"
+      >
+        MyHomeGames
+      </text>
       {/* Gradient definition */}
       <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
