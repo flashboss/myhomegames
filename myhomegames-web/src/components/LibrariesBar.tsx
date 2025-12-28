@@ -24,31 +24,36 @@ type LibrariesBarProps = {
 export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary, loading, error, coverSize = 150, onCoverSizeChange, viewMode = 'grid', onViewModeChange }: LibrariesBarProps) {
   return (
     <div className="plex-libraries-bar">
-      <div className="plex-libraries-container">
-        {loading && libraries.length === 0 ? (
-          <div className="plex-libraries-loading">Loading libraries…</div>
-        ) : (
-          libraries.map((s) => (
-            <button
-              key={s.key}
-              className={`plex-library-button ${activeLibrary?.key === s.key ? 'plex-library-active' : ''}`}
-              onClick={() => onSelectLibrary(s)}
-            >
-              {s.title}
-            </button>
-          ))
-        )}
-        {error && <div className="plex-libraries-error">{error}</div>}
-      </div>
-      <div style={{ marginLeft: '1280px', display: 'flex', alignItems: 'center', gap: '0px', transform: 'translateY(-2px)' }}>
-        {onCoverSizeChange && (
-          <div style={{ visibility: viewMode === 'grid' ? 'visible' : 'hidden', width: '60px', flexShrink: 0 }}>
-            <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
-          </div>
-        )}
-        {onViewModeChange && (
-          <ViewModeSelector value={viewMode} onChange={onViewModeChange} />
-        )}
+      <div className="plex-libraries-bar-container">
+        <div className="plex-libraries-container">
+          {loading && libraries.length === 0 ? (
+            <div className="plex-libraries-loading">Loading libraries…</div>
+          ) : (
+            libraries.map((s) => (
+              <button
+                key={s.key}
+                className={`plex-library-button ${activeLibrary?.key === s.key ? 'plex-library-active' : ''}`}
+                onClick={() => onSelectLibrary(s)}
+              >
+                {s.title}
+              </button>
+            ))
+          )}
+          {error && <div className="plex-libraries-error">{error}</div>}
+        </div>
+        
+        <div className="plex-libraries-actions" style={{ transform: 'translateY(-2px)' }}>
+          {onCoverSizeChange && (
+            <div style={{ visibility: viewMode === 'grid' ? 'visible' : 'hidden', width: '60px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+              <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
+            </div>
+          )}
+          {onViewModeChange && (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <ViewModeSelector value={viewMode} onChange={onViewModeChange} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

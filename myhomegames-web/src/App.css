@@ -156,12 +156,19 @@
   background-color: #1a1a1a;
   padding: 0;
   position: sticky;
-  top: 64px;
+  top: 72px;
   z-index: 90;
+}
+
+.plex-libraries-bar-container {
   display: flex;
   align-items: center;
+  gap: 24px;
   max-width: 1920px;
   margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  position: relative;
 }
 
 .plex-libraries-container {
@@ -176,7 +183,16 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  transform: translateX(-50%);
+  width: 100%;
+  max-width: calc(100% - 200px);
+}
+
+.plex-libraries-actions {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .plex-libraries-container::-webkit-scrollbar {
