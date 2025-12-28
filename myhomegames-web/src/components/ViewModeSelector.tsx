@@ -14,9 +14,9 @@ export default function ViewModeSelector({ value, onChange }: ViewModeSelectorPr
   const selectorRef = useRef<HTMLDivElement>(null);
 
   const modes: { key: ViewMode; label: string; icon: string }[] = [
-    { key: 'grid', label: 'Vista a Griglia', icon: '⊞' },
-    { key: 'detail', label: 'Visualizzazione dettagli', icon: '☰' },
-    { key: 'table', label: 'Vista a tabella', icon: '☷' }
+    { key: 'grid', label: 'Grid View', icon: '⊞' },
+    { key: 'detail', label: 'Detail View', icon: '☰' },
+    { key: 'table', label: 'Table View', icon: '☷' }
   ];
 
   const currentMode = modes.find(m => m.key === value) || modes[0];

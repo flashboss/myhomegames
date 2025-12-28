@@ -63,10 +63,10 @@ loadAllGames();
 app.get('/libraries', requireToken, (req, res) => {
   // example: grouping by libraryType
   const libs = [
-    { key: 'consigliati', title: 'Consigliati', type: 'games' },
-    { key: 'libreria', title: 'Libreria', type: 'games' },
-    { key: 'raccolte', title: 'Raccolte', type: 'games' },
-    { key: 'categorie', title: 'Categorie', type: 'games' }
+    { key: 'consigliati', title: 'Recommended', type: 'games' },
+    { key: 'libreria', title: 'Library', type: 'games' },
+    { key: 'raccolte', title: 'Collections', type: 'games' },
+    { key: 'categorie', title: 'Categories', type: 'games' }
   ];
   res.json({ libraries: libs });
 });

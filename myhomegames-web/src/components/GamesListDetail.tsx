@@ -19,7 +19,7 @@ type GamesListDetailProps = {
   buildCoverUrl: (apiBase: string, cover?: string) => string;
 };
 
-const FIXED_COVER_SIZE = 100; // Dimensione fissa corrispondente al minimo del cursore
+const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
 
 export default function GamesListDetail({ games, apiBase, onGameClick, buildCoverUrl }: GamesListDetailProps) {
   if (games.length === 0) {

@@ -22,19 +22,19 @@ export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick 
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Recupera i dati dalla location state
+  // Retrieve data from location state
   const { searchQuery, games } = (location.state as { searchQuery?: string; games?: GameItem[] }) || {};
 
   if (!searchQuery || !games || games.length === 0) {
     return (
       <div className="bg-[#1a1a1a] text-white flex items-center justify-center" style={{ width: '100%', height: '100%' }}>
         <div className="text-center">
-          <div className="text-gray-400 mb-4">Nessun risultato trovato</div>
+          <div className="text-gray-400 mb-4">No results found</div>
           <button
             onClick={() => navigate("/")}
             className="text-[#E5A00D] hover:text-[#F5B041] transition-colors"
           >
-            Torna alla home
+            Go back to home
           </button>
         </div>
       </div>
@@ -54,7 +54,7 @@ export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick 
               marginBottom: '8px'
             }}
           >
-            Risultati della ricerca: "{searchQuery}"
+            Search results: "{searchQuery}"
           </div>
           <div 
             style={{
@@ -64,7 +64,7 @@ export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick 
               lineHeight: 1.5
             }}
           >
-            Trovati {games.length} {games.length === 1 ? 'gioco' : 'giochi'}
+            Found {games.length} {games.length === 1 ? 'game' : 'games'}
           </div>
         </div>
       </div>

@@ -51,18 +51,18 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   const [coverSize, setCoverSize] = useState(150);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
-  // Funzione per salvare la vista per una libreria
+  // Function to save view mode for a library
   const saveViewModeForLibrary = (libraryKey: string, mode: ViewMode) => {
     localStorage.setItem(`viewMode_${libraryKey}`, mode);
   };
 
-  // Funzione per caricare la vista salvata per una libreria
+  // Function to load saved view mode for a library
   const loadViewModeForLibrary = (libraryKey: string): ViewMode => {
     const saved = localStorage.getItem(`viewMode_${libraryKey}`);
     return (saved as ViewMode) || 'grid';
   };
 
-  // Handler per cambiare la vista
+  // Handler to change view mode
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     if (activeLibrary) {
@@ -84,7 +84,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         : libraries[0];
       
       setActiveLibrary(libraryToSelect);
-      // Carica la vista salvata per questa libreria
+      // Load saved view mode for this library
       const savedViewMode = loadViewModeForLibrary(libraryToSelect.key);
       setViewMode(savedViewMode);
       fetchLibraryGames(libraryToSelect.key);
@@ -152,7 +152,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     localStorage.setItem("lastSelectedLibrary", s.key);
     // Update active library immediately for instant visual feedback
     setActiveLibrary(s);
-    // Carica la vista salvata per questa libreria
+    // Load saved view mode for this library
     const savedViewMode = loadViewModeForLibrary(s.key);
     setViewMode(savedViewMode);
     // Clear previous games immediately

@@ -225,7 +225,7 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
                         marginBottom: '4px'
                       }}
                     >
-                      Colonne
+                      Columns
                     </div>
                     {[
                       { key: 'title' as keyof ColumnVisibility, label: 'Title' },

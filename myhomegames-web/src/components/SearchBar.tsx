@@ -37,11 +37,11 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
     const filtered = games.filter((game) =>
       game.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    // Debug: verifica se i giochi hanno i campi di data
+    // Debug: check if games have date fields
     if (filtered.length > 0) {
       console.log("First filtered game:", filtered[0]);
     }
-    setAllFilteredGames(filtered); // Salva tutti i risultati
+    setAllFilteredGames(filtered); // Save all results
     setFilteredGames(filtered.slice(0, 10)); // Limit to 10 results
     setIsOpen(filtered.length > 0);
   }, [searchQuery, games]);
@@ -172,13 +172,13 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
               const isAtTop = target.scrollTop === 0;
               const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 1;
               
-              // Se siamo in cima e scrolliamo verso l'alto, o in fondo e scrolliamo verso il basso,
-              // permettiamo lo scroll del body
+              // If we're at the top and scrolling up, or at the bottom and scrolling down,
+              // allow body scrolling
               if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
-                // Non fermare la propagazione, permettere lo scroll del body
+                // Don't stop propagation, allow body scrolling
                 return;
               }
-              // Altrimenti ferma la propagazione per scrollare solo il popup
+              // Otherwise stop propagation to scroll only the popup
               e.stopPropagation();
             }}
           >
@@ -282,7 +282,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                   e.currentTarget.style.borderColor = 'rgba(229, 160, 13, 0.5)';
                 }}
               >
-                Visualizza tutti i risultati ({allFilteredGames.length})
+                View all results ({allFilteredGames.length})
               </button>
             </div>
           )}

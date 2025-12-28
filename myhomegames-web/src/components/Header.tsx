@@ -24,7 +24,7 @@ export default function Header({ allGames, onGameSelect, onHomeClick, onSettings
   return (
     <header className="plex-header">
       <div className="plex-header-container">
-        {/* Logo a sinistra */}
+        {/* Logo on the left */}
         <button
           onClick={onHomeClick}
           className="plex-logo-button"
@@ -33,12 +33,12 @@ export default function Header({ allGames, onGameSelect, onHomeClick, onSettings
           <Logo />
         </button>
         
-        {/* SearchBar al centro */}
+        {/* SearchBar in the center */}
         <div className="plex-search-container">
           <SearchBar games={allGames} onGameSelect={onGameSelect} />
         </div>
         
-        {/* Bottoni a destra */}
+        {/* Buttons on the right */}
         <div className="plex-header-actions">
           <button className="plex-header-button" aria-label="Add Game" onClick={onAddGameClick}>
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>

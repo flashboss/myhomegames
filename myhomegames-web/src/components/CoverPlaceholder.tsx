@@ -5,7 +5,7 @@ type CoverPlaceholderProps = {
 };
 
 export default function CoverPlaceholder({ title, width, height }: CoverPlaceholderProps) {
-  // Calcola la dimensione del font in base alla larghezza
+  // Calculate font size based on width
   const fontSize = Math.max(10, Math.min(16, Math.floor(width / 8)));
   const padding = Math.max(4, Math.floor(width / 20));
 
