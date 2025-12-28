@@ -1,0 +1,21 @@
+.plex-libraries-actions {
+  transform: translateY(-2px);
+}
+
+.plex-libraries-actions-slider-container {
+  visibility: visible;
+  width: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.plex-libraries-actions-slider-container.hidden {
+  visibility: hidden;
+}
+
+.plex-libraries-actions-view-mode-container {
+  display: flex;
+  align-items: center;
+}
+

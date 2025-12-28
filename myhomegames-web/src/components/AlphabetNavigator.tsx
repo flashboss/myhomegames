@@ -1,3 +1,4 @@
+import "./AlphabetNavigator.css";
 
 type GameItem = {
   ratingKey: string;
@@ -70,15 +71,7 @@ export default function AlphabetNavigator({ games, scrollContainerRef, itemRefs 
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        pointerEvents: 'auto'
-      }}
-    >
+    <div className="alphabet-navigator">
       {alphabet.map((letter) => {
         const hasGames = hasGamesForLetter(letter);
         return (
@@ -86,28 +79,7 @@ export default function AlphabetNavigator({ games, scrollContainerRef, itemRefs 
             key={letter}
             onClick={() => scrollToLetter(letter)}
             disabled={!hasGames}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: hasGames ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.2)',
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              cursor: hasGames ? 'pointer' : 'default',
-              padding: '2px 4px',
-              transition: 'color 0.2s ease',
-              minWidth: '20px',
-              textAlign: 'center'
-            }}
-            onMouseEnter={(e) => {
-              if (hasGames) {
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (hasGames) {
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
-              }
-            }}
+            className="alphabet-button"
           >
             {letter}
           </button>

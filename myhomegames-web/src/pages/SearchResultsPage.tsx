@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import SearchResultsList from "../components/SearchResultsList";
+import "./SearchResultsPage.css";
 
 type GameItem = {
   ratingKey: string;
@@ -27,7 +28,7 @@ export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick 
 
   if (!searchQuery || !games || games.length === 0) {
     return (
-      <div className="bg-[#1a1a1a] text-white flex items-center justify-center" style={{ width: '100%', height: '100%' }}>
+      <div className="bg-[#1a1a1a] text-white flex items-center justify-center search-results-page-empty">
         <div className="text-center">
           <div className="text-gray-400 mb-4">No results found</div>
           <button
@@ -42,34 +43,19 @@ export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick 
   }
 
   return (
-    <div className="bg-[#1a1a1a] text-white" style={{ width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div className="max-w-7xl mx-auto" style={{ padding: '16px 48px', flexShrink: 0 }}>
-        <div style={{ marginBottom: '8px', marginTop: '8px' }}>
-          <div 
-            style={{
-              fontSize: '18px',
-              fontWeight: 500,
-              color: 'rgba(255, 255, 255, 0.6)',
-              lineHeight: 1.5,
-              marginBottom: '8px'
-            }}
-          >
+    <div className="bg-[#1a1a1a] text-white search-results-page">
+      <div className="search-results-header">
+        <div className="search-results-header-content">
+          <div className="search-results-title">
             Search results: "{searchQuery}"
           </div>
-          <div 
-            style={{
-              fontSize: '18px',
-              fontWeight: 500,
-              color: 'rgba(255, 255, 255, 0.6)',
-              lineHeight: 1.5
-            }}
-          >
+          <div className="search-results-count">
             Found {games.length} {games.length === 1 ? 'game' : 'games'}
           </div>
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-        <div className="max-w-7xl mx-auto" style={{ padding: '0 48px 32px 48px', paddingTop: '0px' }}>
+      <div className="search-results-content">
+        <div className="search-results-content-inner">
           <SearchResultsList 
             games={games}
             apiBase={apiBase}

@@ -1,0 +1,48 @@
+.games-list-detail-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.games-list-detail-item {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.games-list-detail-item.even {
+  background-color: transparent;
+}
+
+.games-list-detail-item.odd {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.games-list-detail-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.games-list-detail-cover {
+  width: 100px;
+  height: 150px;
+  min-width: 100px;
+  min-height: 150px;
+}
+
+.games-list-detail-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.games-list-detail-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #f8f8f8;
+}
+

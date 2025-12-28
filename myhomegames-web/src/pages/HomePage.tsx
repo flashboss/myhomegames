@@ -5,6 +5,7 @@ import GamesList from "../components/GamesList";
 import GamesListDetail from "../components/GamesListDetail";
 import GamesListTable from "../components/GamesListTable";
 import AlphabetNavigator from "../components/AlphabetNavigator";
+import "./HomePage.css";
 
 type GameLibrarySection = {
   key: string;
@@ -185,8 +186,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         onViewModeChange={handleViewModeChange}
       />
 
-      <div className="bg-[#1a1a1a]" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <main className="flex-1" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
+      <div className="bg-[#1a1a1a] home-page-main-container">
+        <main className={`flex-1 home-page-content`}>
           {!activeLibrary ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-gray-400 text-center">
@@ -194,9 +195,9 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               </div>
             </div>
           ) : (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+            <div className="home-page-layout">
               {/* Scrollable lists container */}
-              <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: viewMode === 'table' ? '0' : '5px', paddingBottom: viewMode === 'table' ? '0' : '32px' }}>
+              <div ref={scrollContainerRef} className={`home-page-scroll-container ${viewMode === 'table' ? 'table-view' : ''}`}>
                 {loading ? (
                   <div className="text-sm text-gray-400 text-center">Loading games…</div>
                 ) : (
@@ -233,7 +234,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               
               {/* Alphabet navigator container - separate div */}
               {games.length > 0 && (
-                <div style={{ width: '48px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingRight: '16px' }}>
+                <div className="home-page-alphabet-container">
                   <AlphabetNavigator 
                     games={games} 
                     scrollContainerRef={scrollContainerRef} 

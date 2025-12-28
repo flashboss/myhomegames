@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import CoverPlaceholder from './CoverPlaceholder';
+import "./GameDetail.css";
 
 type GameItem = {
   ratingKey: string;
@@ -22,7 +23,7 @@ export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) 
   const coverHeight = 384; // 256 * 1.5
 
   return (
-    <div className="bg-[#1a1a1a] text-white" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+    <div className="bg-[#1a1a1a] text-white game-detail-page">
       <div className="max-w-7xl mx-auto px-8 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Cover Image */}

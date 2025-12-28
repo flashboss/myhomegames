@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "./SettingsPage.css";
 
 export default function SettingsPage() {
   const [metadataPath, setMetadataPath] = useState("");
@@ -25,109 +26,50 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="bg-[#1a1a1a] text-white" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
-      <div className="max-w-4xl mx-auto" style={{ padding: '48px 48px' }}>
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: 600, 
-            color: '#ffffff',
-            marginBottom: '8px',
-            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-          }}>
+    <div className="bg-[#1a1a1a] text-white settings-page">
+      <div className="settings-container">
+        <div className="settings-header">
+          <h1 className="settings-title">
             Settings
           </h1>
-          <p style={{ 
-            fontSize: '14px', 
-            color: 'rgba(255, 255, 255, 0.6)',
-            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-          }}>
+          <p className="settings-subtitle">
             Configure application preferences
           </p>
         </div>
 
-        <div className="bg-[#1a1a1a]" style={{ borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{ padding: '24px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-            <h2 style={{ 
-              fontSize: '18px', 
-              fontWeight: 600, 
-              color: 'rgba(255, 255, 255, 0.9)',
-              fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-            }}>
+        <div className="bg-[#1a1a1a] settings-card">
+          <div className="settings-card-header">
+            <h2 className="settings-card-title">
               General
             </h2>
           </div>
 
-          <div style={{ padding: '32px' }}>
-            <div style={{ marginBottom: '32px' }}>
-              <label style={{ 
-                display: 'block',
-                fontSize: '14px', 
-                fontWeight: 500, 
-                color: 'rgba(255, 255, 255, 0.9)',
-                marginBottom: '8px',
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-              }}>
+          <div className="settings-card-content">
+            <div className="settings-field-small">
+              <label className="settings-label">
                 Version 1.0.0
               </label>
             </div>
 
-            <div style={{ marginBottom: '40px' }}>
-              <label style={{ 
-                display: 'block',
-                fontSize: '14px', 
-                fontWeight: 500, 
-                color: 'rgba(255, 255, 255, 0.9)',
-                marginBottom: '8px',
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-              }}>
+            <div className="settings-field">
+              <label className="settings-label">
                 Language
               </label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                style={{
-                  width: '200px',
-                  backgroundColor: '#2a2a2a',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '6px',
-                  padding: '12px 16px',
-                  color: '#ffffff',
-                  fontSize: '14px',
-                  fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease',
-                  cursor: 'pointer'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#E5A00D';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                }}
+                className="settings-select"
               >
                 <option value="en">English</option>
                 <option value="it">Italiano</option>
               </select>
-              <p style={{ 
-                marginTop: '8px',
-                fontSize: '12px', 
-                color: 'rgba(255, 255, 255, 0.5)',
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-              }}>
+              <p className="settings-help-text">
                 Select the application language
               </p>
             </div>
 
-            <div style={{ marginBottom: '40px' }}>
-              <label style={{ 
-                display: 'block',
-                fontSize: '14px', 
-                fontWeight: 500, 
-                color: 'rgba(255, 255, 255, 0.9)',
-                marginBottom: '8px',
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-              }}>
+            <div className="settings-field">
+              <label className="settings-label">
                 Metadata Path
               </label>
               <input
@@ -135,56 +77,17 @@ export default function SettingsPage() {
                 value={metadataPath}
                 onChange={(e) => setMetadataPath(e.target.value)}
                 placeholder="/path/to/metadata"
-                style={{
-                  width: '100%',
-                  backgroundColor: '#2a2a2a',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '6px',
-                  padding: '12px 16px',
-                  color: '#ffffff',
-                  fontSize: '14px',
-                  fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#E5A00D';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                }}
+                className="settings-input"
               />
-              <p style={{ 
-                marginTop: '8px',
-                fontSize: '12px', 
-                color: 'rgba(255, 255, 255, 0.5)',
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-              }}>
+              <p className="settings-help-text">
                 Path where game metadata (covers, descriptions, etc.) are stored
               </p>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '24px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <div className="settings-actions">
               <button
                 onClick={handleSave}
-                style={{
-                  padding: '10px 24px',
-                  backgroundColor: '#E5A00D',
-                  border: 'none',
-                  borderRadius: '6px',
-                  color: '#000000',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F5B041';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#E5A00D';
-                }}
+                className="settings-button"
               >
                 Save
               </button>

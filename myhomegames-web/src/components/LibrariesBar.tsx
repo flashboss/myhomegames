@@ -1,11 +1,12 @@
+import CoverSizeSlider from "./CoverSizeSlider";
+import ViewModeSelector from "./ViewModeSelector";
+import "./LibrariesBar.css";
+
 type GameLibrarySection = {
   key: string;
   title: string;
   type: string;
 };
-
-import CoverSizeSlider from "./CoverSizeSlider";
-import ViewModeSelector from "./ViewModeSelector";
 
 export type ViewMode = 'grid' | 'detail' | 'table';
 
@@ -42,14 +43,14 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
           {error && <div className="plex-libraries-error">{error}</div>}
         </div>
         
-        <div className="plex-libraries-actions" style={{ transform: 'translateY(-2px)' }}>
+        <div className="plex-libraries-actions">
           {onCoverSizeChange && (
-            <div style={{ visibility: viewMode === 'grid' ? 'visible' : 'hidden', width: '60px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+            <div className={`plex-libraries-actions-slider-container ${viewMode === 'grid' ? '' : 'hidden'}`}>
               <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
             </div>
           )}
           {onViewModeChange && (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="plex-libraries-actions-view-mode-container">
               <ViewModeSelector value={viewMode} onChange={onViewModeChange} />
             </div>
           )}

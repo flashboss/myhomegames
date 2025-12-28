@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import CoverPlaceholder from './CoverPlaceholder';
+import "./GamesList.css";
 
 type GameItem = {
   ratingKey: string;
@@ -26,7 +27,7 @@ export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl, 
   const coverHeight = coverSize * 1.5;
 
   return (
-    <div style={{ maxWidth: '100%', margin: '0 auto', display: 'grid', gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)`, gap: '40px', justifyContent: 'center' }}>
+    <div className="games-list-container" style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)` }}>
       {games.map((it) => {
         const [imageError, setImageError] = useState(false);
         const showPlaceholder = !it.cover || imageError;
@@ -39,8 +40,8 @@ export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl, 
                 itemRefs.current.set(it.ratingKey, el);
               }
             }}
-            className="group cursor-pointer"
-            style={{ width: `${coverSize}px`, minWidth: `${coverSize}px`, flexShrink: 0 }}
+            className="group cursor-pointer games-list-item"
+            style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
             onClick={() => onGameClick(it)}
           >
             <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">
@@ -57,7 +58,7 @@ export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl, 
                 />
               )}
             </div>
-            <div className="truncate" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', fontSize: '0.85rem', fontWeight: 500, color: '#f8f8f8', backgroundColor: 'transparent', padding: 0 }}>
+            <div className="truncate games-list-title">
               {it.title}
             </div>
           </div>

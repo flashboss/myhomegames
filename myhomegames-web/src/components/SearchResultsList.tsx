@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CoverPlaceholder from './CoverPlaceholder';
+import "./SearchResultsList.css";
 
 type GameItem = {
   ratingKey: string;
@@ -29,7 +30,7 @@ export default function SearchResultsList({ games, apiBase, onGameClick, buildCo
   const coverHeight = FIXED_COVER_SIZE * 1.5;
 
   return (
-    <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0 24px' }}>
+    <div className="search-results-list-container">
       {games.map((it) => {
         const [imageError, setImageError] = useState(false);
         const showPlaceholder = !it.cover || imageError;
@@ -37,30 +38,13 @@ export default function SearchResultsList({ games, apiBase, onGameClick, buildCo
         return (
           <div
             key={it.ratingKey}
-            className="group cursor-pointer mb-6"
-            style={{ 
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '20px',
-              padding: '16px',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
+            className="group cursor-pointer mb-6 search-results-list-item"
             onClick={() => onGameClick(it)}
           >
             <div 
-              className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0"
+              className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover"
               style={{ 
-                width: `${FIXED_COVER_SIZE}px`, 
-                height: `${coverHeight}px`,
-                minWidth: `${FIXED_COVER_SIZE}px`,
-                minHeight: `${coverHeight}px`
+                height: `${coverHeight}px`
               }}
             >
               {showPlaceholder ? (
@@ -76,34 +60,17 @@ export default function SearchResultsList({ games, apiBase, onGameClick, buildCo
                 />
               )}
             </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div 
-              className="text-white mb-2"
-              style={{ 
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', 
-                fontSize: '1.2rem', 
-                fontWeight: 600, 
-                color: '#f8f8f8'
-              }}
-            >
+          <div className="search-results-list-content">
+            <div className="text-white mb-2 search-results-list-title">
               {it.title}
             </div>
             {it.summary && (
-              <div 
-                className="text-gray-400 mb-2"
-                style={{ 
-                  fontSize: '0.95rem', 
-                  lineHeight: 1.5
-                }}
-              >
+              <div className="text-gray-400 mb-2 search-results-list-summary">
                 {it.summary}
               </div>
             )}
             {(it.year !== null && it.year !== undefined) && (
-              <div 
-                className="text-gray-500"
-                style={{ fontSize: '0.85rem' }}
-              >
+              <div className="text-gray-500 search-results-list-date">
                 {it.day !== null && it.day !== undefined && it.month !== null && it.month !== undefined
                   ? `${it.day}/${it.month}/${it.year}`
                   : it.year.toString()}

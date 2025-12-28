@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import CoverPlaceholder from './CoverPlaceholder';
+import "./GamesListDetail.css";
 
 type GameItem = {
   ratingKey: string;
@@ -30,12 +31,11 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
   const coverHeight = FIXED_COVER_SIZE * 1.5;
 
   return (
-    <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0 24px' }}>
+    <div className="games-list-detail-container">
       {games.map((it, index) => {
         const [imageError, setImageError] = useState(false);
         const showPlaceholder = !it.cover || imageError;
         const isEven = index % 2 === 0;
-        const baseBackgroundColor = isEven ? 'transparent' : 'rgba(255, 255, 255, 0.02)';
 
         return (
           <div
@@ -45,31 +45,13 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
                 itemRefs.current.set(it.ratingKey, el);
               }
             }}
-            className="group cursor-pointer mb-6"
-            style={{ 
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '20px',
-              padding: '16px',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease',
-              backgroundColor: baseBackgroundColor
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = baseBackgroundColor;
-            }}
+            className={`group cursor-pointer mb-6 games-list-detail-item ${isEven ? 'even' : 'odd'}`}
             onClick={() => onGameClick(it)}
           >
             <div 
-              className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0"
+              className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 games-list-detail-cover"
               style={{ 
-                width: `${FIXED_COVER_SIZE}px`, 
-                height: `${coverHeight}px`,
-                minWidth: `${FIXED_COVER_SIZE}px`,
-                minHeight: `${coverHeight}px`
+                height: `${coverHeight}px`
               }}
             >
               {showPlaceholder ? (
@@ -85,16 +67,8 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
                 />
               )}
             </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div 
-              className="text-white mb-2"
-              style={{ 
-                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', 
-                fontSize: '1.2rem', 
-                fontWeight: 600, 
-                color: '#f8f8f8'
-              }}
-            >
+          <div className="games-list-detail-content">
+            <div className="text-white mb-2 games-list-detail-title">
               {it.title}
             </div>
             {it.summary && (

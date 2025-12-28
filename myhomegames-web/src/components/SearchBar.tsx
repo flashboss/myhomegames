@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import CoverPlaceholder from "./CoverPlaceholder";
+import "./SearchBar.css";
 
 type GameItem = {
   ratingKey: string;
@@ -65,8 +66,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
   };
 
   return (
-    <div ref={searchRef} className="relative" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div className="plex-search-container-wrapper" style={{ position: 'relative', zIndex: 100 }}>
+    <div ref={searchRef} className="relative search-bar-container">
+      <div className="plex-search-container-wrapper search-bar-wrapper">
         <div className="plex-search-icon-wrapper">
           <svg
             className="text-gray-400"
@@ -91,8 +92,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           onFocus={() => {
             if (searchQuery.trim() !== "") setIsOpen(true);
           }}
-          className="plex-search-input"
-          style={{ position: 'relative', zIndex: 101, paddingRight: searchQuery ? '36px' : undefined }}
+          className={`plex-search-input search-input-with-padding ${searchQuery ? 'has-query' : ''}`}
           onKeyDown={(e) => {
             if (e.key === 'Escape') {
               setIsOpen(false);
@@ -103,27 +103,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           <button
             onClick={handleClear}
             type="button"
-            style={{
-              position: 'absolute',
-              right: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 102,
-              color: 'rgba(255, 255, 255, 0.6)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
-            }}
+            className="search-clear-button"
           >
             <svg
               fill="none"
@@ -144,30 +124,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
       </div>
 
       {isOpen && filteredGames.length > 0 && (
-        <div 
-          className="plex-dropdown" 
-          style={{ 
-            position: 'absolute',
-            top: '100%',
-            left: '138px',
-            marginTop: '0px',
-            zIndex: 50,
-            pointerEvents: 'auto',
-            maxWidth: '500px',
-            width: 'calc(100% - 276px)',
-            maxHeight: 'calc(100vh - 150px)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              overflowX: 'hidden'
-            }}
-          >
+        <div className="plex-dropdown search-dropdown">
+          <div className="search-dropdown-scroll">
             {filteredGames.map((game, index) => {
             const showPlaceholder = !game.cover || imageErrors.has(game.ratingKey);
 
@@ -179,45 +137,29 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                   setSearchQuery("");
                   setIsOpen(false);
                 }}
-                className="w-full plex-dropdown-item"
-                style={{ 
-                  padding: '12px 16px',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  alignContent: 'flex-start',
-                  gap: '12px',
-                  textAlign: 'left',
-                  width: 'calc(100% - 32px)',
-                  marginLeft: '16px',
-                  marginRight: '16px',
-                  borderRadius: '8px',
-                  borderBottom: index < filteredGames.length - 1 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
-                  boxSizing: 'border-box'
-                }}
+                className={`w-full plex-dropdown-item search-dropdown-item ${index < filteredGames.length - 1 ? 'has-border' : ''}`}
               >
                 {showPlaceholder ? (
-                  <div style={{ width: '48px', height: '72px', minWidth: '48px', minHeight: '72px', flexShrink: 0, alignSelf: 'flex-start' }}>
+                  <div className="search-result-thumbnail">
                     <CoverPlaceholder title={game.title} width={48} height={72} />
                   </div>
                 ) : (
                   <img
                     src={game.cover && game.cover.startsWith("http") ? game.cover : `http://127.0.0.1:4000${game.cover || ''}`}
                     alt={game.title}
-                    className="object-cover rounded flex-shrink-0"
-                    style={{ width: '48px', height: '72px', minWidth: '48px', minHeight: '72px', alignSelf: 'flex-start' }}
+                    className="object-cover rounded flex-shrink-0 search-result-thumbnail"
                     onError={() => {
                       setImageErrors(prev => new Set(prev).add(game.ratingKey));
                     }}
                   />
                 )}
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-                <div className="text-white text-sm truncate" style={{ fontWeight: 700 }}>{game.title}</div>
+              <div className="search-result-content">
+                <div className="text-white text-sm truncate search-result-title">{game.title}</div>
                 {game.summary && (
-                  <div className="text-gray-400 text-xs truncate mt-1" style={{ fontWeight: 400 }}>{game.summary}</div>
+                  <div className="text-gray-400 text-xs truncate mt-1 search-result-summary">{game.summary}</div>
                 )}
                 {(game.year !== null && game.year !== undefined) && (
-                  <div className="text-gray-500 text-xs truncate mt-1" style={{ fontWeight: 400 }}>
+                  <div className="text-gray-500 text-xs truncate mt-1 search-result-date">
                     {game.day !== null && game.day !== undefined && game.month !== null && game.month !== undefined
                       ? `${game.day}/${game.month}/${game.year}`
                       : game.year.toString()}
@@ -229,14 +171,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           })}
           </div>
           {allFilteredGames.length > 0 && (
-            <div style={{ 
-              padding: '12px 16px', 
-              display: 'flex', 
-              justifyContent: 'flex-end',
-              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-              backgroundColor: '#1a1a1a',
-              flexShrink: 0
-            }}>
+            <div className="search-dropdown-footer">
               <button
                 onClick={() => {
                   navigate("/search-results", {
@@ -248,25 +183,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                   setSearchQuery("");
                   setIsOpen(false);
                 }}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#E5A00D',
-                  border: '1px solid #E5A00D',
-                  borderRadius: '6px',
-                  color: '#000000',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F5B041';
-                  e.currentTarget.style.borderColor = '#F5B041';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#E5A00D';
-                  e.currentTarget.style.borderColor = '#E5A00D';
-                }}
+                className="search-view-all-button"
               >
                 View all results ({allFilteredGames.length})
               </button>
@@ -276,23 +193,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
       )}
 
       {isOpen && searchQuery.trim() !== "" && filteredGames.length === 0 && (
-        <div 
-          className="plex-dropdown" 
-          style={{ 
-            position: 'absolute',
-            top: '100%',
-            left: '138px',
-            marginTop: '0px',
-            zIndex: 50,
-            pointerEvents: 'auto',
-            maxWidth: '500px',
-            width: 'calc(100% - 276px)',
-            padding: '16px',
-            textAlign: 'center',
-            color: 'rgba(255, 255, 255, 0.6)',
-            fontSize: '0.875rem'
-          }}
-        >
+        <div className="plex-dropdown search-no-results">
           No results found for the term "{searchQuery}"
         </div>
       )}
