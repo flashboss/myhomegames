@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import LibrariesBar from "../components/LibrariesBar";
 import type { ViewMode } from "../components/LibrariesBar";
 import GamesList from "../components/GamesList";
 import GamesListDetail from "../components/GamesListDetail";
 import GamesListTable from "../components/GamesListTable";
+import AlphabetNavigator from "../components/AlphabetNavigator";
 
 type GameLibrarySection = {
   key: string;
@@ -50,6 +51,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   const [error, setError] = useState<string | null>(null);
   const [coverSize, setCoverSize] = useState(150);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   // Function to save view mode for a library
   const saveViewModeForLibrary = (libraryKey: string, mode: ViewMode) => {
@@ -191,35 +194,52 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               </div>
             </div>
           ) : (
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: viewMode === 'table' ? '0' : '5px', paddingBottom: viewMode === 'table' ? '0' : '32px' }}>
-              {loading ? (
-                <div className="text-sm text-gray-400 text-center">Loading games…</div>
-              ) : (
-                <>
-                  {viewMode === 'grid' && (
-                    <GamesList 
-                      games={games}
-                      apiBase={apiBase}
-                      onGameClick={handleGameClick}
-                      buildCoverUrl={buildCoverUrl}
-                      coverSize={coverSize}
-                    />
-                  )}
-                  {viewMode === 'detail' && (
-                    <GamesListDetail 
-                      games={games}
-                      apiBase={apiBase}
-                      onGameClick={handleGameClick}
-                      buildCoverUrl={buildCoverUrl}
-                    />
-                  )}
-                  {viewMode === 'table' && (
-                    <GamesListTable 
-                      games={games}
-                      onGameClick={handleGameClick}
-                    />
-                  )}
-                </>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+              {/* Scrollable lists container */}
+              <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: viewMode === 'table' ? '0' : '5px', paddingBottom: viewMode === 'table' ? '0' : '32px' }}>
+                {loading ? (
+                  <div className="text-sm text-gray-400 text-center">Loading games…</div>
+                ) : (
+                  <>
+                    {viewMode === 'grid' && (
+                      <GamesList 
+                        games={games}
+                        apiBase={apiBase}
+                        onGameClick={handleGameClick}
+                        buildCoverUrl={buildCoverUrl}
+                        coverSize={coverSize}
+                        itemRefs={itemRefs}
+                      />
+                    )}
+                    {viewMode === 'detail' && (
+                      <GamesListDetail 
+                        games={games}
+                        apiBase={apiBase}
+                        onGameClick={handleGameClick}
+                        buildCoverUrl={buildCoverUrl}
+                        itemRefs={itemRefs}
+                      />
+                    )}
+                    {viewMode === 'table' && (
+                      <GamesListTable 
+                        games={games}
+                        onGameClick={handleGameClick}
+                        itemRefs={itemRefs}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+              
+              {/* Alphabet navigator container - separate div */}
+              {games.length > 0 && (
+                <div style={{ width: '48px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingRight: '16px' }}>
+                  <AlphabetNavigator 
+                    games={games} 
+                    scrollContainerRef={scrollContainerRef} 
+                    itemRefs={itemRefs} 
+                  />
+                </div>
               )}
             </div>
           )}

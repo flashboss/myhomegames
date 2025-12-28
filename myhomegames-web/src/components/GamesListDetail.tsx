@@ -17,11 +17,12 @@ type GamesListDetailProps = {
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
+  itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
 const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
 
-export default function GamesListDetail({ games, apiBase, onGameClick, buildCoverUrl }: GamesListDetailProps) {
+export default function GamesListDetail({ games, apiBase, onGameClick, buildCoverUrl, itemRefs }: GamesListDetailProps) {
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">No games found</div>;
   }
@@ -39,6 +40,11 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
         return (
           <div
             key={it.ratingKey}
+            ref={(el) => {
+              if (el && itemRefs?.current) {
+                itemRefs.current.set(it.ratingKey, el);
+              }
+            }}
             className="group cursor-pointer mb-6"
             style={{ 
               display: 'flex',

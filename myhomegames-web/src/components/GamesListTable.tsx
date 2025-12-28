@@ -15,6 +15,7 @@ import { useState, useRef, useEffect } from 'react';
 type GamesListTableProps = {
   games: GameItem[];
   onGameClick: (game: GameItem) => void;
+  itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
 type SortField = 'title' | 'summary' | 'year' | 'stars';
@@ -28,7 +29,7 @@ type ColumnVisibility = {
   stars: boolean;
 };
 
-export default function GamesListTable({ games, onGameClick }: GamesListTableProps) {
+export default function GamesListTable({ games, onGameClick, itemRefs }: GamesListTableProps) {
   // Load saved sort state from localStorage
   const loadSortState = (): { field: SortField | null; direction: SortDirection } => {
     const savedField = localStorage.getItem('tableSortField');
@@ -417,6 +418,11 @@ export default function GamesListTable({ games, onGameClick }: GamesListTablePro
             return (
               <tr
                 key={it.ratingKey}
+                ref={(el) => {
+                  if (el && itemRefs?.current) {
+                    itemRefs.current.set(it.ratingKey, el);
+                  }
+                }}
                 className="cursor-pointer"
                 style={{
                   transition: 'background-color 0.2s ease'

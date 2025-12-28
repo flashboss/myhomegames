@@ -15,9 +15,10 @@ type GamesListProps = {
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
+  itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
-export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl, coverSize = 150 }: GamesListProps) {
+export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl, coverSize = 150, itemRefs }: GamesListProps) {
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">No games found</div>;
   }
@@ -33,6 +34,11 @@ export default function GamesList({ games, apiBase, onGameClick, buildCoverUrl, 
         return (
           <div
             key={it.ratingKey}
+            ref={(el) => {
+              if (el && itemRefs?.current) {
+                itemRefs.current.set(it.ratingKey, el);
+              }
+            }}
             className="group cursor-pointer"
             style={{ width: `${coverSize}px`, minWidth: `${coverSize}px`, flexShrink: 0 }}
             onClick={() => onGameClick(it)}
