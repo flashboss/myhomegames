@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 import "./GamesListTable.css";
 
 type GameItem = {
@@ -16,10 +16,11 @@ type GamesListTableProps = {
   games: GameItem[];
   onGameClick: (game: GameItem) => void;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 };
 
-type SortField = 'title' | 'summary' | 'year' | 'stars';
-type SortDirection = 'asc' | 'desc';
+type SortField = "title" | "summary" | "year" | "stars";
+type SortDirection = "asc" | "desc";
 
 type ColumnVisibility = {
   title: boolean;
@@ -29,31 +30,51 @@ type ColumnVisibility = {
   stars: boolean;
 };
 
-export default function GamesListTable({ games, onGameClick, itemRefs }: GamesListTableProps) {
+export default function GamesListTable({
+  games,
+  onGameClick,
+  itemRefs,
+  scrollContainerRef,
+}: GamesListTableProps) {
   // Load saved sort state from localStorage
-  const loadSortState = (): { field: SortField | null; direction: SortDirection } => {
-    const savedField = localStorage.getItem('tableSortField');
-    const savedDirection = localStorage.getItem('tableSortDirection');
+  const loadSortState = (): {
+    field: SortField | null;
+    direction: SortDirection;
+  } => {
+    const savedField = localStorage.getItem("tableSortField");
+    const savedDirection = localStorage.getItem("tableSortDirection");
     return {
       field: savedField ? (savedField as SortField) : null,
-      direction: savedDirection ? (savedDirection as SortDirection) : 'asc'
+      direction: savedDirection ? (savedDirection as SortDirection) : "asc",
     };
   };
 
   const savedSortState = loadSortState();
-  const [sortField, setSortField] = useState<SortField | null>(savedSortState.field);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(savedSortState.direction);
-  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(() => {
-    const saved = localStorage.getItem('tableColumnVisibility');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return { title: true, summary: true, releaseDate: true, year: false, stars: false };
+  const [sortField, setSortField] = useState<SortField | null>(
+    savedSortState.field
+  );
+  const [sortDirection, setSortDirection] = useState<SortDirection>(
+    savedSortState.direction
+  );
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(
+    () => {
+      const saved = localStorage.getItem("tableColumnVisibility");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return {
+            title: true,
+            summary: true,
+            releaseDate: true,
+            year: false,
+            stars: false,
+          };
+        }
       }
+      return { title: true, summary: true, releaseDate: true };
     }
-    return { title: true, summary: true, releaseDate: true };
-  });
+  );
   const [showColumnMenu, setShowColumnMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -72,25 +93,28 @@ export default function GamesListTable({ games, onGameClick, itemRefs }: GamesLi
   // Save sort state to localStorage when it changes
   useEffect(() => {
     if (sortField) {
-      localStorage.setItem('tableSortField', sortField);
-      localStorage.setItem('tableSortDirection', sortDirection);
+      localStorage.setItem("tableSortField", sortField);
+      localStorage.setItem("tableSortDirection", sortDirection);
     } else {
-      localStorage.removeItem('tableSortField');
-      localStorage.removeItem('tableSortDirection');
+      localStorage.removeItem("tableSortField");
+      localStorage.removeItem("tableSortDirection");
     }
   }, [sortField, sortDirection]);
 
   // Save column visibility to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('tableColumnVisibility', JSON.stringify(columnVisibility));
+    localStorage.setItem(
+      "tableColumnVisibility",
+      JSON.stringify(columnVisibility)
+    );
   }, [columnVisibility]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
@@ -101,19 +125,19 @@ export default function GamesListTable({ games, onGameClick, itemRefs }: GamesLi
     let bValue: string | number | null = null;
 
     switch (sortField) {
-      case 'title':
+      case "title":
         aValue = a.title.toLowerCase();
         bValue = b.title.toLowerCase();
         break;
-      case 'summary':
-        aValue = (a.summary || '').toLowerCase();
-        bValue = (b.summary || '').toLowerCase();
+      case "summary":
+        aValue = (a.summary || "").toLowerCase();
+        bValue = (b.summary || "").toLowerCase();
         break;
-      case 'year':
+      case "year":
         aValue = a.year ?? 0;
         bValue = b.year ?? 0;
         break;
-      case 'stars':
+      case "stars":
         aValue = a.stars ?? 0;
         bValue = b.stars ?? 0;
         break;
@@ -123,8 +147,8 @@ export default function GamesListTable({ games, onGameClick, itemRefs }: GamesLi
     if (aValue === null) return 1;
     if (bValue === null) return -1;
 
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
 
@@ -133,171 +157,220 @@ export default function GamesListTable({ games, onGameClick, itemRefs }: GamesLi
   }
 
   const getSortIcon = (field: SortField) => {
-    if (sortField !== field) return '';
-    return sortDirection === 'asc' ? '↑' : '↓';
+    if (sortField !== field) return "";
+    return sortDirection === "asc" ? "↑" : "↓";
   };
 
   const toggleColumn = (column: keyof ColumnVisibility) => {
-    setColumnVisibility(prev => ({
+    setColumnVisibility((prev) => ({
       ...prev,
-      [column]: !prev[column]
+      [column]: !prev[column],
     }));
   };
 
   return (
     <div className="games-table-container">
-      <div className="games-table-scroll">
+      <div
+        className="games-table-scroll"
+        ref={scrollContainerRef as React.RefObject<HTMLDivElement>}
+      >
         <table className="games-table">
           <thead>
-          <tr>
-                    <th className="games-table th column-menu">
-              <div className="games-table-column-menu-wrapper" ref={menuRef}>
-                <button
-                  onClick={() => setShowColumnMenu(!showColumnMenu)}
-                  className="games-table-column-menu-button"
-                >
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
-                  <svg
-                    width="12"
-                    height="12"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    className={`games-table-column-menu-arrow ${showColumnMenu ? 'open' : ''}`}
+            <tr>
+              <th className="games-table th column-menu">
+                <div className="games-table-column-menu-wrapper" ref={menuRef}>
+                  <button
+                    onClick={() => setShowColumnMenu(!showColumnMenu)}
+                    className="games-table-column-menu-button"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </button>
-                {showColumnMenu && (
-                  <div className="games-table-column-menu-popup">
-                    <div className="games-table-column-menu-header">
-                      Columns
+                    <svg
+                      width="16"
+                      height="16"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                      />
+                    </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      className={`games-table-column-menu-arrow ${
+                        showColumnMenu ? "open" : ""
+                      }`}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </button>
+                  {showColumnMenu && (
+                    <div className="games-table-column-menu-popup">
+                      <div className="games-table-column-menu-header">
+                        Columns
+                      </div>
+                      {[
+                        {
+                          key: "title" as keyof ColumnVisibility,
+                          label: "Title",
+                        },
+                        {
+                          key: "summary" as keyof ColumnVisibility,
+                          label: "Summary",
+                        },
+                        {
+                          key: "releaseDate" as keyof ColumnVisibility,
+                          label: "Release Date",
+                        },
+                        {
+                          key: "year" as keyof ColumnVisibility,
+                          label: "Year",
+                        },
+                        {
+                          key: "stars" as keyof ColumnVisibility,
+                          label: "Stars",
+                        },
+                      ].map((col) => (
+                        <label
+                          key={col.key}
+                          className="games-table-column-menu-item"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={columnVisibility[col.key]}
+                            onChange={() => toggleColumn(col.key)}
+                          />
+                          {col.label}
+                        </label>
+                      ))}
                     </div>
-                    {[
-                      { key: 'title' as keyof ColumnVisibility, label: 'Title' },
-                      { key: 'summary' as keyof ColumnVisibility, label: 'Summary' },
-                      { key: 'releaseDate' as keyof ColumnVisibility, label: 'Release Date' },
-                      { key: 'year' as keyof ColumnVisibility, label: 'Year' },
-                      { key: 'stars' as keyof ColumnVisibility, label: 'Stars' }
-                    ].map((col) => (
-                      <label
-                        key={col.key}
-                        className="games-table-column-menu-item"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={columnVisibility[col.key]}
-                          onChange={() => toggleColumn(col.key)}
-                        />
-                        {col.label}
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </th>
-            {columnVisibility.title && (
-              <th 
-                onClick={() => handleSort('title')}
-                className="has-border-right"
-              >
-                <span>Title</span>
-                <span className="sort-indicator">{getSortIcon('title')}</span>
+                  )}
+                </div>
               </th>
-            )}
-            {columnVisibility.summary && (
-              <th 
-                onClick={() => handleSort('summary')}
-                className="has-border-right"
-              >
-                <span>Summary</span>
-                <span className="sort-indicator">{getSortIcon('summary')}</span>
-              </th>
-            )}
-            {columnVisibility.releaseDate && (
-              <th 
-                onClick={() => handleSort('year')}
-                className={(columnVisibility.stars || columnVisibility.year) ? 'has-border-right' : ''}
-              >
-                <span>Release Date</span>
-                <span className="sort-indicator">{getSortIcon('year')}</span>
-              </th>
-            )}
-            {columnVisibility.stars && (
-              <th 
-                onClick={() => handleSort('stars')}
-                className={columnVisibility.year ? 'has-border-right' : ''}
-              >
-                <span>Stars</span>
-                <span className="sort-indicator">{getSortIcon('stars')}</span>
-              </th>
-            )}
-            {columnVisibility.year && (
-              <th 
-                onClick={() => handleSort('year')}
-              >
-                <span>Year</span>
-                <span className="sort-indicator">{getSortIcon('year')}</span>
-              </th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedGames.map((it, index) => {
-            const isEven = index % 2 === 0;
-            const rowClass = isEven ? 'even-row' : 'odd-row';
-
-            return (
-              <tr
-                key={it.ratingKey}
-                ref={(el) => {
-                  if (el && itemRefs?.current) {
-                    itemRefs.current.set(it.ratingKey, el);
-                  }
-                }}
-                className="cursor-pointer"
-                onClick={() => onGameClick(it)}
-              >
-                        <td className="column-menu-cell"></td>
               {columnVisibility.title && (
-                <td className={`title-cell ${rowClass}`}>
-                  {it.title}
-                </td>
+                <th
+                  onClick={() => handleSort("title")}
+                  className="has-border-right"
+                >
+                  <span>Title</span>
+                  <span className="sort-indicator">{getSortIcon("title")}</span>
+                </th>
               )}
               {columnVisibility.summary && (
-                <td className={`summary-cell ${rowClass}`}>
-                  {it.summary || '-'}
-                </td>
+                <th
+                  onClick={() => handleSort("summary")}
+                  className="has-border-right"
+                >
+                  <span>Summary</span>
+                  <span className="sort-indicator">
+                    {getSortIcon("summary")}
+                  </span>
+                </th>
               )}
               {columnVisibility.releaseDate && (
-                <td className={`date-cell ${rowClass} ${(columnVisibility.stars || columnVisibility.year) ? 'has-border-right' : ''}`}>
-                  {(it.year !== null && it.year !== undefined) 
-                    ? (it.day !== null && it.day !== undefined && it.month !== null && it.month !== undefined
-                        ? `${it.day}/${it.month}/${it.year}`
-                        : it.year.toString())
-                    : '-'}
-                </td>
+                <th
+                  onClick={() => handleSort("year")}
+                  className={
+                    columnVisibility.stars || columnVisibility.year
+                      ? "has-border-right"
+                      : ""
+                  }
+                >
+                  <span>Release Date</span>
+                  <span className="sort-indicator">{getSortIcon("year")}</span>
+                </th>
               )}
               {columnVisibility.stars && (
-                <td className={`stars-cell ${rowClass}`}>
-                  {it.stars !== null && it.stars !== undefined ? it.stars.toString() : '-'}
-                </td>
+                <th
+                  onClick={() => handleSort("stars")}
+                  className={columnVisibility.year ? "has-border-right" : ""}
+                >
+                  <span>Stars</span>
+                  <span className="sort-indicator">{getSortIcon("stars")}</span>
+                </th>
               )}
               {columnVisibility.year && (
-                <td className={`year-cell ${rowClass}`}>
-                  {it.year !== null && it.year !== undefined ? it.year.toString() : '-'}
-                </td>
+                <th onClick={() => handleSort("year")}>
+                  <span>Year</span>
+                  <span className="sort-indicator">{getSortIcon("year")}</span>
+                </th>
               )}
             </tr>
-            );
-          })}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedGames.map((it, index) => {
+              const isEven = index % 2 === 0;
+              const rowClass = isEven ? "even-row" : "odd-row";
+
+              return (
+                <tr
+                  key={it.ratingKey}
+                  ref={(el) => {
+                    if (el && itemRefs?.current) {
+                      itemRefs.current.set(it.ratingKey, el);
+                    }
+                  }}
+                  className="cursor-pointer"
+                  onClick={() => onGameClick(it)}
+                >
+                  <td className="column-menu-cell"></td>
+                  {columnVisibility.title && (
+                    <td className={`title-cell ${rowClass}`}>{it.title}</td>
+                  )}
+                  {columnVisibility.summary && (
+                    <td className={`summary-cell ${rowClass}`}>
+                      {it.summary || "-"}
+                    </td>
+                  )}
+                  {columnVisibility.releaseDate && (
+                    <td
+                      className={`date-cell ${rowClass} ${
+                        columnVisibility.stars || columnVisibility.year
+                          ? "has-border-right"
+                          : ""
+                      }`}
+                    >
+                      {it.year !== null && it.year !== undefined
+                        ? it.day !== null &&
+                          it.day !== undefined &&
+                          it.month !== null &&
+                          it.month !== undefined
+                          ? `${it.day}/${it.month}/${it.year}`
+                          : it.year.toString()
+                        : "-"}
+                    </td>
+                  )}
+                  {columnVisibility.stars && (
+                    <td className={`stars-cell ${rowClass}`}>
+                      {it.stars !== null && it.stars !== undefined
+                        ? it.stars.toString()
+                        : "-"}
+                    </td>
+                  )}
+                  {columnVisibility.year && (
+                    <td className={`year-cell ${rowClass}`}>
+                      {it.year !== null && it.year !== undefined
+                        ? it.year.toString()
+                        : "-"}
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
-

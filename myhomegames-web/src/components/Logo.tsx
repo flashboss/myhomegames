@@ -26,7 +26,15 @@ export default function Logo() {
       <rect x="26" y="22" width="3" height="6" fill="#0d0d0d" />
       <rect x="24.5" y="24" width="6" height="3" fill="#0d0d0d" />
       {/* Additional decorative elements */}
-      <rect x="38" y="22" width="14" height="6" rx="2" fill="#0d0d0d" opacity="0.3" />
+      <rect
+        x="38"
+        y="22"
+        width="14"
+        height="6"
+        rx="2"
+        fill="#0d0d0d"
+        opacity="0.3"
+      />
       {/* Gradient definition */}
       <defs>
         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -37,4 +45,3 @@ export default function Logo() {
     </svg>
   );
 }
-

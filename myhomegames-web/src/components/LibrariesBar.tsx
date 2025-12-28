@@ -8,7 +8,7 @@ type GameLibrarySection = {
   type: string;
 };
 
-export type ViewMode = 'grid' | 'detail' | 'table';
+export type ViewMode = "grid" | "detail" | "table";
 
 type LibrariesBarProps = {
   libraries: GameLibrarySection[];
@@ -22,7 +22,17 @@ type LibrariesBarProps = {
   onViewModeChange?: (mode: ViewMode) => void;
 };
 
-export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary, loading, error, coverSize = 150, onCoverSizeChange, viewMode = 'grid', onViewModeChange }: LibrariesBarProps) {
+export default function LibrariesBar({
+  libraries,
+  activeLibrary,
+  onSelectLibrary,
+  loading,
+  error,
+  coverSize = 150,
+  onCoverSizeChange,
+  viewMode = "grid",
+  onViewModeChange,
+}: LibrariesBarProps) {
   return (
     <div className="plex-libraries-bar">
       <div className="plex-libraries-bar-container">
@@ -33,7 +43,9 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
             libraries.map((s) => (
               <button
                 key={s.key}
-                className={`plex-library-button ${activeLibrary?.key === s.key ? 'plex-library-active' : ''}`}
+                className={`plex-library-button ${
+                  activeLibrary?.key === s.key ? "plex-library-active" : ""
+                }`}
                 onClick={() => onSelectLibrary(s)}
               >
                 {s.title}
@@ -42,10 +54,14 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
           )}
           {error && <div className="plex-libraries-error">{error}</div>}
         </div>
-        
+
         <div className="plex-libraries-actions">
           {onCoverSizeChange && (
-            <div className={`plex-libraries-actions-slider-container ${viewMode === 'grid' ? '' : 'hidden'}`}>
+            <div
+              className={`plex-libraries-actions-slider-container ${
+                viewMode === "grid" ? "" : "hidden"
+              }`}
+            >
               <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
             </div>
           )}
@@ -59,4 +75,3 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
     </div>
   );
 }
-

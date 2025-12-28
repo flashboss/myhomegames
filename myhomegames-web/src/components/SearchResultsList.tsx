@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import CoverPlaceholder from './CoverPlaceholder';
+import React, { useState } from "react";
+import CoverPlaceholder from "./CoverPlaceholder";
 import "./SearchResultsList.css";
 
 type GameItem = {
@@ -22,7 +22,12 @@ type SearchResultsListProps = {
 
 const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
 
-export default function SearchResultsList({ games, apiBase, onGameClick, buildCoverUrl }: SearchResultsListProps) {
+export default function SearchResultsList({
+  games,
+  apiBase,
+  onGameClick,
+  buildCoverUrl,
+}: SearchResultsListProps) {
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">No games found</div>;
   }
@@ -41,14 +46,18 @@ export default function SearchResultsList({ games, apiBase, onGameClick, buildCo
             className="group cursor-pointer mb-6 search-results-list-item"
             onClick={() => onGameClick(it)}
           >
-            <div 
+            <div
               className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover"
-              style={{ 
-                height: `${coverHeight}px`
+              style={{
+                height: `${coverHeight}px`,
               }}
             >
               {showPlaceholder ? (
-                <CoverPlaceholder title={it.title} width={FIXED_COVER_SIZE} height={coverHeight} />
+                <CoverPlaceholder
+                  title={it.title}
+                  width={FIXED_COVER_SIZE}
+                  height={coverHeight}
+                />
               ) : (
                 <img
                   src={buildCoverUrl(apiBase, it.cover)}
@@ -60,27 +69,29 @@ export default function SearchResultsList({ games, apiBase, onGameClick, buildCo
                 />
               )}
             </div>
-          <div className="search-results-list-content">
-            <div className="text-white mb-2 search-results-list-title">
-              {it.title}
+            <div className="search-results-list-content">
+              <div className="text-white mb-2 search-results-list-title">
+                {it.title}
+              </div>
+              {it.summary && (
+                <div className="text-gray-400 mb-2 search-results-list-summary">
+                  {it.summary}
+                </div>
+              )}
+              {it.year !== null && it.year !== undefined && (
+                <div className="text-gray-500 search-results-list-date">
+                  {it.day !== null &&
+                  it.day !== undefined &&
+                  it.month !== null &&
+                  it.month !== undefined
+                    ? `${it.day}/${it.month}/${it.year}`
+                    : it.year.toString()}
+                </div>
+              )}
             </div>
-            {it.summary && (
-              <div className="text-gray-400 mb-2 search-results-list-summary">
-                {it.summary}
-              </div>
-            )}
-            {(it.year !== null && it.year !== undefined) && (
-              <div className="text-gray-500 search-results-list-date">
-                {it.day !== null && it.day !== undefined && it.month !== null && it.month !== undefined
-                  ? `${it.day}/${it.month}/${it.year}`
-                  : it.year.toString()}
-              </div>
-            )}
           </div>
-        </div>
         );
       })}
     </div>
   );
 }
-

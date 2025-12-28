@@ -19,12 +19,17 @@ type SearchResultsPageProps = {
   onGameClick: (game: GameItem) => void;
 };
 
-export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick }: SearchResultsPageProps) {
+export default function SearchResultsPage({
+  apiBase,
+  buildCoverUrl,
+  onGameClick,
+}: SearchResultsPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Retrieve data from location state
-  const { searchQuery, games } = (location.state as { searchQuery?: string; games?: GameItem[] }) || {};
+  const { searchQuery, games } =
+    (location.state as { searchQuery?: string; games?: GameItem[] }) || {};
 
   if (!searchQuery || !games || games.length === 0) {
     return (
@@ -50,13 +55,13 @@ export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick 
             Search results: "{searchQuery}"
           </div>
           <div className="search-results-count">
-            Found {games.length} {games.length === 1 ? 'game' : 'games'}
+            Found {games.length} {games.length === 1 ? "game" : "games"}
           </div>
         </div>
       </div>
       <div className="search-results-content">
         <div className="search-results-content-inner">
-          <SearchResultsList 
+          <SearchResultsList
             games={games}
             apiBase={apiBase}
             onGameClick={onGameClick}
@@ -67,4 +72,3 @@ export default function SearchResultsPage({ apiBase, buildCoverUrl, onGameClick 
     </div>
   );
 }
-

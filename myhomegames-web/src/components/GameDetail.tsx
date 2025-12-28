@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import CoverPlaceholder from './CoverPlaceholder';
+import { useState } from "react";
+import CoverPlaceholder from "./CoverPlaceholder";
 import "./GameDetail.css";
 
 type GameItem = {
@@ -16,7 +16,11 @@ type GameDetailProps = {
   onPlay: (game: GameItem) => void;
 };
 
-export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) {
+export default function GameDetail({
+  game,
+  coverUrl,
+  onPlay,
+}: GameDetailProps) {
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !coverUrl || imageError;
   const coverWidth = 256;
@@ -30,7 +34,11 @@ export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) 
           <div className="flex-shrink-0">
             <div className="w-64 aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden">
               {showPlaceholder ? (
-                <CoverPlaceholder title={game.title} width={coverWidth} height={coverHeight} />
+                <CoverPlaceholder
+                  title={game.title}
+                  width={coverWidth}
+                  height={coverHeight}
+                />
               ) : (
                 <img
                   src={coverUrl}
@@ -47,7 +55,7 @@ export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) 
           {/* Game Info */}
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">{game.title}</h1>
-            
+
             {game.summary && (
               <div className="text-gray-300 mb-6">
                 <p className="text-lg">{game.summary}</p>
@@ -67,4 +75,3 @@ export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) 
     </div>
   );
 }
-

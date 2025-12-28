@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import CoverPlaceholder from './CoverPlaceholder';
+import { useState } from "react";
+import CoverPlaceholder from "./CoverPlaceholder";
 import "./GamesListDetail.css";
 
 type GameItem = {
@@ -23,7 +23,13 @@ type GamesListDetailProps = {
 
 const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
 
-export default function GamesListDetail({ games, apiBase, onGameClick, buildCoverUrl, itemRefs }: GamesListDetailProps) {
+export default function GamesListDetail({
+  games,
+  apiBase,
+  onGameClick,
+  buildCoverUrl,
+  itemRefs,
+}: GamesListDetailProps) {
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">No games found</div>;
   }
@@ -45,17 +51,23 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
                 itemRefs.current.set(it.ratingKey, el);
               }
             }}
-            className={`group cursor-pointer mb-6 games-list-detail-item ${isEven ? 'even' : 'odd'}`}
+            className={`group cursor-pointer mb-6 games-list-detail-item ${
+              isEven ? "even" : "odd"
+            }`}
             onClick={() => onGameClick(it)}
           >
-            <div 
+            <div
               className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 games-list-detail-cover"
-              style={{ 
-                height: `${coverHeight}px`
+              style={{
+                height: `${coverHeight}px`,
               }}
             >
               {showPlaceholder ? (
-                <CoverPlaceholder title={it.title} width={FIXED_COVER_SIZE} height={coverHeight} />
+                <CoverPlaceholder
+                  title={it.title}
+                  width={FIXED_COVER_SIZE}
+                  height={coverHeight}
+                />
               ) : (
                 <img
                   src={buildCoverUrl(apiBase, it.cover)}
@@ -67,36 +79,35 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
                 />
               )}
             </div>
-          <div className="games-list-detail-content">
-            <div className="text-white mb-2 games-list-detail-title">
-              {it.title}
+            <div className="games-list-detail-content">
+              <div className="text-white mb-2 games-list-detail-title">
+                {it.title}
+              </div>
+              {it.summary && (
+                <div
+                  className="text-gray-400 mb-2"
+                  style={{
+                    fontSize: "0.95rem",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  {it.summary}
+                </div>
+              )}
+              {it.year !== null && it.year !== undefined && (
+                <div className="text-gray-500" style={{ fontSize: "0.85rem" }}>
+                  {it.day !== null &&
+                  it.day !== undefined &&
+                  it.month !== null &&
+                  it.month !== undefined
+                    ? `${it.day}/${it.month}/${it.year}`
+                    : it.year.toString()}
+                </div>
+              )}
             </div>
-            {it.summary && (
-              <div 
-                className="text-gray-400 mb-2"
-                style={{ 
-                  fontSize: '0.95rem', 
-                  lineHeight: '1.5'
-                }}
-              >
-                {it.summary}
-              </div>
-            )}
-            {(it.year !== null && it.year !== undefined) && (
-              <div 
-                className="text-gray-500"
-                style={{ fontSize: '0.85rem' }}
-              >
-                {it.day !== null && it.day !== undefined && it.month !== null && it.month !== undefined
-                  ? `${it.day}/${it.month}/${it.year}`
-                  : it.year.toString()}
-              </div>
-            )}
           </div>
-        </div>
         );
       })}
     </div>
   );
 }
-

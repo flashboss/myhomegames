@@ -1,29 +1,35 @@
 import { useState, useRef, useEffect } from "react";
 import "./ViewModeSelector.css";
 
-type ViewMode = 'grid' | 'detail' | 'table';
+type ViewMode = "grid" | "detail" | "table";
 
 type ViewModeSelectorProps = {
   value: ViewMode;
   onChange: (mode: ViewMode) => void;
 };
 
-export default function ViewModeSelector({ value, onChange }: ViewModeSelectorProps) {
+export default function ViewModeSelector({
+  value,
+  onChange,
+}: ViewModeSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [iconHover, setIconHover] = useState(false);
   const selectorRef = useRef<HTMLDivElement>(null);
 
   const modes: { key: ViewMode; label: string; icon: string }[] = [
-    { key: 'grid', label: 'Grid View', icon: '⊞' },
-    { key: 'detail', label: 'Detail View', icon: '☰' },
-    { key: 'table', label: 'Table View', icon: '☷' }
+    { key: "grid", label: "Grid View", icon: "⊞" },
+    { key: "detail", label: "Detail View", icon: "☰" },
+    { key: "table", label: "Table View", icon: "☷" },
   ];
 
-  const currentMode = modes.find(m => m.key === value) || modes[0];
+  const currentMode = modes.find((m) => m.key === value) || modes[0];
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (selectorRef.current && !selectorRef.current.contains(event.target as Node)) {
+      if (
+        selectorRef.current &&
+        !selectorRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -49,7 +55,9 @@ export default function ViewModeSelector({ value, onChange }: ViewModeSelectorPr
           setIconHover(false);
         }}
       >
-        <span className={`view-mode-icon ${iconHover ? 'hover' : ''}`}>{currentMode.icon}</span>
+        <span className={`view-mode-icon ${iconHover ? "hover" : ""}`}>
+          {currentMode.icon}
+        </span>
         <svg
           width="12"
           height="12"
@@ -57,9 +65,13 @@ export default function ViewModeSelector({ value, onChange }: ViewModeSelectorPr
           stroke="currentColor"
           viewBox="0 0 24 24"
           strokeWidth={2}
-          className={`view-mode-arrow ${isOpen ? 'open' : ''}`}
+          className={`view-mode-arrow ${isOpen ? "open" : ""}`}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
@@ -73,7 +85,9 @@ export default function ViewModeSelector({ value, onChange }: ViewModeSelectorPr
                 setIsOpen(false);
               }}
               type="button"
-              className={`view-mode-option ${value === mode.key ? 'active' : ''}`}
+              className={`view-mode-option ${
+                value === mode.key ? "active" : ""
+              }`}
             >
               <span className="view-mode-option-icon">{mode.icon}</span>
               <span>{mode.label}</span>
@@ -84,4 +98,3 @@ export default function ViewModeSelector({ value, onChange }: ViewModeSelectorPr
     </div>
   );
 }
-

@@ -49,7 +49,10 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -92,9 +95,11 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           onFocus={() => {
             if (searchQuery.trim() !== "") setIsOpen(true);
           }}
-          className={`plex-search-input search-input-with-padding ${searchQuery ? 'has-query' : ''}`}
+          className={`plex-search-input search-input-with-padding ${
+            searchQuery ? "has-query" : ""
+          }`}
           onKeyDown={(e) => {
-            if (e.key === 'Escape') {
+            if (e.key === "Escape") {
               setIsOpen(false);
             }
           }}
@@ -127,48 +132,68 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
         <div className="plex-dropdown search-dropdown">
           <div className="search-dropdown-scroll">
             {filteredGames.map((game, index) => {
-            const showPlaceholder = !game.cover || imageErrors.has(game.ratingKey);
+              const showPlaceholder =
+                !game.cover || imageErrors.has(game.ratingKey);
 
-            return (
-              <button
-                key={game.ratingKey}
-                onClick={() => {
-                  onGameSelect(game);
-                  setSearchQuery("");
-                  setIsOpen(false);
-                }}
-                className={`w-full plex-dropdown-item search-dropdown-item ${index < filteredGames.length - 1 ? 'has-border' : ''}`}
-              >
-                {showPlaceholder ? (
-                  <div className="search-result-thumbnail">
-                    <CoverPlaceholder title={game.title} width={48} height={72} />
+              return (
+                <button
+                  key={game.ratingKey}
+                  onClick={() => {
+                    onGameSelect(game);
+                    setSearchQuery("");
+                    setIsOpen(false);
+                  }}
+                  className={`w-full plex-dropdown-item search-dropdown-item ${
+                    index < filteredGames.length - 1 ? "has-border" : ""
+                  }`}
+                >
+                  {showPlaceholder ? (
+                    <div className="search-result-thumbnail">
+                      <CoverPlaceholder
+                        title={game.title}
+                        width={48}
+                        height={72}
+                      />
+                    </div>
+                  ) : (
+                    <img
+                      src={
+                        game.cover && game.cover.startsWith("http")
+                          ? game.cover
+                          : `http://127.0.0.1:4000${game.cover || ""}`
+                      }
+                      alt={game.title}
+                      className="object-cover rounded flex-shrink-0 search-result-thumbnail"
+                      onError={() => {
+                        setImageErrors((prev) =>
+                          new Set(prev).add(game.ratingKey)
+                        );
+                      }}
+                    />
+                  )}
+                  <div className="search-result-content">
+                    <div className="text-white text-sm truncate search-result-title">
+                      {game.title}
+                    </div>
+                    {game.summary && (
+                      <div className="text-gray-400 text-xs truncate mt-1 search-result-summary">
+                        {game.summary}
+                      </div>
+                    )}
+                    {game.year !== null && game.year !== undefined && (
+                      <div className="text-gray-500 text-xs truncate mt-1 search-result-date">
+                        {game.day !== null &&
+                        game.day !== undefined &&
+                        game.month !== null &&
+                        game.month !== undefined
+                          ? `${game.day}/${game.month}/${game.year}`
+                          : game.year.toString()}
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <img
-                    src={game.cover && game.cover.startsWith("http") ? game.cover : `http://127.0.0.1:4000${game.cover || ''}`}
-                    alt={game.title}
-                    className="object-cover rounded flex-shrink-0 search-result-thumbnail"
-                    onError={() => {
-                      setImageErrors(prev => new Set(prev).add(game.ratingKey));
-                    }}
-                  />
-                )}
-              <div className="search-result-content">
-                <div className="text-white text-sm truncate search-result-title">{game.title}</div>
-                {game.summary && (
-                  <div className="text-gray-400 text-xs truncate mt-1 search-result-summary">{game.summary}</div>
-                )}
-                {(game.year !== null && game.year !== undefined) && (
-                  <div className="text-gray-500 text-xs truncate mt-1 search-result-date">
-                    {game.day !== null && game.day !== undefined && game.month !== null && game.month !== undefined
-                      ? `${game.day}/${game.month}/${game.year}`
-                      : game.year.toString()}
-                  </div>
-                )}
-              </div>
-            </button>
-            );
-          })}
+                </button>
+              );
+            })}
           </div>
           {allFilteredGames.length > 0 && (
             <div className="search-dropdown-footer">
@@ -177,8 +202,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                   navigate("/search-results", {
                     state: {
                       searchQuery: searchQuery,
-                      games: allFilteredGames
-                    }
+                      games: allFilteredGames,
+                    },
                   });
                   setSearchQuery("");
                   setIsOpen(false);
@@ -200,4 +225,3 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
     </div>
   );
 }
-

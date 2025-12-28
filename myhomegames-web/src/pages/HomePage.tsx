@@ -32,7 +32,11 @@ type HomePageProps = {
   onGamesLoaded: (games: GameItem[]) => void;
 };
 
-function buildApiUrl(apiBase: string, path: string, params: Record<string, string | number | boolean> = {}) {
+function buildApiUrl(
+  apiBase: string,
+  path: string,
+  params: Record<string, string | number | boolean> = {}
+) {
   const u = new URL(path, apiBase);
   Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));
   return u.toString();
@@ -44,15 +48,24 @@ function buildCoverUrl(apiBase: string, cover?: string) {
   return buildApiUrl(apiBase, cover);
 }
 
-export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGamesLoaded }: HomePageProps) {
+export default function HomePage({
+  apiBase,
+  apiToken,
+  onGameClick,
+  onPlay,
+  onGamesLoaded,
+}: HomePageProps) {
   const [libraries, setLibraries] = useState<GameLibrarySection[]>([]);
-  const [activeLibrary, setActiveLibrary] = useState<GameLibrarySection | null>(null);
+  const [activeLibrary, setActiveLibrary] = useState<GameLibrarySection | null>(
+    null
+  );
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coverSize, setCoverSize] = useState(150);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const tableScrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   // Function to save view mode for a library
@@ -63,7 +76,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
   // Function to load saved view mode for a library
   const loadViewModeForLibrary = (libraryKey: string): ViewMode => {
     const saved = localStorage.getItem(`viewMode_${libraryKey}`);
-    return (saved as ViewMode) || 'grid';
+    return (saved as ViewMode) || "grid";
   };
 
   // Handler to change view mode
@@ -83,10 +96,10 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     if (libraries.length > 0 && !activeLibrary) {
       // Try to restore last selected library from localStorage
       const savedLibraryKey = localStorage.getItem("lastSelectedLibrary");
-      const libraryToSelect = savedLibraryKey 
-        ? libraries.find(lib => lib.key === savedLibraryKey) || libraries[0]
+      const libraryToSelect = savedLibraryKey
+        ? libraries.find((lib) => lib.key === savedLibraryKey) || libraries[0]
         : libraries[0];
-      
+
       setActiveLibrary(libraryToSelect);
       // Load saved view mode for this library
       const savedViewMode = loadViewModeForLibrary(libraryToSelect.key);
@@ -100,16 +113,20 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     setError(null);
     try {
       const url = buildApiUrl(apiBase, "/libraries");
-      const res = await fetch(url, { 
-        headers: { 
+      const res = await fetch(url, {
+        headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken
-        } 
+          "X-Auth-Token": apiToken,
+        },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const libs = (json.libraries || []) as any[];
-      const parsed = libs.map((d) => ({ key: d.key, title: d.title, type: d.type }));
+      const parsed = libs.map((d) => ({
+        key: d.key,
+        title: d.title,
+        type: d.type,
+      }));
       setLibraries(parsed);
     } catch (err: any) {
       setError(String(err.message || err));
@@ -122,25 +139,27 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     setLoading(true);
     setError(null);
     try {
-      const url = buildApiUrl(apiBase, `/libraries/${sectionKey}/games`, { sort: "title" });
-      const res = await fetch(url, { 
-        headers: { 
+      const url = buildApiUrl(apiBase, `/libraries/${sectionKey}/games`, {
+        sort: "title",
+      });
+      const res = await fetch(url, {
+        headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken
-        } 
+          "X-Auth-Token": apiToken,
+        },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const items = (json.games || []) as any[];
-      const parsed = items.map((v) => ({ 
-        ratingKey: v.id, 
-        title: v.title, 
-        summary: v.summary, 
-        cover: v.cover, 
+      const parsed = items.map((v) => ({
+        ratingKey: v.id,
+        title: v.title,
+        summary: v.summary,
+        cover: v.cover,
         day: v.day,
         month: v.month,
         year: v.year,
-        stars: v.stars
+        stars: v.stars,
       }));
       setGames(parsed);
       onGamesLoaded(parsed);
@@ -174,7 +193,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
 
   return (
     <>
-      <LibrariesBar 
+      <LibrariesBar
         libraries={libraries}
         activeLibrary={activeLibrary}
         onSelectLibrary={onSelectLibrary}
@@ -197,13 +216,20 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
           ) : (
             <div className="home-page-layout">
               {/* Scrollable lists container */}
-              <div ref={scrollContainerRef} className={`home-page-scroll-container ${viewMode === 'table' ? 'table-view' : ''}`}>
+              <div
+                ref={scrollContainerRef}
+                className={`home-page-scroll-container ${
+                  viewMode === "table" ? "table-view" : ""
+                }`}
+              >
                 {loading ? (
-                  <div className="text-sm text-gray-400 text-center">Loading games…</div>
+                  <div className="text-sm text-gray-400 text-center">
+                    Loading games…
+                  </div>
                 ) : (
                   <>
-                    {viewMode === 'grid' && (
-                      <GamesList 
+                    {viewMode === "grid" && (
+                      <GamesList
                         games={games}
                         apiBase={apiBase}
                         onGameClick={handleGameClick}
@@ -212,8 +238,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
                         itemRefs={itemRefs}
                       />
                     )}
-                    {viewMode === 'detail' && (
-                      <GamesListDetail 
+                    {viewMode === "detail" && (
+                      <GamesListDetail
                         games={games}
                         apiBase={apiBase}
                         onGameClick={handleGameClick}
@@ -221,24 +247,27 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
                         itemRefs={itemRefs}
                       />
                     )}
-                    {viewMode === 'table' && (
-                      <GamesListTable 
+                    {viewMode === "table" && (
+                      <GamesListTable
                         games={games}
                         onGameClick={handleGameClick}
                         itemRefs={itemRefs}
+                        scrollContainerRef={tableScrollRef}
                       />
                     )}
                   </>
                 )}
               </div>
-              
+
               {/* Alphabet navigator container - separate div */}
               {games.length > 0 && (
                 <div className="home-page-alphabet-container">
-                  <AlphabetNavigator 
-                    games={games} 
-                    scrollContainerRef={scrollContainerRef} 
-                    itemRefs={itemRefs} 
+                  <AlphabetNavigator
+                    games={games}
+                    scrollContainerRef={
+                      viewMode === "table" ? tableScrollRef : scrollContainerRef
+                    }
+                    itemRefs={itemRefs}
                   />
                 </div>
               )}
@@ -249,4 +278,3 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
     </>
   );
 }
-

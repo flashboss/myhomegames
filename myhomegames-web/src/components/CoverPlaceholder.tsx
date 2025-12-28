@@ -6,7 +6,11 @@ type CoverPlaceholderProps = {
   height: number;
 };
 
-export default function CoverPlaceholder({ title, width, height }: CoverPlaceholderProps) {
+export default function CoverPlaceholder({
+  title,
+  width,
+  height,
+}: CoverPlaceholderProps) {
   // Calculate font size based on width
   const fontSize = Math.max(10, Math.min(16, Math.floor(width / 8)));
   const padding = Math.max(4, Math.floor(width / 20));
@@ -19,7 +23,7 @@ export default function CoverPlaceholder({ title, width, height }: CoverPlacehol
         width: `${width}px`,
         height: `${height}px`,
         minWidth: `${width}px`,
-        minHeight: `${height}px`
+        minHeight: `${height}px`,
       }}
     >
       <div
@@ -27,7 +31,7 @@ export default function CoverPlaceholder({ title, width, height }: CoverPlacehol
         style={{
           padding: `${padding}px`,
           fontSize: `${fontSize}px`,
-          WebkitLineClamp: lineClamp
+          WebkitLineClamp: lineClamp,
         }}
       >
         {title}
@@ -35,4 +39,3 @@ export default function CoverPlaceholder({ title, width, height }: CoverPlacehol
     </div>
   );
 }
-

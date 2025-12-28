@@ -12,7 +12,7 @@ export default function SettingsPage() {
     const defaultPath = "$HOME/Library/Application\\ Support/MyHomeGames";
     const saved = localStorage.getItem("metadataPath") || defaultPath;
     setMetadataPath(saved);
-    
+
     // Load saved language from localStorage, or use default (English)
     const savedLanguage = localStorage.getItem("language") || "en";
     setLanguage(savedLanguage);
@@ -29,32 +29,22 @@ export default function SettingsPage() {
     <div className="bg-[#1a1a1a] text-white settings-page">
       <div className="settings-container">
         <div className="settings-header">
-          <h1 className="settings-title">
-            Settings
-          </h1>
-          <p className="settings-subtitle">
-            Configure application preferences
-          </p>
+          <h1 className="settings-title">Settings</h1>
+          <p className="settings-subtitle">Configure application preferences</p>
         </div>
 
         <div className="bg-[#1a1a1a] settings-card">
           <div className="settings-card-header">
-            <h2 className="settings-card-title">
-              General
-            </h2>
+            <h2 className="settings-card-title">General</h2>
           </div>
 
           <div className="settings-card-content">
             <div className="settings-field-small">
-              <label className="settings-label">
-                Version 1.0.0
-              </label>
+              <label className="settings-label">Version 1.0.0</label>
             </div>
 
             <div className="settings-field">
-              <label className="settings-label">
-                Language
-              </label>
+              <label className="settings-label">Language</label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
@@ -69,9 +59,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="settings-field">
-              <label className="settings-label">
-                Metadata Path
-              </label>
+              <label className="settings-label">Metadata Path</label>
               <input
                 type="text"
                 value={metadataPath}
@@ -85,10 +73,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="settings-actions">
-              <button
-                onClick={handleSave}
-                className="settings-button"
-              >
+              <button onClick={handleSave} className="settings-button">
                 Save
               </button>
             </div>
@@ -98,4 +83,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

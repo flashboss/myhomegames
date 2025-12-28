@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate, useParams } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import "./App.css";
 import Favicon from "./components/Favicon";
 import Header from "./components/Header";
@@ -24,7 +30,10 @@ type GameItem = {
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
 const API_TOKEN = import.meta.env.VITE_API_TOKEN || "";
 
-function buildApiUrl(path: string, params: Record<string, string | number | boolean> = {}) {
+function buildApiUrl(
+  path: string,
+  params: Record<string, string | number | boolean> = {}
+) {
   const u = new URL(path, API_BASE);
   Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));
   return u.toString();
@@ -45,7 +54,10 @@ function AppContent() {
   const navigate = useNavigate();
 
   function openLauncher(item: GameItem) {
-    const launchUrl = buildApiUrl(`/launcher`, { gameId: item.ratingKey, token: API_TOKEN });
+    const launchUrl = buildApiUrl(`/launcher`, {
+      gameId: item.ratingKey,
+      token: API_TOKEN,
+    });
     setPlayerUrl(launchUrl);
   }
 
@@ -60,9 +72,19 @@ function AppContent() {
   return (
     <>
       <Favicon />
-      <div className="bg-[#1a1a1a] text-white" style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <Header 
-          allGames={allGames} 
+      <div
+        className="bg-[#1a1a1a] text-white"
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "100vh",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Header
+          allGames={allGames}
           onGameSelect={handleGameSelect}
           onHomeClick={() => navigate("/")}
           onSettingsClick={() => navigate("/settings")}
@@ -70,41 +92,39 @@ function AppContent() {
         />
 
         <Routes>
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
-              <HomePage 
+              <HomePage
                 apiBase={API_BASE}
                 apiToken={API_TOKEN}
                 onGameClick={handleGameClick}
                 onPlay={openLauncher}
                 onGamesLoaded={(games) => {
                   setAllGames((prev: GameItem[]) => {
-                    const existingIds = new Set(prev.map((g: GameItem) => g.ratingKey));
-                    const newGames = games.filter((g: GameItem) => !existingIds.has(g.ratingKey));
+                    const existingIds = new Set(
+                      prev.map((g: GameItem) => g.ratingKey)
+                    );
+                    const newGames = games.filter(
+                      (g: GameItem) => !existingIds.has(g.ratingKey)
+                    );
                     return [...prev, ...newGames];
                   });
                 }}
               />
-            } 
+            }
           />
-          <Route 
-            path="/game/:gameId" 
+          <Route
+            path="/game/:gameId"
             element={
-              <GameDetailPage 
-                allGames={allGames}
-                onPlay={openLauncher}
-              />
-            } 
+              <GameDetailPage allGames={allGames} onPlay={openLauncher} />
+            }
           />
-          <Route 
-            path="/settings" 
-            element={<SettingsPage />} 
-          />
-          <Route 
-            path="/add-game" 
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route
+            path="/add-game"
             element={
-              <AddGamePage 
+              <AddGamePage
                 apiBase={API_BASE}
                 apiToken={API_TOKEN}
                 onGameSelected={(game) => {
@@ -112,17 +132,17 @@ function AppContent() {
                   // TODO: Implement game addition logic
                 }}
               />
-            } 
+            }
           />
-          <Route 
-            path="/search-results" 
+          <Route
+            path="/search-results"
             element={
-              <SearchResultsPage 
+              <SearchResultsPage
                 apiBase={API_BASE}
                 buildCoverUrl={buildCoverUrl}
                 onGameClick={handleGameClick}
               />
-            } 
+            }
           />
         </Routes>
 
@@ -156,7 +176,11 @@ function AppContent() {
                   ✕ Close
                 </button>
               </div>
-              <iframe src={playerUrl} title="Game Launcher" className="w-full h-full border-0" />
+              <iframe
+                src={playerUrl}
+                title="Game Launcher"
+                className="w-full h-full border-0"
+              />
             </div>
           </div>
         )}
@@ -165,17 +189,23 @@ function AppContent() {
   );
 }
 
-function GameDetailPage({ allGames, onPlay }: { 
+function GameDetailPage({
+  allGames,
+  onPlay,
+}: {
   allGames: GameItem[];
   onPlay: (game: GameItem) => void;
 }) {
   const navigate = useNavigate();
   const { gameId } = useParams<{ gameId: string }>();
-  const game = allGames.find(g => g.ratingKey === gameId);
+  const game = allGames.find((g) => g.ratingKey === gameId);
 
   if (!game) {
     return (
-      <div className="bg-[#1a1a1a] text-white flex items-center justify-center" style={{ width: '100%', height: '100%' }}>
+      <div
+        className="bg-[#1a1a1a] text-white flex items-center justify-center"
+        style={{ width: "100%", height: "100%" }}
+      >
         <div className="text-center">
           <div className="text-gray-400 mb-4">Game not found</div>
           <button

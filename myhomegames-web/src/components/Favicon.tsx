@@ -3,7 +3,9 @@ import { useEffect } from "react";
 export default function Favicon() {
   useEffect(() => {
     // Remove existing favicon links
-    const existingLinks = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+    const existingLinks = document.querySelectorAll(
+      'link[rel="icon"], link[rel="shortcut icon"]'
+    );
     existingLinks.forEach((link) => link.remove());
 
     // Create SVG favicon
@@ -45,4 +47,3 @@ export default function Favicon() {
 
   return null;
 }
-

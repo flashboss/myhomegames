@@ -17,7 +17,13 @@ type AddGameProps = {
   apiToken: string;
 };
 
-export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiToken }: AddGameProps) {
+export default function AddGame({
+  isOpen,
+  onClose,
+  onGameSelected,
+  apiBase,
+  apiToken,
+}: AddGameProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<IGDBGame[]>([]);
   const [loading, setLoading] = useState(false);
@@ -34,16 +40,16 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
 
     // Handle ESC key to close modal
     function handleEscKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     }
 
-    document.addEventListener('keydown', handleEscKey);
+    document.addEventListener("keydown", handleEscKey);
 
     // Clear timeout on unmount
     return () => {
-      document.removeEventListener('keydown', handleEscKey);
+      document.removeEventListener("keydown", handleEscKey);
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
@@ -103,19 +109,19 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
 
   return createPortal(
     <div
-      style={{ 
-        position: 'fixed', 
-        top: 0, 
-        left: 0, 
-        right: 0, 
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         zIndex: 99999,
         margin: 0,
-        padding: 0
+        padding: 0,
       }}
     >
       <div
@@ -138,17 +144,19 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
             />
           </div>
 
-          {error && (
-            <div className="mb-4 text-red-400 text-sm">{error}</div>
-          )}
+          {error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
 
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="text-center text-gray-400 py-8">Searching...</div>
             ) : results.length === 0 && searchQuery.trim().length >= 2 ? (
-              <div className="text-center text-gray-400 py-8">No games found</div>
+              <div className="text-center text-gray-400 py-8">
+                No games found
+              </div>
             ) : results.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">Type at least 2 characters to search</div>
+              <div className="text-center text-gray-400 py-8">
+                Type at least 2 characters to search
+              </div>
             ) : (
               <div className="grid grid-cols-1 gap-3">
                 {results.map((game) => (
@@ -175,12 +183,18 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="text-white font-medium text-lg mb-1">{game.name}</div>
+                      <div className="text-white font-medium text-lg mb-1">
+                        {game.name}
+                      </div>
                       {game.releaseDate && (
-                        <div className="text-gray-400 text-sm mb-2">{game.releaseDate}</div>
+                        <div className="text-gray-400 text-sm mb-2">
+                          {game.releaseDate}
+                        </div>
                       )}
                       {game.summary && (
-                        <div className="text-gray-300 text-sm line-clamp-2">{game.summary}</div>
+                        <div className="text-gray-300 text-sm line-clamp-2">
+                          {game.summary}
+                        </div>
                       )}
                     </div>
                   </button>
@@ -194,4 +208,3 @@ export default function AddGame({ isOpen, onClose, onGameSelected, apiBase, apiT
     document.body
   );
 }
-

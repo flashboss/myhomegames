@@ -15,7 +15,11 @@ type AddGamePageProps = {
   onGameSelected: (game: IGDBGame) => void;
 };
 
-export default function AddGamePage({ apiBase, apiToken, onGameSelected }: AddGamePageProps) {
+export default function AddGamePage({
+  apiBase,
+  apiToken,
+  onGameSelected,
+}: AddGamePageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<IGDBGame[]>([]);
   const [loading, setLoading] = useState(false);
@@ -89,7 +93,15 @@ export default function AddGamePage({ apiBase, apiToken, onGameSelected }: AddGa
   }
 
   return (
-    <div className="bg-[#1a1a1a] text-white" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+    <div
+      className="bg-[#1a1a1a] text-white"
+      style={{
+        width: "100%",
+        height: "100%",
+        overflowY: "auto",
+        overflowX: "hidden",
+      }}
+    >
       <div className="max-w-4xl mx-auto px-8 py-8">
         <div className="bg-[#1a1a1a] rounded-lg shadow-2xl overflow-hidden border border-[#2a2a2a] max-h-[80vh] flex flex-col">
           <div className="p-6 border-b border-[#2a2a2a] bg-[#0d0d0d]">
@@ -108,17 +120,21 @@ export default function AddGamePage({ apiBase, apiToken, onGameSelected }: AddGa
               />
             </div>
 
-            {error && (
-              <div className="mb-4 text-red-400 text-sm">{error}</div>
-            )}
+            {error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
 
             <div className="flex-1 overflow-y-auto">
               {loading ? (
-                <div className="text-center text-gray-400 py-8">Searching...</div>
+                <div className="text-center text-gray-400 py-8">
+                  Searching...
+                </div>
               ) : results.length === 0 && searchQuery.trim().length >= 2 ? (
-                <div className="text-center text-gray-400 py-8">No games found</div>
+                <div className="text-center text-gray-400 py-8">
+                  No games found
+                </div>
               ) : results.length === 0 ? (
-                <div className="text-center text-gray-400 py-8">Type at least 2 characters to search</div>
+                <div className="text-center text-gray-400 py-8">
+                  Type at least 2 characters to search
+                </div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {results.map((game) => (
@@ -133,7 +149,8 @@ export default function AddGamePage({ apiBase, apiToken, onGameSelected }: AddGa
                           alt={game.name}
                           className="w-20 h-28 object-cover rounded flex-shrink-0"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
+                            (e.target as HTMLImageElement).style.display =
+                              "none";
                           }}
                         />
                       ) : (
@@ -142,12 +159,18 @@ export default function AddGamePage({ apiBase, apiToken, onGameSelected }: AddGa
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-white font-medium text-lg mb-1">{game.name}</div>
+                        <div className="text-white font-medium text-lg mb-1">
+                          {game.name}
+                        </div>
                         {game.releaseDate && (
-                          <div className="text-gray-400 text-sm mb-2">{game.releaseDate}</div>
+                          <div className="text-gray-400 text-sm mb-2">
+                            {game.releaseDate}
+                          </div>
                         )}
                         {game.summary && (
-                          <div className="text-gray-300 text-sm line-clamp-2">{game.summary}</div>
+                          <div className="text-gray-300 text-sm line-clamp-2">
+                            {game.summary}
+                          </div>
                         )}
                       </div>
                     </button>
@@ -161,4 +184,3 @@ export default function AddGamePage({ apiBase, apiToken, onGameSelected }: AddGa
     </div>
   );
 }
-

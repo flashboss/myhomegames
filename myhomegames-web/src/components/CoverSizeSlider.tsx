@@ -7,7 +7,12 @@ type CoverSizeSliderProps = {
   max?: number;
 };
 
-export default function CoverSizeSlider({ value, onChange, min = 100, max = 200 }: CoverSizeSliderProps) {
+export default function CoverSizeSlider({
+  value,
+  onChange,
+  min = 100,
+  max = 200,
+}: CoverSizeSliderProps) {
   return (
     <div className="cover-size-slider-container">
       <input
@@ -21,4 +26,3 @@ export default function CoverSizeSlider({ value, onChange, min = 100, max = 200 
     </div>
   );
 }
-
