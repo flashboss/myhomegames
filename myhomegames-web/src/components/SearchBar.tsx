@@ -138,7 +138,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
 
       {isOpen && filteredGames.length > 0 && (
         <div 
-          className="plex-dropdown max-h-96 overflow-y-auto" 
+          className="plex-dropdown" 
           style={{ 
             position: 'absolute',
             top: '100%',
@@ -147,7 +147,24 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             zIndex: 50,
             pointerEvents: 'auto',
             maxWidth: '500px',
-            width: 'calc(100% - 276px)'
+            width: 'calc(100% - 276px)',
+            maxHeight: '400px',
+            overflowY: 'auto',
+            overflowX: 'hidden'
+          }}
+          onWheel={(e) => {
+            const target = e.currentTarget;
+            const isAtTop = target.scrollTop === 0;
+            const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 1;
+            
+            // Se siamo in cima e scrolliamo verso l'alto, o in fondo e scrolliamo verso il basso,
+            // permettiamo lo scroll del body
+            if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
+              // Non fermare la propagazione, permettere lo scroll del body
+              return;
+            }
+            // Altrimenti ferma la propagazione per scrollare solo il popup
+            e.stopPropagation();
           }}
         >
           {filteredGames.map((game, index) => (
