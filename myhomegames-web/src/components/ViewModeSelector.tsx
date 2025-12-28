@@ -63,7 +63,7 @@ export default function ViewModeSelector({ value, onChange }: ViewModeSelectorPr
         }}
       >
         <span style={{ 
-          fontSize: '24px',
+          fontSize: '28px',
           opacity: iconHover ? 0.7 : 1,
           transition: 'opacity 0.2s ease',
           animation: iconHover ? 'pulse 1s ease-in-out infinite' : 'none'

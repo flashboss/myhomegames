@@ -40,7 +40,7 @@ export default function LibrariesBar({ libraries, activeLibrary, onSelectLibrary
         )}
         {error && <div className="plex-libraries-error">{error}</div>}
       </div>
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0px' }}>
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0px', transform: 'translateY(-2px)' }}>
         {onCoverSizeChange && (
           <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
         )}
