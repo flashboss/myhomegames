@@ -182,8 +182,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         onViewModeChange={handleViewModeChange}
       />
 
-      <div className={`h-[calc(100vh-57px-57px)] bg-[#1a1a1a] ${viewMode === 'table' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-        <main className="flex-1">
+      <div className="bg-[#1a1a1a]" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <main className="flex-1" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {!activeLibrary ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-gray-400 text-center">
@@ -191,7 +191,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               </div>
             </div>
           ) : (
-            <div style={{ paddingTop: viewMode === 'table' ? '0' : '22px', paddingBottom: viewMode === 'table' ? '0' : '32px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: viewMode === 'table' ? '0' : '22px', paddingBottom: viewMode === 'table' ? '0' : '32px' }}>
               {loading ? (
                 <div className="text-sm text-gray-400 text-center">Loading games…</div>
               ) : (

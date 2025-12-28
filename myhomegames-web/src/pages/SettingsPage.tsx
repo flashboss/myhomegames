@@ -19,7 +19,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white">
+    <div className="bg-[#1a1a1a] text-white" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
       <div className="max-w-4xl mx-auto px-8 py-8">
         <div className="bg-[#1a1a1a] rounded-lg shadow-2xl overflow-hidden border border-[#2a2a2a]">
           <div className="p-6 border-b border-[#2a2a2a] bg-[#0d0d0d]">

@@ -60,7 +60,7 @@ function AppContent() {
   return (
     <>
       <Favicon />
-      <div className="min-h-screen bg-[#1a1a1a] text-white" style={{ position: 'relative' }}>
+      <div className="bg-[#1a1a1a] text-white" style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <Header 
           allGames={allGames} 
           onGameSelect={handleGameSelect}
@@ -175,7 +175,7 @@ function GameDetailPage({ allGames, onPlay }: {
 
   if (!game) {
     return (
-      <div className="min-h-screen bg-[#1a1a1a] text-white flex items-center justify-center">
+      <div className="bg-[#1a1a1a] text-white flex items-center justify-center" style={{ width: '100%', height: '100%' }}>
         <div className="text-center">
           <div className="text-gray-400 mb-4">Game not found</div>
           <button

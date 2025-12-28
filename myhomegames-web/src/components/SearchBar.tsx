@@ -156,25 +156,33 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             maxWidth: '500px',
             width: 'calc(100% - 276px)',
             maxHeight: 'calc(100vh - 150px)',
-            overflowY: 'auto',
-            overflowX: 'hidden'
-          }}
-          onWheel={(e) => {
-            const target = e.currentTarget;
-            const isAtTop = target.scrollTop === 0;
-            const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 1;
-            
-            // Se siamo in cima e scrolliamo verso l'alto, o in fondo e scrolliamo verso il basso,
-            // permettiamo lo scroll del body
-            if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
-              // Non fermare la propagazione, permettere lo scroll del body
-              return;
-            }
-            // Altrimenti ferma la propagazione per scrollare solo il popup
-            e.stopPropagation();
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
           }}
         >
-          {filteredGames.map((game, index) => {
+          <div
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              overflowX: 'hidden'
+            }}
+            onWheel={(e) => {
+              const target = e.currentTarget;
+              const isAtTop = target.scrollTop === 0;
+              const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 1;
+              
+              // Se siamo in cima e scrolliamo verso l'alto, o in fondo e scrolliamo verso il basso,
+              // permettiamo lo scroll del body
+              if ((isAtTop && e.deltaY < 0) || (isAtBottom && e.deltaY > 0)) {
+                // Non fermare la propagazione, permettere lo scroll del body
+                return;
+              }
+              // Altrimenti ferma la propagazione per scrollare solo il popup
+              e.stopPropagation();
+            }}
+          >
+            {filteredGames.map((game, index) => {
             const showPlaceholder = !game.cover || imageErrors.has(game.ratingKey);
 
             return (
@@ -233,13 +241,15 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             </button>
             );
           })}
+          </div>
           {allFilteredGames.length > 10 && (
             <div style={{ 
               padding: '12px 16px', 
               display: 'flex', 
               justifyContent: 'flex-end',
               borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-              marginTop: '8px'
+              backgroundColor: '#1a1a1a',
+              flexShrink: 0
             }}>
               <button
                 onClick={() => {
