@@ -27,7 +27,15 @@ export default function AlphabetNavigator({
   // Get first letter of each game title
   const getFirstLetter = (title: string): string => {
     const firstChar = title.trim().charAt(0).toUpperCase();
-    return /[A-Z]/.test(firstChar) ? firstChar : "#";
+    if (/[A-Z]/.test(firstChar)) {
+      return firstChar;
+    } else if (/[0-9]/.test(firstChar)) {
+      return "#";
+    } else {
+      // For other special characters, use the first letter found in the title
+      const match = title.match(/[A-Z]/i);
+      return match ? match[0].toUpperCase() : "#";
+    }
   };
 
   // Check if a letter has games

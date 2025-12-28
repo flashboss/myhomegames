@@ -1,0 +1,12 @@
+[
+  {
+    "id": "test_game_3",
+    "title": "Test Game 3",
+    "summary": "Library test game",
+    "command": "/usr/bin/echo",
+    "args": ["test3"],
+    "allowed_dir": "/usr/bin",
+    "year": 2022
+  }
+]
+

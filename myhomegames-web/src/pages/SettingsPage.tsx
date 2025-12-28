@@ -2,27 +2,77 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SettingsPage.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
+const API_TOKEN = import.meta.env.VITE_API_TOKEN || "";
+
 export default function SettingsPage() {
-  const [metadataPath, setMetadataPath] = useState("");
   const [language, setLanguage] = useState("en");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load saved metadata path from localStorage, or use default
-    const defaultPath = "$HOME/Library/Application\\ Support/MyHomeGames";
-    const saved = localStorage.getItem("metadataPath") || defaultPath;
-    setMetadataPath(saved);
-
-    // Load saved language from localStorage, or use default (English)
-    const savedLanguage = localStorage.getItem("language") || "en";
-    setLanguage(savedLanguage);
+    // Load settings from server
+    async function loadSettings() {
+      try {
+        const url = new URL("/settings", API_BASE);
+        const res = await fetch(url.toString(), {
+          headers: {
+            Accept: "application/json",
+            "X-Auth-Token": API_TOKEN,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.language) {
+            setLanguage(data.language);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+        // Fallback to localStorage
+        const saved = localStorage.getItem("language");
+        if (saved) {
+          setLanguage(saved);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSettings();
   }, []);
 
-  function handleSave() {
-    // Save to localStorage
-    localStorage.setItem("metadataPath", metadataPath);
-    localStorage.setItem("language", language);
-    navigate("/");
+  async function handleSave() {
+    setSaving(true);
+    try {
+      // Save settings to server
+      const url = new URL("/settings", API_BASE);
+      const res = await fetch(url.toString(), {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Auth-Token": API_TOKEN,
+        },
+        body: JSON.stringify({
+          language: language,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to save settings");
+      }
+
+      // Also save to localStorage as fallback
+      localStorage.setItem("language", language);
+      navigate("/");
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+      // Fallback to localStorage
+      localStorage.setItem("language", language);
+      navigate("/");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -58,23 +108,13 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <div className="settings-field">
-              <label className="settings-label">Metadata Path</label>
-              <input
-                type="text"
-                value={metadataPath}
-                onChange={(e) => setMetadataPath(e.target.value)}
-                placeholder="/path/to/metadata"
-                className="settings-input"
-              />
-              <p className="settings-help-text">
-                Path where game metadata (covers, descriptions, etc.) are stored
-              </p>
-            </div>
-
             <div className="settings-actions">
-              <button onClick={handleSave} className="settings-button">
-                Save
+              <button
+                onClick={handleSave}
+                className="settings-button"
+                disabled={loading || saving}
+              >
+                {saving ? "Saving..." : "Save"}
               </button>
             </div>
           </div>

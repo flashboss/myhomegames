@@ -37,13 +37,14 @@ function requireToken(req, res, next) {
 }
 
 // Load games whitelist from JSON files (one per library)
-const GAMES_DIR = __dirname;
+// Games JSON files are stored in METADATA_PATH/metadata/
+const METADATA_GAMES_DIR = path.join(METADATA_PATH, "metadata");
 let allGames = {}; // Store all games by ID for launcher
 let gamesByLibrary = {}; // Store games grouped by library
 
 function loadGamesForLibrary(libraryKey) {
   const fileName = `games-${libraryKey}.json`;
-  const filePath = path.join(GAMES_DIR, fileName);
+  const filePath = path.join(METADATA_GAMES_DIR, fileName);
   try {
     const txt = fs.readFileSync(filePath, "utf8");
     const games = JSON.parse(txt);
@@ -314,4 +315,61 @@ app.get("/igdb/search", requireToken, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`MyHomeGames server listening on :${PORT}`));
+// Settings file path - stored in metadata path root
+const SETTINGS_FILE = path.join(METADATA_PATH, "settings.json");
+
+// Helper function to read settings
+function readSettings() {
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const data = fs.readFileSync(SETTINGS_FILE, "utf8");
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.error("Error reading settings:", e.message);
+  }
+  // Return default settings
+  return {
+    language: "en",
+  };
+}
+
+// Helper function to write settings
+function writeSettings(settings) {
+  try {
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), "utf8");
+    return true;
+  } catch (e) {
+    console.error("Error writing settings:", e.message);
+    return false;
+  }
+}
+
+// Endpoint: get settings
+app.get("/settings", requireToken, (req, res) => {
+  const settings = readSettings();
+  res.json(settings);
+});
+
+// Endpoint: update settings
+app.put("/settings", requireToken, (req, res) => {
+  const currentSettings = readSettings();
+  const updatedSettings = {
+    ...currentSettings,
+    ...req.body,
+  };
+
+  if (writeSettings(updatedSettings)) {
+    res.json({ status: "success", settings: updatedSettings });
+  } else {
+    res.status(500).json({ error: "Failed to save settings" });
+  }
+});
+
+// Only start listening if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => console.log(`MyHomeGames server listening on :${PORT}`));
+}
+
+// Export app for testing
+module.exports = app;
