@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import CoverPlaceholder from "./CoverPlaceholder";
 import "./SearchResultsList.css";
 

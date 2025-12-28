@@ -28,7 +28,6 @@ type HomePageProps = {
   apiBase: string;
   apiToken: string;
   onGameClick: (game: GameItem) => void;
-  onPlay: (game: GameItem) => void;
   onGamesLoaded: (games: GameItem[]) => void;
 };
 
@@ -52,7 +51,6 @@ export default function HomePage({
   apiBase,
   apiToken,
   onGameClick,
-  onPlay,
   onGamesLoaded,
 }: HomePageProps) {
   const [libraries, setLibraries] = useState<GameLibrarySection[]>([]);

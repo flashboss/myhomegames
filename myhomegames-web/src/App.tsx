@@ -99,7 +99,6 @@ function AppContent() {
                 apiBase={API_BASE}
                 apiToken={API_TOKEN}
                 onGameClick={handleGameClick}
-                onPlay={openLauncher}
                 onGamesLoaded={(games) => {
                   setAllGames((prev: GameItem[]) => {
                     const existingIds = new Set(

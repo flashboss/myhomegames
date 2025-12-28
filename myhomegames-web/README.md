@@ -1,4 +1,72 @@
-# React + TypeScript + Vite
+# MyHomeGames Web
+
+React + TypeScript + Vite application for managing and browsing game collections.
+
+## Building and Running Locally
+
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm or yarn
+
+### Development Mode
+
+To run the application in development mode:
+
+```bash
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The application will be available at `http://localhost:5173` (or the port shown in the terminal).
+
+### Building for Production
+
+To create a production bundle:
+
+```bash
+# Build the application
+npm run build
+```
+
+This will create an optimized production build in the `dist` directory.
+
+### Preview Production Build Locally
+
+To preview the production build locally:
+
+```bash
+# After building, preview the production build
+npm run preview
+```
+
+This will serve the production build locally, typically at `http://localhost:4173`.
+
+### Server Setup
+
+Make sure the backend server is running. Navigate to the `myhomegames-server` directory:
+
+```bash
+cd ../myhomegames-server
+
+# Install dependencies
+npm install
+
+# Start the server
+npm start
+
+# Or run in development mode with auto-reload
+npm run dev
+```
+
+The server will run on `http://127.0.0.1:4000` by default.
+
+---
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

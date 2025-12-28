@@ -40,7 +40,7 @@ export default function SettingsPage() {
 
           <div className="settings-card-content">
             <div className="settings-field-small">
-              <label className="settings-label">Version 1.0.0</label>
+              <label className="settings-label">Version {__APP_VERSION__}</label>
             </div>
 
             <div className="settings-field">
