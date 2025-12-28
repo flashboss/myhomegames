@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import CoverPlaceholder from './CoverPlaceholder';
 
 type GameItem = {
@@ -31,9 +31,11 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
 
   return (
     <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0 24px' }}>
-      {games.map((it) => {
+      {games.map((it, index) => {
         const [imageError, setImageError] = useState(false);
         const showPlaceholder = !it.cover || imageError;
+        const isEven = index % 2 === 0;
+        const baseBackgroundColor = isEven ? 'transparent' : 'rgba(255, 255, 255, 0.02)';
 
         return (
           <div
@@ -45,13 +47,14 @@ export default function GamesListDetail({ games, apiBase, onGameClick, buildCove
               gap: '20px',
               padding: '16px',
               borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
+              transition: 'background-color 0.2s ease',
+              backgroundColor: baseBackgroundColor
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.backgroundColor = baseBackgroundColor;
             }}
             onClick={() => onGameClick(it)}
           >

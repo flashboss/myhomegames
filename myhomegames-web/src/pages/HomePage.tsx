@@ -218,10 +218,7 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
                   {viewMode === 'table' && (
                     <GamesListTable 
                       games={games}
-                      apiBase={apiBase}
                       onGameClick={handleGameClick}
-                      buildCoverUrl={buildCoverUrl}
-                      coverSize={coverSize}
                     />
                   )}
                 </>
