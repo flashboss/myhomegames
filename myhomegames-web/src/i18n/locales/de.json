@@ -1,0 +1,80 @@
+{
+  "libraries": {
+    "consigliati": "Empfohlen",
+    "libreria": "Bibliothek",
+    "raccolte": "Sammlungen",
+    "categorie": "Kategorien"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Anwendungseinstellungen konfigurieren",
+    "general": "Allgemein",
+    "version": "Version",
+    "language": "Sprache",
+    "selectLanguage": "Wählen Sie die Anwendungssprache",
+    "save": "Speichern",
+    "saving": "Speichern...",
+    "english": "Englisch",
+    "italian": "Italienisch",
+    "portuguese": "Portugiesisch",
+    "spanish": "Spanisch",
+    "french": "Französisch",
+    "german": "Deutsch",
+    "chinese": "Chinesisch",
+    "japanese": "Japanisch"
+  },
+  "header": {
+    "home": "Startseite",
+    "addGame": "Spiel Hinzufügen",
+    "settings": "Einstellungen",
+    "account": "Konto"
+  },
+  "search": {
+    "noResults": "Keine Ergebnisse für den Begriff \"{{query}}\" gefunden",
+    "viewAllResults": "Alle Ergebnisse anzeigen ({{count}})",
+    "placeholder": "Spiele suchen..."
+  },
+  "searchResults": {
+    "title": "Suchergebnisse: \"{{query}}\"",
+    "foundGames_one": "{{count}} Spiel gefunden",
+    "foundGames_other": "{{count}} Spiele gefunden",
+    "noResults": "Keine Ergebnisse gefunden",
+    "goBack": "Zurück zur Startseite"
+  },
+  "home": {
+    "loadingGames": "Spiele werden geladen…",
+    "loadingLibraries": "Bibliotheken werden geladen…"
+  },
+  "addGame": {
+    "title": "Spiel Hinzufügen",
+    "searchPlaceholder": "Nach einem Spiel suchen...",
+    "loading": "Suche...",
+    "noResults": "Keine Spiele gefunden",
+    "typeToSearch": "Geben Sie mindestens 2 Zeichen ein, um zu suchen",
+    "error": "Fehler beim Suchen von Spielen"
+  },
+  "viewMode": {
+    "grid": "Rasteransicht",
+    "detail": "Detailansicht",
+    "table": "Tabellenansicht"
+  },
+  "table": {
+    "columns": "Spalten",
+    "title": "Titel",
+    "summary": "Zusammenfassung",
+    "releaseDate": "Veröffentlichungsdatum",
+    "year": "Jahr",
+    "stars": "Sterne",
+    "noGames": "Keine Spiele gefunden"
+  },
+  "gameDetail": {
+    "notFound": "Spiel nicht gefunden",
+    "goBack": "Zurück zur Startseite"
+  },
+  "common": {
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "close": "Schließen"
+  }
+}
+

@@ -1,0 +1,80 @@
+{
+  "libraries": {
+    "consigliati": "Recommandés",
+    "libreria": "Bibliothèque",
+    "raccolte": "Collections",
+    "categorie": "Catégories"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Configurer les préférences de l'application",
+    "general": "Général",
+    "version": "Version",
+    "language": "Langue",
+    "selectLanguage": "Sélectionnez la langue de l'application",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "english": "Anglais",
+    "italian": "Italien",
+    "portuguese": "Portugais",
+    "spanish": "Espagnol",
+    "french": "Français",
+    "german": "Allemand",
+    "chinese": "Chinois",
+    "japanese": "Japonais"
+  },
+  "header": {
+    "home": "Accueil",
+    "addGame": "Ajouter un Jeu",
+    "settings": "Paramètres",
+    "account": "Compte"
+  },
+  "search": {
+    "noResults": "Aucun résultat trouvé pour le terme \"{{query}}\"",
+    "viewAllResults": "Voir tous les résultats ({{count}})",
+    "placeholder": "Rechercher des jeux..."
+  },
+  "searchResults": {
+    "title": "Résultats de recherche : \"{{query}}\"",
+    "foundGames_one": "{{count}} jeu trouvé",
+    "foundGames_other": "{{count}} jeux trouvés",
+    "noResults": "Aucun résultat trouvé",
+    "goBack": "Retour à l'accueil"
+  },
+  "home": {
+    "loadingGames": "Chargement des jeux…",
+    "loadingLibraries": "Chargement des bibliothèques…"
+  },
+  "addGame": {
+    "title": "Ajouter un Jeu",
+    "searchPlaceholder": "Rechercher un jeu...",
+    "loading": "Recherche...",
+    "noResults": "Aucun jeu trouvé",
+    "typeToSearch": "Tapez au moins 2 caractères pour rechercher",
+    "error": "Erreur lors de la recherche de jeux"
+  },
+  "viewMode": {
+    "grid": "Vue Grille",
+    "detail": "Vue Détaillée",
+    "table": "Vue Tableau"
+  },
+  "table": {
+    "columns": "Colonnes",
+    "title": "Titre",
+    "summary": "Résumé",
+    "releaseDate": "Date de Sortie",
+    "year": "Année",
+    "stars": "Étoiles",
+    "noGames": "Aucun jeu trouvé"
+  },
+  "gameDetail": {
+    "notFound": "Jeu non trouvé",
+    "goBack": "Retour à l'accueil"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "close": "Fermer"
+  }
+}
+

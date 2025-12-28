@@ -1,0 +1,80 @@
+{
+  "libraries": {
+    "consigliati": "Recomendados",
+    "libreria": "Biblioteca",
+    "raccolte": "Coleções",
+    "categorie": "Categorias"
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Configurar preferências do aplicativo",
+    "general": "Geral",
+    "version": "Versão",
+    "language": "Idioma",
+    "selectLanguage": "Selecione o idioma do aplicativo",
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "english": "Inglês",
+    "italian": "Italiano",
+    "portuguese": "Português",
+    "spanish": "Espanhol",
+    "french": "Francês",
+    "german": "Alemão",
+    "chinese": "Chinês",
+    "japanese": "Japonês"
+  },
+  "header": {
+    "home": "Início",
+    "addGame": "Adicionar Jogo",
+    "settings": "Configurações",
+    "account": "Conta"
+  },
+  "search": {
+    "noResults": "Nenhum resultado encontrado para o termo \"{{query}}\"",
+    "viewAllResults": "Ver todos os resultados ({{count}})",
+    "placeholder": "Pesquisar jogos..."
+  },
+  "searchResults": {
+    "title": "Resultados da pesquisa: \"{{query}}\"",
+    "foundGames_one": "Encontrado {{count}} jogo",
+    "foundGames_other": "Encontrados {{count}} jogos",
+    "noResults": "Nenhum resultado encontrado",
+    "goBack": "Voltar ao início"
+  },
+  "home": {
+    "loadingGames": "Carregando jogos…",
+    "loadingLibraries": "Carregando bibliotecas…"
+  },
+  "addGame": {
+    "title": "Adicionar Jogo",
+    "searchPlaceholder": "Pesquisar um jogo...",
+    "loading": "Pesquisando...",
+    "noResults": "Nenhum jogo encontrado",
+    "typeToSearch": "Digite pelo menos 2 caracteres para pesquisar",
+    "error": "Erro ao pesquisar jogos"
+  },
+  "viewMode": {
+    "grid": "Visualização em Grade",
+    "detail": "Visualização Detalhada",
+    "table": "Visualização em Tabela"
+  },
+  "table": {
+    "columns": "Colunas",
+    "title": "Título",
+    "summary": "Resumo",
+    "releaseDate": "Data de Lançamento",
+    "year": "Ano",
+    "stars": "Estrelas",
+    "noGames": "Nenhum jogo encontrado"
+  },
+  "gameDetail": {
+    "notFound": "Jogo não encontrado",
+    "goBack": "Voltar ao início"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "close": "Fechar"
+  }
+}
+

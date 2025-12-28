@@ -1,0 +1,80 @@
+{
+  "libraries": {
+    "consigliati": "Recomendados",
+    "libreria": "Biblioteca",
+    "raccolte": "Colecciones",
+    "categorie": "Categorías"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Configurar preferencias de la aplicación",
+    "general": "General",
+    "version": "Versión",
+    "language": "Idioma",
+    "selectLanguage": "Seleccione el idioma de la aplicación",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "english": "Inglés",
+    "italian": "Italiano",
+    "portuguese": "Portugués",
+    "spanish": "Español",
+    "french": "Francés",
+    "german": "Alemán",
+    "chinese": "Chino",
+    "japanese": "Japonés"
+  },
+  "header": {
+    "home": "Inicio",
+    "addGame": "Añadir Juego",
+    "settings": "Configuración",
+    "account": "Cuenta"
+  },
+  "search": {
+    "noResults": "No se encontraron resultados para el término \"{{query}}\"",
+    "viewAllResults": "Ver todos los resultados ({{count}})",
+    "placeholder": "Buscar juegos..."
+  },
+  "searchResults": {
+    "title": "Resultados de búsqueda: \"{{query}}\"",
+    "foundGames_one": "Se encontró {{count}} juego",
+    "foundGames_other": "Se encontraron {{count}} juegos",
+    "noResults": "No se encontraron resultados",
+    "goBack": "Volver al inicio"
+  },
+  "home": {
+    "loadingGames": "Cargando juegos…",
+    "loadingLibraries": "Cargando bibliotecas…"
+  },
+  "addGame": {
+    "title": "Añadir Juego",
+    "searchPlaceholder": "Buscar un juego...",
+    "loading": "Buscando...",
+    "noResults": "No se encontraron juegos",
+    "typeToSearch": "Escriba al menos 2 caracteres para buscar",
+    "error": "Error al buscar juegos"
+  },
+  "viewMode": {
+    "grid": "Vista de Cuadrícula",
+    "detail": "Vista Detallada",
+    "table": "Vista de Tabla"
+  },
+  "table": {
+    "columns": "Columnas",
+    "title": "Título",
+    "summary": "Resumen",
+    "releaseDate": "Fecha de Lanzamiento",
+    "year": "Año",
+    "stars": "Estrellas",
+    "noGames": "No se encontraron juegos"
+  },
+  "gameDetail": {
+    "notFound": "Juego no encontrado",
+    "goBack": "Volver al inicio"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "close": "Cerrar"
+  }
+}
+

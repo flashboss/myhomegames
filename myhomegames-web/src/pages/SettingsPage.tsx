@@ -121,6 +121,12 @@ export default function SettingsPage() {
               >
                 <option value="en">{t("settings.english")}</option>
                 <option value="it">{t("settings.italian")}</option>
+                <option value="pt">{t("settings.portuguese")}</option>
+                <option value="es">{t("settings.spanish")}</option>
+                <option value="fr">{t("settings.french")}</option>
+                <option value="de">{t("settings.german")}</option>
+                <option value="zh">{t("settings.chinese")}</option>
+                <option value="ja">{t("settings.japanese")}</option>
               </select>
               <p className="settings-help-text">
                 {t("settings.selectLanguage")}

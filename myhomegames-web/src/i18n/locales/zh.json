@@ -1,0 +1,80 @@
+{
+  "libraries": {
+    "consigliati": "推荐",
+    "libreria": "游戏库",
+    "raccolte": "收藏",
+    "categorie": "分类"
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "配置应用程序偏好",
+    "general": "常规",
+    "version": "版本",
+    "language": "语言",
+    "selectLanguage": "选择应用程序语言",
+    "save": "保存",
+    "saving": "保存中...",
+    "english": "英语",
+    "italian": "意大利语",
+    "portuguese": "葡萄牙语",
+    "spanish": "西班牙语",
+    "french": "法语",
+    "german": "德语",
+    "chinese": "中文",
+    "japanese": "日语"
+  },
+  "header": {
+    "home": "首页",
+    "addGame": "添加游戏",
+    "settings": "设置",
+    "account": "账户"
+  },
+  "search": {
+    "noResults": "未找到术语 \"{{query}}\" 的结果",
+    "viewAllResults": "查看所有结果 ({{count}})",
+    "placeholder": "搜索游戏..."
+  },
+  "searchResults": {
+    "title": "搜索结果: \"{{query}}\"",
+    "foundGames_one": "找到 {{count}} 个游戏",
+    "foundGames_other": "找到 {{count}} 个游戏",
+    "noResults": "未找到结果",
+    "goBack": "返回首页"
+  },
+  "home": {
+    "loadingGames": "加载游戏中…",
+    "loadingLibraries": "加载游戏库中…"
+  },
+  "addGame": {
+    "title": "添加游戏",
+    "searchPlaceholder": "搜索游戏...",
+    "loading": "搜索中...",
+    "noResults": "未找到游戏",
+    "typeToSearch": "至少输入 2 个字符进行搜索",
+    "error": "搜索游戏时出错"
+  },
+  "viewMode": {
+    "grid": "网格视图",
+    "detail": "详细视图",
+    "table": "表格视图"
+  },
+  "table": {
+    "columns": "列",
+    "title": "标题",
+    "summary": "摘要",
+    "releaseDate": "发布日期",
+    "year": "年份",
+    "stars": "评分",
+    "noGames": "未找到游戏"
+  },
+  "gameDetail": {
+    "notFound": "未找到游戏",
+    "goBack": "返回首页"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "close": "关闭"
+  }
+}
+

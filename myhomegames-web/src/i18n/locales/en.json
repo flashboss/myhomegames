@@ -15,7 +15,13 @@
     "save": "Save",
     "saving": "Saving...",
     "english": "English",
-    "italian": "Italiano"
+    "italian": "Italiano",
+    "portuguese": "Português",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "chinese": "中文",
+    "japanese": "日本語"
   },
   "header": {
     "home": "Home",
