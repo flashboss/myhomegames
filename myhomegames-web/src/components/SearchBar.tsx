@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import CoverPlaceholder from "./CoverPlaceholder";
 
 type GameItem = {
   ratingKey: string;
@@ -8,6 +10,7 @@ type GameItem = {
   day?: number | null;
   month?: number | null;
   year?: number | null;
+  stars?: number | null;
 };
 
 type SearchBarProps = {
@@ -19,7 +22,10 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [filteredGames, setFilteredGames] = useState<GameItem[]>([]);
+  const [allFilteredGames, setAllFilteredGames] = useState<GameItem[]>([]);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const searchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -35,6 +41,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
     if (filtered.length > 0) {
       console.log("First filtered game:", filtered[0]);
     }
+    setAllFilteredGames(filtered); // Salva tutti i risultati
     setFilteredGames(filtered.slice(0, 10)); // Limit to 10 results
     setIsOpen(filtered.length > 0);
   }, [searchQuery, games]);
@@ -167,42 +174,49 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
             e.stopPropagation();
           }}
         >
-          {filteredGames.map((game, index) => (
-            <button
-              key={game.ratingKey}
-              onClick={() => {
-                onGameSelect(game);
-                setSearchQuery("");
-                setIsOpen(false);
-              }}
-              className="w-full plex-dropdown-item"
-              style={{ 
-                padding: '12px 16px',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                alignContent: 'flex-start',
-                gap: '12px',
-                textAlign: 'left',
-                width: 'calc(100% - 32px)',
-                marginLeft: '16px',
-                marginRight: '16px',
-                borderRadius: '8px',
-                borderBottom: index < filteredGames.length - 1 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
-                boxSizing: 'border-box'
-              }}
-            >
-              {game.cover && (
-                <img
-                  src={game.cover.startsWith("http") ? game.cover : `http://127.0.0.1:4000${game.cover}`}
-                  alt={game.title}
-                  className="object-cover rounded flex-shrink-0"
-                  style={{ width: '48px', height: '72px', minWidth: '48px', minHeight: '72px', alignSelf: 'flex-start' }}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              )}
+          {filteredGames.map((game, index) => {
+            const showPlaceholder = !game.cover || imageErrors.has(game.ratingKey);
+
+            return (
+              <button
+                key={game.ratingKey}
+                onClick={() => {
+                  onGameSelect(game);
+                  setSearchQuery("");
+                  setIsOpen(false);
+                }}
+                className="w-full plex-dropdown-item"
+                style={{ 
+                  padding: '12px 16px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  alignContent: 'flex-start',
+                  gap: '12px',
+                  textAlign: 'left',
+                  width: 'calc(100% - 32px)',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  borderRadius: '8px',
+                  borderBottom: index < filteredGames.length - 1 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+                  boxSizing: 'border-box'
+                }}
+              >
+                {showPlaceholder ? (
+                  <div style={{ width: '48px', height: '72px', minWidth: '48px', minHeight: '72px', flexShrink: 0, alignSelf: 'flex-start' }}>
+                    <CoverPlaceholder title={game.title} width={48} height={72} />
+                  </div>
+                ) : (
+                  <img
+                    src={game.cover && game.cover.startsWith("http") ? game.cover : `http://127.0.0.1:4000${game.cover || ''}`}
+                    alt={game.title}
+                    className="object-cover rounded flex-shrink-0"
+                    style={{ width: '48px', height: '72px', minWidth: '48px', minHeight: '72px', alignSelf: 'flex-start' }}
+                    onError={() => {
+                      setImageErrors(prev => new Set(prev).add(game.ratingKey));
+                    }}
+                  />
+                )}
               <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                 <div className="text-white text-sm truncate" style={{ fontWeight: 700 }}>{game.title}</div>
                 {game.summary && (
@@ -217,7 +231,51 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                 )}
               </div>
             </button>
-          ))}
+            );
+          })}
+          {allFilteredGames.length > 10 && (
+            <div style={{ 
+              padding: '12px 16px', 
+              display: 'flex', 
+              justifyContent: 'flex-end',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+              marginTop: '8px'
+            }}>
+              <button
+                onClick={() => {
+                  navigate("/search-results", {
+                    state: {
+                      searchQuery: searchQuery,
+                      games: allFilteredGames
+                    }
+                  });
+                  setSearchQuery("");
+                  setIsOpen(false);
+                }}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: 'rgba(229, 160, 13, 0.2)',
+                  border: '1px solid rgba(229, 160, 13, 0.5)',
+                  borderRadius: '6px',
+                  color: '#E5A00D',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(229, 160, 13, 0.3)';
+                  e.currentTarget.style.borderColor = 'rgba(229, 160, 13, 0.7)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(229, 160, 13, 0.2)';
+                  e.currentTarget.style.borderColor = 'rgba(229, 160, 13, 0.5)';
+                }}
+              >
+                Visualizza tutti i risultati ({allFilteredGames.length})
+              </button>
+            </div>
+          )}
         </div>
       )}
 

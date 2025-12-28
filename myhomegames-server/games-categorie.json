@@ -8,7 +8,8 @@
         "allowed_dir": "/opt/games",
         "day": 1,
         "month": 3,
-        "year": 2011
+        "year": 2011,
+        "stars": 8
     },
     {
         "id": "steam_1811260",
@@ -22,7 +23,8 @@
         "allowed_dir": "/usr/bin",
         "day": 29,
         "month": 9,
-        "year": 2023
+        "year": 2023,
+        "stars": 7
     },
     {
         "id": "steam_1599340",
@@ -36,7 +38,8 @@
         "allowed_dir": "/usr/bin",
         "day": 24,
         "month": 3,
-        "year": 2023
+        "year": 2023,
+        "stars": 9
     },
     {
         "id": "steam_1938090",
@@ -50,7 +53,8 @@
         "allowed_dir": "/usr/bin",
         "day": 10,
         "month": 11,
-        "year": 2023
+        "year": 2023,
+        "stars": 7
     },
     {
         "id": "steam_1517290",
@@ -64,7 +68,8 @@
         "allowed_dir": "/usr/bin",
         "day": 19,
         "month": 11,
-        "year": 2021
+        "year": 2021,
+        "stars": 6
     },
     {
         "id": "steam_1245620",
@@ -78,7 +83,8 @@
         "allowed_dir": "/usr/bin",
         "day": 25,
         "month": 2,
-        "year": 2022
+        "year": 2022,
+        "stars": 10
     },
     {
         "id": "steam_1086940",
@@ -92,7 +98,8 @@
         "allowed_dir": "/usr/bin",
         "day": 3,
         "month": 8,
-        "year": 2023
+        "year": 2023,
+        "stars": 10
     },
     {
         "id": "steam_1888930",
@@ -106,6 +113,228 @@
         "allowed_dir": "/usr/bin",
         "day": 19,
         "month": 5,
-        "year": 2015
+        "year": 2015,
+        "stars": 10
+    },
+    {
+        "id": "game_1075",
+        "title": "Zombie Apocalypse",
+        "day": 25,
+        "month": 9,
+        "year": 2023,
+        "stars": 2
+    },
+    {
+        "id": "game_1076",
+        "title": "Vampire Hunter",
+        "summary": "Description for Vampire Hunter",
+        "day": 14,
+        "month": 4,
+        "year": 2018
+    },
+    {
+        "id": "game_1077",
+        "title": "Werewolf",
+        "month": 12,
+        "year": 2019,
+        "stars": 4
+    },
+    {
+        "id": "game_1078",
+        "title": "Ghost Buster",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin"
+    },
+    {
+        "id": "game_1079",
+        "title": "Monster Tamer",
+        "command": "/usr/bin/game",
+        "args": [],
+        "allowed_dir": "/usr/bin",
+        "day": 12,
+        "month": 6,
+        "year": 2019,
+        "stars": 10
+    },
+    {
+        "id": "game_1080",
+        "title": "Pet Simulator",
+        "summary": "Description for Pet Simulator",
+        "day": 23,
+        "month": 1,
+        "year": 2023
+    },
+    {
+        "id": "game_1081",
+        "title": "Virtual Pet",
+        "summary": "Description for Virtual Pet",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "day": 19,
+        "month": 11,
+        "year": 2016,
+        "stars": 8
+    },
+    {
+        "id": "game_1082",
+        "title": "Tamagotchi",
+        "summary": "Description for Tamagotchi",
+        "command": "/usr/bin/game",
+        "args": [],
+        "allowed_dir": "/usr/bin",
+        "stars": 7
+    },
+    {
+        "id": "game_1083",
+        "title": "Pokemon Clone",
+        "summary": "Description for Pokemon Clone",
+        "stars": 3
+    },
+    {
+        "id": "game_1084",
+        "title": "Digimon Style",
+        "day": 6,
+        "month": 7,
+        "stars": 3
+    },
+    {
+        "id": "game_1085",
+        "title": "Anime Fighter",
+        "summary": "Description for Anime Fighter",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "year": 2024
+    },
+    {
+        "id": "game_1086",
+        "title": "Manga Adventure",
+        "summary": "Description for Manga Adventure",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "day": 18,
+        "month": 7,
+        "year": 2021
+    },
+    {
+        "id": "game_1087",
+        "title": "Visual Novel",
+        "summary": "Description for Visual Novel",
+        "command": "/usr/bin/game",
+        "year": 2016,
+        "stars": 2
+    },
+    {
+        "id": "game_1088",
+        "title": "Dating Sim",
+        "summary": "Description for Dating Sim",
+        "day": 17,
+        "month": 1,
+        "year": 2016,
+        "stars": 8
+    },
+    {
+        "id": "game_1089",
+        "title": "Life Sim",
+        "summary": "Description for Life Sim",
+        "command": "/usr/bin/game",
+        "args": [],
+        "day": 2,
+        "month": 5,
+        "year": 2016
+    },
+    {
+        "id": "game_1090",
+        "title": "School Sim",
+        "summary": "Description for School Sim",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "month": 7,
+        "year": 2020
+    },
+    {
+        "id": "game_1091",
+        "title": "College Life",
+        "summary": "Description for College Life"
+    },
+    {
+        "id": "game_1092",
+        "title": "Job Simulator",
+        "summary": "Description for Job Simulator",
+        "day": 5,
+        "month": 9,
+        "year": 2016,
+        "stars": 6
+    },
+    {
+        "id": "game_1093",
+        "title": "Office Worker",
+        "summary": "Description for Office Worker",
+        "command": "/usr/bin/game",
+        "args": [],
+        "year": 2019
+    },
+    {
+        "id": "game_1094",
+        "title": "CEO Sim",
+        "summary": "Description for CEO Sim",
+        "command": "/usr/bin/game",
+        "allowed_dir": "/usr/bin",
+        "year": 2017
+    },
+    {
+        "id": "game_1095",
+        "title": "Medieval Times",
+        "summary": "Description for Medieval Times",
+        "command": "/usr/bin/game",
+        "args": [],
+        "allowed_dir": "/usr/bin",
+        "year": 2024,
+        "stars": 2
+    },
+    {
+        "id": "game_1096",
+        "title": "Ancient Egypt",
+        "summary": "Description for Ancient Egypt",
+        "year": 2023
+    },
+    {
+        "id": "game_1097",
+        "title": "Roman Empire",
+        "summary": "Description for Roman Empire",
+        "month": 4,
+        "year": 2016,
+        "stars": 9
+    },
+    {
+        "id": "game_1098",
+        "title": "Viking Age",
+        "command": "/usr/bin/game",
+        "allowed_dir": "/usr/bin"
+    },
+    {
+        "id": "game_1099",
+        "title": "Samurai Era",
+        "summary": "Description for Samurai Era",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "year": 2024,
+        "stars": 9
     }
 ]

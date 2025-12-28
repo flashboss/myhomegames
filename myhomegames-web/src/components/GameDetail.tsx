@@ -1,9 +1,13 @@
+import { useState } from 'react';
+import CoverPlaceholder from './CoverPlaceholder';
+
 type GameItem = {
   ratingKey: string;
   title: string;
   summary?: string;
   cover?: string;
   duration?: number;
+  stars?: number | null;
 };
 
 type GameDetailProps = {
@@ -13,6 +17,11 @@ type GameDetailProps = {
 };
 
 export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) {
+  const [imageError, setImageError] = useState(false);
+  const showPlaceholder = !coverUrl || imageError;
+  const coverWidth = 256;
+  const coverHeight = 384; // 256 * 1.5
+
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       <div className="max-w-7xl mx-auto px-8 py-8">
@@ -20,19 +29,17 @@ export default function GameDetail({ game, coverUrl, onPlay }: GameDetailProps) 
           {/* Cover Image */}
           <div className="flex-shrink-0">
             <div className="w-64 aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden">
-              {coverUrl ? (
+              {showPlaceholder ? (
+                <CoverPlaceholder title={game.title} width={coverWidth} height={coverHeight} />
+              ) : (
                 <img
                   src={coverUrl}
                   alt={game.title}
                   className="object-cover w-full h-full"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
+                  onError={() => {
+                    setImageError(true);
                   }}
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="text-gray-500 text-6xl">🎮</div>
-                </div>
               )}
             </div>
           </div>

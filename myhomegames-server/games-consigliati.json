@@ -11,7 +11,8 @@
         "allowed_dir": "/usr/bin",
         "day": 9,
         "month": 7,
-        "year": 2013
+        "year": 2013,
+        "stars": 9
     },
     {
         "id": "steam_730",
@@ -25,7 +26,8 @@
         "allowed_dir": "/usr/bin",
         "day": 27,
         "month": 9,
-        "year": 2023
+        "year": 2023,
+        "stars": 9
     },
     {
         "id": "steam_1245620",
@@ -39,7 +41,8 @@
         "allowed_dir": "/usr/bin",
         "day": 25,
         "month": 2,
-        "year": 2022
+        "year": 2022,
+        "stars": 10
     },
     {
         "id": "steam_1086940",
@@ -53,7 +56,8 @@
         "allowed_dir": "/usr/bin",
         "day": 3,
         "month": 8,
-        "year": 2023
+        "year": 2023,
+        "stars": 10
     },
     {
         "id": "steam_1174180",
@@ -67,7 +71,8 @@
         "allowed_dir": "/usr/bin",
         "day": 5,
         "month": 11,
-        "year": 2019
+        "year": 2019,
+        "stars": 10
     },
     {
         "id": "steam_271590",
@@ -81,7 +86,8 @@
         "allowed_dir": "/usr/bin",
         "day": 14,
         "month": 4,
-        "year": 2015
+        "year": 2015,
+        "stars": 9
     },
     {
         "id": "steam_1888930",
@@ -95,7 +101,8 @@
         "allowed_dir": "/usr/bin",
         "day": 19,
         "month": 5,
-        "year": 2015
+        "year": 2015,
+        "stars": 10
     },
     {
         "id": "steam_1091500",
@@ -109,7 +116,8 @@
         "allowed_dir": "/usr/bin",
         "day": 10,
         "month": 12,
-        "year": 2020
+        "year": 2020,
+        "stars": 8
     },
     {
         "id": "steam_1599340",
@@ -123,7 +131,8 @@
         "allowed_dir": "/usr/bin",
         "day": 24,
         "month": 3,
-        "year": 2023
+        "year": 2023,
+        "stars": 9
     },
     {
         "id": "steam_1938090",
@@ -137,6 +146,195 @@
         "allowed_dir": "/usr/bin",
         "day": 10,
         "month": 11,
-        "year": 2023
+        "year": 2023,
+        "stars": 7
+    },
+    {
+        "id": "game_1000",
+        "title": "Minimal Game"
+    },
+    {
+        "id": "game_1001",
+        "title": "Game with Summary",
+        "summary": "A game with only summary"
+    },
+    {
+        "id": "game_1002",
+        "title": "Game with Year",
+        "summary": "Action game",
+        "year": 2020
+    },
+    {
+        "id": "game_1003",
+        "title": "Game with Full Date",
+        "summary": "Adventure game",
+        "day": 15,
+        "month": 6,
+        "year": 2021
+    },
+    {
+        "id": "game_1004",
+        "title": "Game with Stars",
+        "stars": 8
+    },
+    {
+        "id": "game_1005",
+        "title": "Game with Summary and Stars",
+        "summary": "RPG",
+        "stars": 9
+    },
+    {
+        "id": "game_1006",
+        "title": "Game with Date and Stars",
+        "day": 20,
+        "month": 3,
+        "year": 2022,
+        "stars": 7
+    },
+    {
+        "id": "game_1007",
+        "title": "Game with Command",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ]
+    },
+    {
+        "id": "game_1008",
+        "title": "Game with All Launch Fields",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin"
+    },
+    {
+        "id": "game_1009",
+        "title": "Game with Summary and Command",
+        "summary": "Strategy",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ]
+    },
+    {
+        "id": "game_1010",
+        "title": "Game without Stars",
+        "summary": "Puzzle",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "day": 10,
+        "month": 5,
+        "year": 2020
+    },
+    {
+        "id": "game_1011",
+        "title": "Game without Summary",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "day": 12,
+        "month": 7,
+        "year": 2021,
+        "stars": 6
+    },
+    {
+        "id": "game_1012",
+        "title": "Game without Date",
+        "summary": "Racing",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "stars": 8
+    },
+    {
+        "id": "game_1013",
+        "title": "Game without Command",
+        "summary": "Simulation",
+        "allowed_dir": "/usr/bin",
+        "day": 25,
+        "month": 9,
+        "year": 2022,
+        "stars": 7
+    },
+    {
+        "id": "game_1014",
+        "title": "Game with Year and Stars",
+        "year": 2019,
+        "stars": 9
+    },
+    {
+        "id": "game_1015",
+        "title": "Game with Month and Year",
+        "month": 4,
+        "year": 2020
+    },
+    {
+        "id": "game_1016",
+        "title": "Game with Command No Args",
+        "command": "/usr/bin/game"
+    },
+    {
+        "id": "game_1017",
+        "title": "Game with Empty Args",
+        "command": "/usr/bin/game",
+        "args": []
+    },
+    {
+        "id": "game_1018",
+        "title": "Game with Allowed Dir Only",
+        "allowed_dir": "/usr/bin"
+    },
+    {
+        "id": "game_1019",
+        "title": "Game with Summary Year Stars",
+        "summary": "Platformer",
+        "year": 2021,
+        "stars": 8
+    },
+    {
+        "id": "game_1020",
+        "title": "Title and Stars Only",
+        "stars": 5
+    },
+    {
+        "id": "game_1021",
+        "title": "Title and Year Only",
+        "year": 2018
+    },
+    {
+        "id": "game_1022",
+        "title": "Game with Summary Month Year",
+        "summary": "Shooter",
+        "month": 11,
+        "year": 2020
+    },
+    {
+        "id": "game_1023",
+        "title": "Game with Day Month",
+        "day": 15,
+        "month": 8
+    },
+    {
+        "id": "game_1024",
+        "title": "Complete Game",
+        "summary": "Complete RPG",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch",
+            "--fullscreen"
+        ],
+        "allowed_dir": "/usr/bin",
+        "day": 1,
+        "month": 1,
+        "year": 2023,
+        "stars": 10
     }
 ]

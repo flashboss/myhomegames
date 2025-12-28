@@ -10,6 +10,7 @@ type GameItem = {
   day?: number | null;
   month?: number | null;
   year?: number | null;
+  stars?: number | null;
 };
 
 type HeaderProps = {

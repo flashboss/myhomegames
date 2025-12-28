@@ -11,7 +11,8 @@
         "allowed_dir": "/usr/bin",
         "day": 10,
         "month": 11,
-        "year": 2023
+        "year": 2023,
+        "stars": 7
     },
     {
         "id": "steam_1517290",
@@ -25,7 +26,8 @@
         "allowed_dir": "/usr/bin",
         "day": 19,
         "month": 11,
-        "year": 2021
+        "year": 2021,
+        "stars": 6
     },
     {
         "id": "steam_1811260",
@@ -39,7 +41,8 @@
         "allowed_dir": "/usr/bin",
         "day": 29,
         "month": 9,
-        "year": 2023
+        "year": 2023,
+        "stars": 7
     },
     {
         "id": "steam_1599340",
@@ -53,7 +56,8 @@
         "allowed_dir": "/usr/bin",
         "day": 24,
         "month": 3,
-        "year": 2023
+        "year": 2023,
+        "stars": 9
     },
     {
         "id": "steam_730",
@@ -67,7 +71,8 @@
         "allowed_dir": "/usr/bin",
         "day": 27,
         "month": 9,
-        "year": 2023
+        "year": 2023,
+        "stars": 9
     },
     {
         "id": "steam_570",
@@ -81,7 +86,8 @@
         "allowed_dir": "/usr/bin",
         "day": 9,
         "month": 7,
-        "year": 2013
+        "year": 2013,
+        "stars": 9
     },
     {
         "id": "steam_252490",
@@ -95,7 +101,8 @@
         "allowed_dir": "/usr/bin",
         "day": 8,
         "month": 2,
-        "year": 2018
+        "year": 2018,
+        "stars": 8
     },
     {
         "id": "steam_440",
@@ -109,7 +116,8 @@
         "allowed_dir": "/usr/bin",
         "day": 10,
         "month": 10,
-        "year": 2007
+        "year": 2007,
+        "stars": 9
     },
     {
         "id": "steam_1174180",
@@ -123,7 +131,8 @@
         "allowed_dir": "/usr/bin",
         "day": 5,
         "month": 11,
-        "year": 2019
+        "year": 2019,
+        "stars": 10
     },
     {
         "id": "steam_271590",
@@ -137,7 +146,8 @@
         "allowed_dir": "/usr/bin",
         "day": 14,
         "month": 4,
-        "year": 2015
+        "year": 2015,
+        "stars": 9
     },
     {
         "id": "steam_1888930",
@@ -151,7 +161,8 @@
         "allowed_dir": "/usr/bin",
         "day": 19,
         "month": 5,
-        "year": 2015
+        "year": 2015,
+        "stars": 10
     },
     {
         "id": "steam_1091500",
@@ -165,6 +176,182 @@
         "allowed_dir": "/usr/bin",
         "day": 10,
         "month": 12,
+        "year": 2020,
+        "stars": 8
+    },
+    {
+        "id": "game_1050",
+        "title": "Music Game",
+        "command": "/usr/bin/game",
+        "args": [],
+        "stars": 5
+    },
+    {
+        "id": "game_1051",
+        "title": "Dance Party",
+        "year": 2020,
+        "stars": 3
+    },
+    {
+        "id": "game_1052",
+        "title": "Rhythm Master",
+        "year": 2015,
+        "stars": 9
+    },
+    {
+        "id": "game_1053",
+        "title": "Sing Star",
+        "command": "/usr/bin/game",
+        "allowed_dir": "/usr/bin",
+        "year": 2016,
+        "stars": 7
+    },
+    {
+        "id": "game_1054",
+        "title": "Karaoke Fun",
+        "summary": "Description for Karaoke Fun",
+        "command": "/usr/bin/game",
+        "args": [],
+        "allowed_dir": "/usr/bin",
+        "day": 16,
+        "month": 6,
+        "year": 2016
+    },
+    {
+        "id": "game_1055",
+        "title": "Fishing Sim",
+        "summary": "Description for Fishing Sim",
+        "year": 2016
+    },
+    {
+        "id": "game_1056",
+        "title": "Hunting Game",
+        "command": "/usr/bin/game",
+        "allowed_dir": "/usr/bin"
+    },
+    {
+        "id": "game_1057",
+        "title": "Farming Sim",
+        "summary": "Description for Farming Sim",
+        "year": 2021,
+        "stars": 6
+    },
+    {
+        "id": "game_1058",
+        "title": "Cooking Game",
+        "stars": 7
+    },
+    {
+        "id": "game_1059",
+        "title": "Restaurant Tycoon",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "allowed_dir": "/usr/bin",
+        "month": 8,
         "year": 2020
+    },
+    {
+        "id": "game_1060",
+        "title": "Zoo Builder",
+        "summary": "Description for Zoo Builder",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "year": 2022
+    },
+    {
+        "id": "game_1061",
+        "title": "Theme Park",
+        "day": 8,
+        "month": 3
+    },
+    {
+        "id": "game_1062",
+        "title": "Roller Coaster",
+        "day": 12,
+        "month": 10
+    },
+    {
+        "id": "game_1063",
+        "title": "City Planner"
+    },
+    {
+        "id": "game_1064",
+        "title": "Traffic Manager",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ]
+    },
+    {
+        "id": "game_1065",
+        "title": "Train Sim",
+        "summary": "Description for Train Sim",
+        "year": 2019
+    },
+    {
+        "id": "game_1066",
+        "title": "Flight Control",
+        "summary": "Description for Flight Control",
+        "day": 4,
+        "month": 3
+    },
+    {
+        "id": "game_1067",
+        "title": "Ship Captain",
+        "summary": "Description for Ship Captain"
+    },
+    {
+        "id": "game_1068",
+        "title": "Submarine",
+        "summary": "Description for Submarine",
+        "command": "/usr/bin/game",
+        "args": [
+            "--launch"
+        ],
+        "day": 16,
+        "month": 11,
+        "stars": 8
+    },
+    {
+        "id": "game_1069",
+        "title": "Space Station",
+        "year": 2021,
+        "stars": 1
+    },
+    {
+        "id": "game_1070",
+        "title": "Mars Colony",
+        "summary": "Description for Mars Colony"
+    },
+    {
+        "id": "game_1071",
+        "title": "Moon Base",
+        "year": 2016
+    },
+    {
+        "id": "game_1072",
+        "title": "Alien Contact",
+        "command": "/usr/bin/game",
+        "args": [],
+        "year": 2020,
+        "stars": 2
+    },
+    {
+        "id": "game_1073",
+        "title": "UFO Hunter",
+        "summary": "Description for UFO Hunter",
+        "stars": 4
+    },
+    {
+        "id": "game_1074",
+        "title": "Alien Invasion",
+        "summary": "Description for Alien Invasion",
+        "month": 8,
+        "year": 2024,
+        "stars": 5
     }
 ]

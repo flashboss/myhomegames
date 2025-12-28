@@ -20,6 +20,7 @@ type GameItem = {
   day?: number | null;
   month?: number | null;
   year?: number | null;
+  stars?: number | null;
 };
 
 type HomePageProps = {
@@ -136,7 +137,8 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
         duration: v.duration,
         day: v.day,
         month: v.month,
-        year: v.year
+        year: v.year,
+        stars: v.stars
       }));
       setGames(parsed);
       onGamesLoaded(parsed);

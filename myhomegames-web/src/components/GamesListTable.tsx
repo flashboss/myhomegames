@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import CoverPlaceholder from './CoverPlaceholder';
 
 type GameItem = {
   ratingKey: string;
@@ -9,6 +10,7 @@ type GameItem = {
   day?: number | null;
   month?: number | null;
   year?: number | null;
+  stars?: number | null;
 };
 
 type GamesListTableProps = {
@@ -64,48 +66,50 @@ export default function GamesListTable({ games, apiBase, onGameClick, buildCover
           </tr>
         </thead>
         <tbody>
-          {games.map((it) => (
-            <tr
-              key={it.ratingKey}
-              className="cursor-pointer"
-              style={{
-                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                transition: 'background-color 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-              onClick={() => onGameClick(it)}
-            >
-              <td style={{ padding: '12px 16px' }}>
-                <div 
-                  className="relative bg-[#2a2a2a] rounded overflow-hidden"
-                  style={{ 
-                    width: '60px', 
-                    height: '90px',
-                    minWidth: '60px',
-                    minHeight: '90px'
-                  }}
-                >
-                  {it.cover ? (
-                    <img
-                      src={buildCoverUrl(apiBase, it.cover)}
-                      alt={it.title}
-                      className="object-cover w-full h-full"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-gray-500 text-2xl">🎮</div>
-                    </div>
-                  )}
-                </div>
-              </td>
+          {games.map((it) => {
+            const [imageError, setImageError] = useState(false);
+            const showPlaceholder = !it.cover || imageError;
+
+            return (
+              <tr
+                key={it.ratingKey}
+                className="cursor-pointer"
+                style={{
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                onClick={() => onGameClick(it)}
+              >
+                <td style={{ padding: '12px 16px' }}>
+                  <div 
+                    className="relative bg-[#2a2a2a] rounded overflow-hidden"
+                    style={{ 
+                      width: '60px', 
+                      height: '90px',
+                      minWidth: '60px',
+                      minHeight: '90px'
+                    }}
+                  >
+                    {showPlaceholder ? (
+                      <CoverPlaceholder title={it.title} width={60} height={90} />
+                    ) : (
+                      <img
+                        src={buildCoverUrl(apiBase, it.cover)}
+                        alt={it.title}
+                        className="object-cover w-full h-full"
+                        onError={() => {
+                          setImageError(true);
+                        }}
+                      />
+                    )}
+                  </div>
+                </td>
               <td style={{ 
                 padding: '12px 16px',
                 fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', 
@@ -134,7 +138,8 @@ export default function GamesListTable({ games, apiBase, onGameClick, buildCover
                   : '-'}
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>

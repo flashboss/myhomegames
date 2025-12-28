@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingsPage";
 import AddGamePage from "./pages/AddGamePage";
+import SearchResultsPage from "./pages/SearchResultsPage";
 import AddGame from "./components/AddGame";
 import GameDetail from "./components/GameDetail";
 
@@ -18,6 +19,7 @@ type GameItem = {
   day?: number | null;
   month?: number | null;
   year?: number | null;
+  stars?: number | null;
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
@@ -29,9 +31,12 @@ function buildApiUrl(path: string, params: Record<string, string | number | bool
   return u.toString();
 }
 
-function buildCoverUrl(cover?: string) {
+function buildCoverUrl(apiBase: string, cover?: string) {
   if (!cover) return "";
-  return buildApiUrl(cover);
+  // Cover is already a full path from server (e.g., /covers/gameId)
+  // We need to prepend the API base URL
+  const u = new URL(cover, apiBase);
+  return u.toString();
 }
 
 function AppContent() {
@@ -110,6 +115,16 @@ function AppContent() {
               />
             } 
           />
+          <Route 
+            path="/search-results" 
+            element={
+              <SearchResultsPage 
+                apiBase={API_BASE}
+                buildCoverUrl={buildCoverUrl}
+                onGameClick={handleGameClick}
+              />
+            } 
+          />
         </Routes>
 
         {/* Add Game Modal */}
@@ -178,7 +193,7 @@ function GameDetailPage({ allGames, onPlay }: {
   return (
     <GameDetail
       game={game}
-      coverUrl={buildCoverUrl(game.cover)}
+      coverUrl={buildCoverUrl(API_BASE, game.cover)}
       onPlay={onPlay}
     />
   );
