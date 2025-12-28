@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import LibrariesBar from "../components/LibrariesBar";
 import type { ViewMode } from "../components/LibrariesBar";
 import GamesList from "../components/GamesList";
+import GamesListDetail from "../components/GamesListDetail";
+import GamesListTable from "../components/GamesListTable";
 
 type GameLibrarySection = {
   key: string;
@@ -168,13 +170,35 @@ export default function HomePage({ apiBase, apiToken, onGameClick, onPlay, onGam
               {loading ? (
                 <div className="text-sm text-gray-400 text-center">Loading games…</div>
               ) : (
-                <GamesList 
-                  games={games}
-                  apiBase={apiBase}
-                  onGameClick={handleGameClick}
-                  buildCoverUrl={buildCoverUrl}
-                  coverSize={coverSize}
-                />
+                <>
+                  {viewMode === 'grid' && (
+                    <GamesList 
+                      games={games}
+                      apiBase={apiBase}
+                      onGameClick={handleGameClick}
+                      buildCoverUrl={buildCoverUrl}
+                      coverSize={coverSize}
+                    />
+                  )}
+                  {viewMode === 'detail' && (
+                    <GamesListDetail 
+                      games={games}
+                      apiBase={apiBase}
+                      onGameClick={handleGameClick}
+                      buildCoverUrl={buildCoverUrl}
+                      coverSize={coverSize}
+                    />
+                  )}
+                  {viewMode === 'table' && (
+                    <GamesListTable 
+                      games={games}
+                      apiBase={apiBase}
+                      onGameClick={handleGameClick}
+                      buildCoverUrl={buildCoverUrl}
+                      coverSize={coverSize}
+                    />
+                  )}
+                </>
               )}
             </div>
           )}
