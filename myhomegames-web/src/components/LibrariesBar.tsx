@@ -68,9 +68,13 @@ export default function LibrariesBar({
               <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
             </div>
           )}
-          {onViewModeChange && (
+          {onViewModeChange && activeLibrary && (
             <div className="plex-libraries-actions-view-mode-container">
-              <ViewModeSelector value={viewMode} onChange={onViewModeChange} />
+              <ViewModeSelector 
+                value={viewMode} 
+                onChange={onViewModeChange}
+                disabled={activeLibrary.key !== "consigliati" && activeLibrary.key !== "libreria"}
+              />
             </div>
           )}
         </div>

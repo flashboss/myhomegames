@@ -79,10 +79,10 @@ export default function HomePage({
     return (saved as ViewMode) || "grid";
   };
 
-  // Handler to change view mode
+  // Handler to change view mode (only for consigliati and libreria)
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
-    if (activeLibrary) {
+    if (activeLibrary && (activeLibrary.key === "consigliati" || activeLibrary.key === "libreria")) {
       saveViewModeForLibrary(activeLibrary.key, mode);
     }
   };
@@ -175,9 +175,14 @@ export default function HomePage({
     localStorage.setItem("lastSelectedLibrary", s.key);
     // Update active library immediately for instant visual feedback
     setActiveLibrary(s);
-    // Load saved view mode for this library
-    const savedViewMode = loadViewModeForLibrary(s.key);
-    setViewMode(savedViewMode);
+    // Load saved view mode for this library (only for consigliati and libreria)
+    // For raccolte and categorie, always use grid view
+    if (s.key === "consigliati" || s.key === "libreria") {
+      const savedViewMode = loadViewModeForLibrary(s.key);
+      setViewMode(savedViewMode);
+    } else {
+      setViewMode("grid");
+    }
     // Clear previous games immediately
     setGames([]);
     // Set loading state immediately
@@ -260,7 +265,10 @@ export default function HomePage({
               </div>
 
               {/* Alphabet navigator container - separate div */}
-              {games.length > 0 && (
+              {games.length > 0 && 
+               activeLibrary && 
+               activeLibrary.key !== "consigliati" && 
+               activeLibrary.key !== "categorie" && (
                 <div className="home-page-alphabet-container">
                   <AlphabetNavigator
                     games={games}

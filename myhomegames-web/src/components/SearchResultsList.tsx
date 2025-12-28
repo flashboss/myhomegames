@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "./CoverPlaceholder";
 import "./SearchResultsList.css";
 
@@ -28,8 +29,10 @@ export default function SearchResultsList({
   onGameClick,
   buildCoverUrl,
 }: SearchResultsListProps) {
+  const { t } = useTranslation();
+  
   if (games.length === 0) {
-    return <div className="text-gray-400 text-center">No games found</div>;
+    return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
   const coverHeight = FIXED_COVER_SIZE * 1.5;

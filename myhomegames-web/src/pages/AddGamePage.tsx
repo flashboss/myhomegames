@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type IGDBGame = {
   id: number;
@@ -20,6 +21,7 @@ export default function AddGamePage({
   apiToken,
   onGameSelected,
 }: AddGamePageProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<IGDBGame[]>([]);
   const [loading, setLoading] = useState(false);
@@ -129,11 +131,11 @@ export default function AddGamePage({
                 </div>
               ) : results.length === 0 && searchQuery.trim().length >= 2 ? (
                 <div className="text-center text-gray-400 py-8">
-                  No games found
+                  {t("table.noGames")}
                 </div>
               ) : results.length === 0 ? (
                 <div className="text-center text-gray-400 py-8">
-                  Type at least 2 characters to search
+                  {t("addGame.typeToSearch")}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">

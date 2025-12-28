@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "./CoverPlaceholder";
 import "./GamesList.css";
 
@@ -27,8 +28,10 @@ export default function GamesList({
   coverSize = 150,
   itemRefs,
 }: GamesListProps) {
+  const { t } = useTranslation();
+  
   if (games.length === 0) {
-    return <div className="text-gray-400 text-center">No games found</div>;
+    return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
   const coverHeight = coverSize * 1.5;

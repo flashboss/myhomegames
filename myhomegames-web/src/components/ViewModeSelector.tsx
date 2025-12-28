@@ -7,11 +7,13 @@ type ViewMode = "grid" | "detail" | "table";
 type ViewModeSelectorProps = {
   value: ViewMode;
   onChange: (mode: ViewMode) => void;
+  disabled?: boolean;
 };
 
 export default function ViewModeSelector({
   value,
   onChange,
+  disabled = false,
 }: ViewModeSelectorProps) {
   const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -51,37 +53,44 @@ export default function ViewModeSelector({
   return (
     <div ref={selectorRef} className="view-mode-selector">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         type="button"
-        className="view-mode-button"
+        className={`view-mode-button ${disabled ? "disabled" : ""}`}
+        disabled={disabled}
         onMouseEnter={() => {
-          setIconHover(true);
+          if (!disabled) {
+            setIconHover(true);
+          }
         }}
         onMouseLeave={() => {
-          setIconHover(false);
+          if (!disabled) {
+            setIconHover(false);
+          }
         }}
       >
-        <span className={`view-mode-icon ${iconHover ? "hover" : ""}`}>
+        <span className={`view-mode-icon ${iconHover && !disabled ? "hover" : ""}`}>
           {currentMode.icon}
         </span>
-        <svg
-          width="12"
-          height="12"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          className={`view-mode-arrow ${isOpen ? "open" : ""}`}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
+        {!disabled && (
+          <svg
+            width="12"
+            height="12"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            className={`view-mode-arrow ${isOpen ? "open" : ""}`}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        )}
       </button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="view-mode-dropdown">
           {modes.map((mode) => (
             <button
