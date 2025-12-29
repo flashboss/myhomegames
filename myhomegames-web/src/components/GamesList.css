@@ -17,4 +17,82 @@
   color: #f8f8f8;
   background-color: transparent;
   padding: 0;
+  cursor: pointer;
+  transition: text-decoration 0.2s ease;
+}
+
+.games-list-item:hover .games-list-title {
+  text-decoration: underline;
+}
+
+.games-list-cover {
+  position: relative;
+  cursor: pointer;
+  outline: 3px solid transparent;
+  outline-offset: -3px;
+  transition: outline-color 0.2s ease;
+}
+
+.games-list-item:hover .games-list-cover {
+  outline-color: #E5A00D;
+  border-radius: 4px;
+}
+
+.games-list-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  z-index: 10;
+}
+
+.games-list-play-button:hover {
+  background-color: rgba(229, 160, 13, 0.9);
+}
+
+.games-list-item:hover .games-list-play-button {
+  opacity: 1;
+}
+
+.games-list-play-button svg {
+  width: 24px;
+  height: 24px;
+  color: #ffffff;
+  margin-left: 3px;
+}
+
+.games-list-title-overlay {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 20%, rgba(0, 0, 0, 0.8) 50%, rgba(0, 0, 0, 0.4) 80%, transparent 100%);
+  padding: 12px 8px;
+  z-index: 5;
+}
+
+.games-list-title-inside {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }

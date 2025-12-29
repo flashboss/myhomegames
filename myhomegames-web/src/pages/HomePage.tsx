@@ -30,6 +30,7 @@ type HomePageProps = {
   apiToken: string;
   onGameClick: (game: GameItem) => void;
   onGamesLoaded: (games: GameItem[]) => void;
+  onPlay?: (game: GameItem) => void;
 };
 
 function buildApiUrl(
@@ -53,6 +54,7 @@ export default function HomePage({
   apiToken,
   onGameClick,
   onGamesLoaded,
+  onPlay,
 }: HomePageProps) {
   const { t } = useTranslation();
   const [libraries, setLibraries] = useState<GameLibrarySection[]>([]);
@@ -79,10 +81,10 @@ export default function HomePage({
     return (saved as ViewMode) || "grid";
   };
 
-  // Handler to change view mode (only for consigliati and libreria)
+  // Handler to change view mode (only for libreria)
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
-    if (activeLibrary && (activeLibrary.key === "consigliati" || activeLibrary.key === "libreria")) {
+    if (activeLibrary && activeLibrary.key === "libreria") {
       saveViewModeForLibrary(activeLibrary.key, mode);
     }
   };
@@ -101,9 +103,14 @@ export default function HomePage({
         : libraries[0];
 
       setActiveLibrary(libraryToSelect);
-      // Load saved view mode for this library
-      const savedViewMode = loadViewModeForLibrary(libraryToSelect.key);
-      setViewMode(savedViewMode);
+      // Load saved view mode for this library (only for libreria)
+      // For consigliati, raccolte and categorie, always use grid view
+      if (libraryToSelect.key === "libreria") {
+        const savedViewMode = loadViewModeForLibrary(libraryToSelect.key);
+        setViewMode(savedViewMode);
+      } else {
+        setViewMode("grid");
+      }
       fetchLibraryGames(libraryToSelect.key);
     }
   }, [libraries]);
@@ -189,9 +196,9 @@ export default function HomePage({
     localStorage.setItem("lastSelectedLibrary", s.key);
     // Update active library immediately for instant visual feedback
     setActiveLibrary(s);
-    // Load saved view mode for this library (only for consigliati and libreria)
-    // For raccolte and categorie, always use grid view
-    if (s.key === "consigliati" || s.key === "libreria") {
+    // Load saved view mode for this library (only for libreria)
+    // For consigliati, raccolte and categorie, always use grid view
+    if (s.key === "libreria") {
       const savedViewMode = loadViewModeForLibrary(s.key);
       setViewMode(savedViewMode);
     } else {
@@ -249,9 +256,11 @@ export default function HomePage({
                         games={games}
                         apiBase={apiBase}
                         onGameClick={handleGameClick}
+                        onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
                         buildCoverUrl={buildCoverUrl}
                         coverSize={coverSize}
                         itemRefs={itemRefs}
+                        isCategory={activeLibrary.key === "categorie"}
                       />
                     )}
                     {viewMode === "detail" && (
