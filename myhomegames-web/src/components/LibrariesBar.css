@@ -8,6 +8,7 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  transform: translateY(2px);
 }
 
 .plex-libraries-actions-slider-container.hidden {
@@ -17,4 +18,49 @@
 .plex-libraries-actions-view-mode-container {
   display: flex;
   align-items: center;
+}
+
+.plex-libraries-combobox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: calc(100% - 200px);
+}
+
+.plex-libraries-combobox {
+  padding: 12px 24px 12px 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: auto;
+  width: auto;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 9L1 4h10L6 9z' fill='%23ffffff'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  padding-right: 20px;
+  transition: color 0.2s ease;
+}
+
+.plex-libraries-combobox:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+.plex-libraries-combobox:focus {
+  outline: none;
+  color: #E5A00D;
+}
+
+.plex-libraries-combobox option {
+  background-color: #2a2a2a;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 8px;
 }
