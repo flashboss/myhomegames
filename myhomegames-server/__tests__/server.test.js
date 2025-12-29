@@ -135,6 +135,41 @@ describe('GET /libraries/:id/games', () => {
   });
 });
 
+describe('GET /categories', () => {
+  test('should return list of categories', async () => {
+    const response = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('categories');
+    expect(Array.isArray(response.body.categories)).toBe(true);
+  });
+
+  test('should return categories with correct structure', async () => {
+    const response = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (response.body.categories.length > 0) {
+      const category = response.body.categories[0];
+      expect(category).toHaveProperty('id');
+      expect(category).toHaveProperty('title');
+      expect(category).toHaveProperty('cover');
+      expect(category.cover).toContain('/category-covers/');
+    }
+  });
+
+  test('should require authentication', async () => {
+    const response = await request(app)
+      .get('/categories')
+      .expect(401);
+    
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
+  });
+});
+
 describe('GET /covers/:gameId', () => {
   test('should return 404 for non-existent cover', async () => {
     const response = await request(app)

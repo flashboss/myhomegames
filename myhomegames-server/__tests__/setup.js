@@ -37,12 +37,18 @@ beforeAll(() => {
     fs.copyFileSync(settingsSource, settingsDest);
   }
   
-  // Create a test cover image directory in content folder
+  // Create test cover image directories in content/games folder
   const testGameId = 'test_game_1';
-  const coverDir = path.join(testMetadataPath, 'content', testGameId);
+  const gamesContentDir = path.join(testMetadataPath, 'content', 'games');
+  fs.mkdirSync(gamesContentDir, { recursive: true });
+  const coverDir = path.join(gamesContentDir, testGameId);
   fs.mkdirSync(coverDir, { recursive: true });
   // Create a dummy cover file (empty file for testing)
   fs.writeFileSync(path.join(coverDir, 'cover.webp'), 'fake webp data');
+  
+  // Create test category cover directory in content/categories folder
+  const categoriesContentDir = path.join(testMetadataPath, 'content', 'categories');
+  fs.mkdirSync(categoriesContentDir, { recursive: true });
   
   // Set environment variable for test metadata path
   process.env.METADATA_PATH = testMetadataPath;

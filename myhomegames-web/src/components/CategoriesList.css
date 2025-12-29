@@ -1,0 +1,65 @@
+.categories-list-container {
+  max-width: 100%;
+  margin: 0 auto;
+  display: grid;
+  gap: 40px;
+  justify-content: center;
+}
+
+.categories-list-item {
+  flex-shrink: 0;
+}
+
+.categories-list-cover {
+  position: relative;
+  cursor: pointer;
+  outline: 3px solid transparent;
+  outline-offset: -3px;
+  transition: outline-color 0.2s ease;
+  overflow: hidden;
+}
+
+.categories-list-cover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 4;
+  transition: background-color 0.2s ease;
+  pointer-events: none;
+}
+
+.categories-list-item:hover .categories-list-cover::before {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.categories-list-item:hover .categories-list-cover {
+  outline-color: #E5A00D;
+  border-radius: 4px;
+}
+
+.categories-list-title-overlay {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.categories-list-title-inside {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  line-height: 1.2;
+  padding: 8px;
+}
+
+

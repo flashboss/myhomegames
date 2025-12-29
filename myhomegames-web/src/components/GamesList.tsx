@@ -19,7 +19,6 @@ type GamesListProps = {
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
-  isCategory?: boolean;
 };
 
 type GameListItemProps = {
@@ -30,7 +29,6 @@ type GameListItemProps = {
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
-  isCategory?: boolean;
 };
 
 function GameListItem({
@@ -41,7 +39,6 @@ function GameListItem({
   buildCoverUrl,
   coverSize,
   itemRefs,
-  isCategory = false,
 }: GameListItemProps) {
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !game.cover || imageError;
@@ -83,11 +80,6 @@ function GameListItem({
                 setImageError(true);
               }}
             />
-            {isCategory && (
-              <div className="games-list-title-overlay">
-                <div className="games-list-title-inside">{game.title}</div>
-              </div>
-            )}
           </>
         )}
         {onPlay && (
@@ -111,9 +103,7 @@ function GameListItem({
           </button>
         )}
       </div>
-      {!isCategory && (
-        <div className="truncate games-list-title">{game.title}</div>
-      )}
+      <div className="truncate games-list-title">{game.title}</div>
     </div>
   );
 }
@@ -126,7 +116,6 @@ export default function GamesList({
   buildCoverUrl,
   coverSize = 150,
   itemRefs,
-  isCategory = false,
 }: GamesListProps) {
   const { t } = useTranslation();
   
@@ -149,7 +138,6 @@ export default function GamesList({
           buildCoverUrl={buildCoverUrl}
           coverSize={coverSize}
           itemRefs={itemRefs}
-          isCategory={isCategory}
         />
       ))}
     </div>

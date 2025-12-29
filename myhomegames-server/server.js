@@ -86,7 +86,22 @@ app.get("/libraries", requireToken, (req, res) => {
 // Endpoint: serve game cover image (public, no auth required for images)
 app.get("/covers/:gameId", (req, res) => {
   const gameId = decodeURIComponent(req.params.gameId);
-  const coverPath = path.join(METADATA_PATH, "content", gameId, "cover.webp");
+  const coverPath = path.join(METADATA_PATH, "content", "games", gameId, "cover.webp");
+
+  // Check if file exists
+  if (!fs.existsSync(coverPath)) {
+    return res.status(404).json({ error: "Cover not found" });
+  }
+
+  // Set appropriate content type for webp
+  res.type("image/webp");
+  res.sendFile(coverPath);
+});
+
+// Endpoint: serve category cover image (public, no auth required for images)
+app.get("/category-covers/:categoryId", (req, res) => {
+  const categoryId = decodeURIComponent(req.params.categoryId);
+  const coverPath = path.join(METADATA_PATH, "content", "categories", categoryId, "cover.webp");
 
   // Check if file exists
   if (!fs.existsSync(coverPath)) {
@@ -112,6 +127,18 @@ app.get("/libraries/:id/games", requireToken, (req, res) => {
       month: g.month || null,
       year: g.year || null,
       stars: g.stars || null,
+    })),
+  });
+});
+
+// Endpoint: list categories
+app.get("/categories", requireToken, (req, res) => {
+  const categories = gamesByLibrary["categorie"] || [];
+  res.json({
+    categories: categories.map((c) => ({
+      id: c.id,
+      title: c.title,
+      cover: `/category-covers/${encodeURIComponent(c.id)}`,
     })),
   });
 });

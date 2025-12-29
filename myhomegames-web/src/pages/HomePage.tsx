@@ -5,6 +5,7 @@ import type { ViewMode } from "../components/LibrariesBar";
 import GamesList from "../components/GamesList";
 import GamesListDetail from "../components/GamesListDetail";
 import GamesListTable from "../components/GamesListTable";
+import CategoriesList from "../components/CategoriesList";
 import AlphabetNavigator from "../components/AlphabetNavigator";
 import GamesListToolbar from "../components/GamesListToolbar";
 import "./HomePage.css";
@@ -24,6 +25,12 @@ type GameItem = {
   month?: number | null;
   year?: number | null;
   stars?: number | null;
+};
+
+type CategoryItem = {
+  ratingKey: string;
+  title: string;
+  cover?: string;
 };
 
 type HomePageProps = {
@@ -63,9 +70,13 @@ export default function HomePage({
     null
   );
   const [games, setGames] = useState<GameItem[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [coverSize, setCoverSize] = useState(150);
+  const [coverSize, setCoverSize] = useState(() => {
+    const saved = localStorage.getItem("coverSize");
+    return saved ? parseInt(saved, 10) : 150;
+  });
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [filterField, setFilterField] = useState<"all" | "year">("all");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -94,6 +105,12 @@ export default function HomePage({
     }
   };
 
+  // Handler to change cover size
+  const handleCoverSizeChange = (size: number) => {
+    setCoverSize(size);
+    localStorage.setItem("coverSize", size.toString());
+  };
+
   useEffect(() => {
     fetchLibraries();
   }, []);
@@ -116,7 +133,11 @@ export default function HomePage({
       } else {
         setViewMode("grid");
       }
-      fetchLibraryGames(libraryToSelect.key);
+      if (libraryToSelect.key === "categorie") {
+        fetchCategories();
+      } else {
+        fetchLibraryGames(libraryToSelect.key);
+      }
     }
   }, [libraries]);
 
@@ -196,6 +217,41 @@ export default function HomePage({
     }
   }
 
+  async function fetchCategories() {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = buildApiUrl(apiBase, "/categories");
+      const res = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "X-Auth-Token": apiToken,
+        },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const items = (json.categories || []) as any[];
+      const parsed = items.map((v) => ({
+        ratingKey: v.id,
+        title: v.title,
+        cover: v.cover,
+      }));
+      setCategories(parsed);
+      setGames([]); // Clear games when showing categories
+    } catch (err: any) {
+      const errorMessage = String(err.message || err);
+      // Translate fetch errors
+      if (errorMessage.toLowerCase().includes("failed to fetch") || 
+          errorMessage.toLowerCase().includes("fetch")) {
+        setError(t("common.fetchError"));
+      } else {
+        setError(errorMessage);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function onSelectLibrary(s: GameLibrarySection) {
     // Save selected library to localStorage
     localStorage.setItem("lastSelectedLibrary", s.key);
@@ -209,17 +265,22 @@ export default function HomePage({
     } else {
       setViewMode("grid");
     }
-    // Clear previous games immediately
+    // Clear previous games/categories immediately
     setGames([]);
+    setCategories([]);
     // Set loading state immediately
     setLoading(true);
     setError(null);
-    // Then fetch new games
-    fetchLibraryGames(s.key);
+    // Then fetch new data
+    if (s.key === "categorie") {
+      fetchCategories();
+    } else {
+      fetchLibraryGames(s.key);
+    }
   }
 
-  function handleGameClick(game: GameItem) {
-    onGameClick(game);
+  function handleGameClick(game: GameItem | CategoryItem) {
+    onGameClick(game as GameItem);
   }
 
   // Filter and sort games
@@ -300,7 +361,7 @@ export default function HomePage({
         loading={loading}
         error={error}
         coverSize={coverSize}
-        onCoverSizeChange={setCoverSize}
+        onCoverSizeChange={handleCoverSizeChange}
         viewMode={viewMode}
         onViewModeChange={handleViewModeChange}
       />
@@ -338,40 +399,52 @@ export default function HomePage({
                 >
                 {!loading && (
                   <>
-                    {viewMode === "grid" && (
-                      <GamesList
-                        games={filteredAndSortedGames}
+                    {activeLibrary.key === "categorie" ? (
+                      <CategoriesList
+                        categories={categories}
                         apiBase={apiBase}
-                        onGameClick={handleGameClick}
-                        onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
+                        onCategoryClick={handleGameClick}
                         buildCoverUrl={buildCoverUrl}
-                        coverSize={coverSize}
-                        itemRefs={itemRefs}
-                        isCategory={activeLibrary.key === "categorie"}
-                      />
-                    )}
-                    {viewMode === "detail" && (
-                      <GamesListDetail
-                        games={filteredAndSortedGames}
-                        apiBase={apiBase}
-                        onGameClick={handleGameClick}
-                        onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
-                        buildCoverUrl={buildCoverUrl}
+                        coverSize={coverSize * 2}
                         itemRefs={itemRefs}
                       />
-                    )}
-                    {viewMode === "table" && (
-                      <GamesListTable
-                        games={filteredAndSortedGames}
-                        onGameClick={handleGameClick}
-                        onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
-                        itemRefs={itemRefs}
-                        scrollContainerRef={tableScrollRef}
-                        sortField={sortField}
-                        sortAscending={sortAscending}
-                        onSortChange={setSortField}
-                        onSortDirectionChange={setSortAscending}
-                      />
+                    ) : (
+                      <>
+                        {viewMode === "grid" && (
+                          <GamesList
+                            games={filteredAndSortedGames}
+                            apiBase={apiBase}
+                            onGameClick={handleGameClick}
+                            onPlay={onPlay}
+                            buildCoverUrl={buildCoverUrl}
+                            coverSize={coverSize}
+                            itemRefs={itemRefs}
+                          />
+                        )}
+                        {viewMode === "detail" && (
+                          <GamesListDetail
+                            games={filteredAndSortedGames}
+                            apiBase={apiBase}
+                            onGameClick={handleGameClick}
+                            onPlay={onPlay}
+                            buildCoverUrl={buildCoverUrl}
+                            itemRefs={itemRefs}
+                          />
+                        )}
+                        {viewMode === "table" && (
+                          <GamesListTable
+                            games={filteredAndSortedGames}
+                            onGameClick={handleGameClick}
+                            onPlay={onPlay}
+                            itemRefs={itemRefs}
+                            scrollContainerRef={tableScrollRef}
+                            sortField={sortField}
+                            sortAscending={sortAscending}
+                            onSortChange={setSortField}
+                            onSortDirectionChange={setSortAscending}
+                          />
+                        )}
+                      </>
                     )}
                   </>
                 )}
