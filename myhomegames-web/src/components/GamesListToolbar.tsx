@@ -9,8 +9,10 @@ type GamesListToolbarProps = {
   gamesCount: number;
   onFilterChange?: (field: FilterField) => void;
   onSortChange?: (field: SortField) => void;
+  onSortDirectionChange?: (ascending: boolean) => void;
   currentFilter?: FilterField;
   currentSort?: SortField;
+  sortAscending?: boolean;
   viewMode?: "grid" | "detail" | "table";
 };
 
@@ -18,8 +20,10 @@ export default function GamesListToolbar({
   gamesCount,
   onFilterChange,
   onSortChange,
+  onSortDirectionChange,
   currentFilter = "all",
   currentSort = "title",
+  sortAscending = true,
   viewMode = "grid",
 }: GamesListToolbarProps) {
   const { t } = useTranslation();
@@ -66,7 +70,16 @@ export default function GamesListToolbar({
   };
 
   const handleSortSelect = (field: SortField) => {
-    onSortChange?.(field);
+    if (field === currentSort && onSortDirectionChange) {
+      // If clicking the same field, toggle direction
+      onSortDirectionChange(!sortAscending);
+    } else {
+      // If selecting a new field, set to ascending by default
+      onSortChange?.(field);
+      if (onSortDirectionChange) {
+        onSortDirectionChange(true);
+      }
+    }
     setIsSortOpen(false);
   };
 
@@ -151,7 +164,22 @@ export default function GamesListToolbar({
                       }`}
                       onClick={() => handleSortSelect(option.value)}
                     >
-                      {option.label}
+                      <span>{option.label}</span>
+                      {currentSort === option.value && (
+                        <svg
+                          className={`games-list-toolbar-popup-sort-direction ${sortAscending ? "ascending" : "descending"}`}
+                          width="10"
+                          height="10"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d={sortAscending ? "M6 2L10 8H2L6 2Z" : "M6 10L2 4H10L6 10Z"}
+                            fill="currentColor"
+                          />
+                        </svg>
+                      )}
                     </button>
                   ))}
                 </div>

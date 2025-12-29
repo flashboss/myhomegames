@@ -69,6 +69,7 @@ export default function HomePage({
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [filterField, setFilterField] = useState<"all" | "title" | "year" | "stars" | "summary">("all");
   const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">("title");
+  const [sortAscending, setSortAscending] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -244,35 +245,53 @@ export default function HomePage({
 
     // Apply sort
     filtered.sort((a, b) => {
+      let compareResult = 0;
       switch (sortField) {
         case "title":
-          return (a.title || "").localeCompare(b.title || "");
+          compareResult = (a.title || "").localeCompare(b.title || "");
+          break;
         case "year":
           const yearA = a.year ?? 0;
           const yearB = b.year ?? 0;
-          return yearB - yearA; // Descending (newest first)
+          compareResult = yearB - yearA; // Descending (newest first) by default
+          break;
         case "stars":
           const starsA = a.stars ?? 0;
           const starsB = b.stars ?? 0;
-          return starsB - starsA; // Descending (highest first)
+          compareResult = starsB - starsA; // Descending (highest first) by default
+          break;
         case "releaseDate":
           // Sort by release date (year, month, day)
           const dateA = a.year ?? 0;
           const dateB = b.year ?? 0;
-          if (dateA !== dateB) return dateB - dateA;
-          const monthA = a.month ?? 0;
-          const monthB = b.month ?? 0;
-          if (monthA !== monthB) return monthB - monthA;
-          const dayA = a.day ?? 0;
-          const dayB = b.day ?? 0;
-          return dayB - dayA;
+          if (dateA !== dateB) {
+            compareResult = dateB - dateA; // Descending (newest first) by default
+          } else {
+            const monthA = a.month ?? 0;
+            const monthB = b.month ?? 0;
+            if (monthA !== monthB) {
+              compareResult = monthB - monthA;
+            } else {
+              const dayA = a.day ?? 0;
+              const dayB = b.day ?? 0;
+              compareResult = dayB - dayA;
+            }
+          }
+          break;
         default:
           return 0;
+      }
+      // Apply direction: if ascending, reverse the default descending order for year, stars, releaseDate
+      if (sortField === "title") {
+        return sortAscending ? compareResult : -compareResult;
+      } else {
+        // For year, stars, releaseDate: default is descending, so reverse if ascending
+        return sortAscending ? -compareResult : compareResult;
       }
     });
 
     return filtered;
-  }, [games, filterField, sortField]);
+  }, [games, filterField, sortField, sortAscending]);
 
   return (
     <>
@@ -298,14 +317,16 @@ export default function HomePage({
               <div className={`home-page-content-wrapper ${!loading && games.length > 0 && activeLibrary.key === "libreria" ? "has-toolbar" : ""}`}>
                 {/* Toolbar with filter and sort - only for libreria */}
                 {!loading && games.length > 0 && activeLibrary.key === "libreria" && (
-                  <GamesListToolbar
-                    gamesCount={filteredAndSortedGames.length}
-                    onFilterChange={setFilterField}
-                    onSortChange={setSortField}
-                    currentFilter={filterField}
-                    currentSort={sortField}
-                    viewMode={viewMode}
-                  />
+                <GamesListToolbar
+                  gamesCount={filteredAndSortedGames.length}
+                  onFilterChange={setFilterField}
+                  onSortChange={setSortField}
+                  onSortDirectionChange={setSortAscending}
+                  currentFilter={filterField}
+                  currentSort={sortField}
+                  sortAscending={sortAscending}
+                  viewMode={viewMode}
+                />
                 )}
                 {/* Scrollable lists container */}
                 <div
@@ -356,14 +377,16 @@ export default function HomePage({
               {games.length > 0 && 
                activeLibrary && 
                activeLibrary.key !== "consigliati" && 
-               activeLibrary.key !== "categorie" && (
+               activeLibrary.key !== "categorie" &&
+               sortField === "title" && (
                 <div className="home-page-alphabet-container">
                   <AlphabetNavigator
-                    games={games}
+                    games={filteredAndSortedGames}
                     scrollContainerRef={
                       viewMode === "table" ? tableScrollRef : scrollContainerRef
                     }
                     itemRefs={itemRefs}
+                    ascending={sortAscending}
                   />
                 </div>
               )}

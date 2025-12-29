@@ -15,14 +15,18 @@ type AlphabetNavigatorProps = {
   games: GameItem[];
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
+  ascending?: boolean;
 };
 
 export default function AlphabetNavigator({
   games,
   scrollContainerRef,
   itemRefs,
+  ascending = true,
 }: AlphabetNavigatorProps) {
-  const alphabet = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
+  const alphabet = ascending
+    ? ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")]
+    : [..."ZYXWVUTSRQPONMLKJIHGFEDCBA".split(""), "#"];
 
   // Get first letter of each game title
   const getFirstLetter = (title: string): string => {
