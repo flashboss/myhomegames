@@ -18,6 +18,7 @@ type GamesListDetailProps = {
   games: GameItem[];
   apiBase: string;
   onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
@@ -28,6 +29,7 @@ type GameDetailItemProps = {
   game: GameItem;
   apiBase: string;
   onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   index: number;
@@ -37,6 +39,7 @@ function GameDetailItem({
   game,
   apiBase,
   onGameClick,
+  onPlay,
   buildCoverUrl,
   itemRefs,
   index,
@@ -45,6 +48,13 @@ function GameDetailItem({
   const showPlaceholder = !game.cover || imageError;
   const isEven = index % 2 === 0;
   const coverHeight = FIXED_COVER_SIZE * 1.5;
+
+  const handleCoverClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onPlay) {
+      onPlay(game);
+    }
+  };
 
   return (
     <div
@@ -64,6 +74,7 @@ function GameDetailItem({
         style={{
           height: `${coverHeight}px`,
         }}
+        onClick={handleCoverClick}
       >
         {showPlaceholder ? (
           <CoverPlaceholder
@@ -80,6 +91,26 @@ function GameDetailItem({
               setImageError(true);
             }}
           />
+        )}
+        {onPlay && (
+          <button
+            onClick={handleCoverClick}
+            className="games-list-detail-play-button"
+            aria-label="Play game"
+          >
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 5v14l11-7z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
         )}
       </div>
       <div className="games-list-detail-content">
@@ -116,6 +147,7 @@ export default function GamesListDetail({
   games,
   apiBase,
   onGameClick,
+  onPlay,
   buildCoverUrl,
   itemRefs,
 }: GamesListDetailProps) {
@@ -133,6 +165,7 @@ export default function GamesListDetail({
           game={game}
           apiBase={apiBase}
           onGameClick={onGameClick}
+          onPlay={onPlay}
           buildCoverUrl={buildCoverUrl}
           itemRefs={itemRefs}
           index={index}

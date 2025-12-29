@@ -16,6 +16,7 @@ type GameItem = {
 type GamesListTableProps = {
   games: GameItem[];
   onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 };
@@ -34,6 +35,7 @@ type ColumnVisibility = {
 export default function GamesListTable({
   games,
   onGameClick,
+  onPlay,
   itemRefs,
   scrollContainerRef,
 }: GamesListTableProps) {
@@ -267,60 +269,125 @@ export default function GamesListTable({
                   )}
                 </div>
               </th>
-              {columnVisibility.title && (
-                <th
-                  onClick={() => handleSort("title")}
-                  className="has-border-right"
-                >
-                  <span>{t("table.title")}</span>
-                  <span className="sort-indicator">{getSortIcon("title")}</span>
-                </th>
-              )}
-              {columnVisibility.summary && (
-                <th
-                  onClick={() => handleSort("summary")}
-                  className="has-border-right"
-                >
-                  <span>{t("table.summary")}</span>
-                  <span className="sort-indicator">
-                    {getSortIcon("summary")}
-                  </span>
-                </th>
-              )}
-              {columnVisibility.releaseDate && (
-                <th
-                  onClick={() => handleSort("year")}
-                  className={
-                    columnVisibility.stars || columnVisibility.year
-                      ? "has-border-right"
-                      : ""
-                  }
-                >
-                  <span>{t("table.releaseDate")}</span>
-                  <span className="sort-indicator">{getSortIcon("year")}</span>
-                </th>
-              )}
-              {columnVisibility.stars && (
-                <th
-                  onClick={() => handleSort("stars")}
-                  className={columnVisibility.year ? "has-border-right" : ""}
-                >
-                  <span>{t("table.stars")}</span>
-                  <span className="sort-indicator">{getSortIcon("stars")}</span>
-                </th>
-              )}
-              {columnVisibility.year && (
-                <th onClick={() => handleSort("year")}>
-                  <span>{t("table.year")}</span>
-                  <span className="sort-indicator">{getSortIcon("year")}</span>
-                </th>
-              )}
+              {(() => {
+                // Determine the first visible column for header alignment
+                const firstVisibleColumn = columnVisibility.title
+                  ? "title"
+                  : columnVisibility.summary
+                  ? "summary"
+                  : columnVisibility.releaseDate
+                  ? "releaseDate"
+                  : columnVisibility.stars
+                  ? "stars"
+                  : columnVisibility.year
+                  ? "year"
+                  : null;
+
+                return (
+                  <>
+                    {columnVisibility.title && (
+                      <th
+                        onClick={() => handleSort("title")}
+                        className={`has-border-right ${firstVisibleColumn === "title" ? "first-visible-cell" : ""}`}
+                      >
+                        <span>{t("table.title")}</span>
+                        <span className="sort-indicator">{getSortIcon("title")}</span>
+                      </th>
+                    )}
+                    {columnVisibility.summary && (
+                      <th
+                        onClick={() => handleSort("summary")}
+                        className={`has-border-right ${firstVisibleColumn === "summary" ? "first-visible-cell" : ""}`}
+                      >
+                        <span>{t("table.summary")}</span>
+                        <span className="sort-indicator">
+                          {getSortIcon("summary")}
+                        </span>
+                      </th>
+                    )}
+                    {columnVisibility.releaseDate && (
+                      <th
+                        onClick={() => handleSort("year")}
+                        className={`${
+                          columnVisibility.stars || columnVisibility.year
+                            ? "has-border-right"
+                            : ""
+                        } ${firstVisibleColumn === "releaseDate" ? "first-visible-cell" : ""}`}
+                      >
+                        <span>{t("table.releaseDate")}</span>
+                        <span className="sort-indicator">{getSortIcon("year")}</span>
+                      </th>
+                    )}
+                    {columnVisibility.stars && (
+                      <th
+                        onClick={() => handleSort("stars")}
+                        className={`${columnVisibility.year ? "has-border-right" : ""} ${firstVisibleColumn === "stars" ? "first-visible-cell" : ""}`}
+                      >
+                        <span>{t("table.stars")}</span>
+                        <span className="sort-indicator">{getSortIcon("stars")}</span>
+                      </th>
+                    )}
+                    {columnVisibility.year && (
+                      <th
+                        onClick={() => handleSort("year")}
+                        className={firstVisibleColumn === "year" ? "first-visible-cell" : ""}
+                      >
+                        <span>{t("table.year")}</span>
+                        <span className="sort-indicator">{getSortIcon("year")}</span>
+                      </th>
+                    )}
+                  </>
+                );
+              })()}
             </tr>
           </thead>
           <tbody>
             {sortedGames.map((it, index) => {
               const isEven = index % 2 === 0;
               const rowClass = isEven ? "even-row" : "odd-row";
+              
+              // Determine the first visible column
+              const firstVisibleColumn = columnVisibility.title
+                ? "title"
+                : columnVisibility.summary
+                ? "summary"
+                : columnVisibility.releaseDate
+                ? "releaseDate"
+                : columnVisibility.stars
+                ? "stars"
+                : columnVisibility.year
+                ? "year"
+                : null;
+
+              const PlayIcon = () => {
+                const handlePlayClick = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  if (onPlay) {
+                    onPlay(it);
+                  }
+                };
+
+                return (
+                  <button 
+                    className="first-cell-play-button" 
+                    aria-label="Play game"
+                    onClick={handlePlayClick}
+                  >
+                    <svg
+                      width="36"
+                      height="36"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 5v14l11-7z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                );
+              };
 
               return (
                 <tr
@@ -335,11 +402,15 @@ export default function GamesListTable({
                 >
                   <td className="column-menu-cell"></td>
                   {columnVisibility.title && (
-                    <td className={`title-cell ${rowClass}`}>{it.title}</td>
+                    <td className={`title-cell ${rowClass} ${firstVisibleColumn === "title" ? "first-visible-cell" : ""}`}>
+                      {firstVisibleColumn === "title" && onPlay && <PlayIcon />}
+                      <span className={firstVisibleColumn === "title" ? "first-cell-text" : ""}>{it.title}</span>
+                    </td>
                   )}
                   {columnVisibility.summary && (
-                    <td className={`summary-cell ${rowClass}`}>
-                      {it.summary || "-"}
+                    <td className={`summary-cell ${rowClass} ${firstVisibleColumn === "summary" ? "first-visible-cell" : ""}`}>
+                      {firstVisibleColumn === "summary" && onPlay && <PlayIcon />}
+                      <span className={firstVisibleColumn === "summary" ? "first-cell-text" : ""}>{it.summary || "-"}</span>
                     </td>
                   )}
                   {columnVisibility.releaseDate && (
@@ -348,30 +419,39 @@ export default function GamesListTable({
                         columnVisibility.stars || columnVisibility.year
                           ? "has-border-right"
                           : ""
-                      }`}
+                      } ${firstVisibleColumn === "releaseDate" ? "first-visible-cell" : ""}`}
                     >
-                      {it.year !== null && it.year !== undefined
-                        ? it.day !== null &&
-                          it.day !== undefined &&
-                          it.month !== null &&
-                          it.month !== undefined
-                          ? `${it.day}/${it.month}/${it.year}`
-                          : it.year.toString()
-                        : "-"}
+                      {firstVisibleColumn === "releaseDate" && onPlay && <PlayIcon />}
+                      <span className={firstVisibleColumn === "releaseDate" ? "first-cell-text" : ""}>
+                        {it.year !== null && it.year !== undefined
+                          ? it.day !== null &&
+                            it.day !== undefined &&
+                            it.month !== null &&
+                            it.month !== undefined
+                            ? `${it.day}/${it.month}/${it.year}`
+                            : it.year.toString()
+                          : "-"}
+                      </span>
                     </td>
                   )}
                   {columnVisibility.stars && (
-                    <td className={`stars-cell ${rowClass}`}>
-                      {it.stars !== null && it.stars !== undefined
-                        ? it.stars.toString()
-                        : "-"}
+                    <td className={`stars-cell ${rowClass} ${firstVisibleColumn === "stars" ? "first-visible-cell" : ""}`}>
+                      {firstVisibleColumn === "stars" && onPlay && <PlayIcon />}
+                      <span className={firstVisibleColumn === "stars" ? "first-cell-text" : ""}>
+                        {it.stars !== null && it.stars !== undefined
+                          ? it.stars.toString()
+                          : "-"}
+                      </span>
                     </td>
                   )}
                   {columnVisibility.year && (
-                    <td className={`year-cell ${rowClass}`}>
-                      {it.year !== null && it.year !== undefined
-                        ? it.year.toString()
-                        : "-"}
+                    <td className={`year-cell ${rowClass} ${firstVisibleColumn === "year" ? "first-visible-cell" : ""}`}>
+                      {firstVisibleColumn === "year" && onPlay && <PlayIcon />}
+                      <span className={firstVisibleColumn === "year" ? "first-cell-text" : ""}>
+                        {it.year !== null && it.year !== undefined
+                          ? it.year.toString()
+                          : "-"}
+                      </span>
                     </td>
                   )}
                 </tr>

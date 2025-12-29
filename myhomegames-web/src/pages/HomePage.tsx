@@ -268,6 +268,7 @@ export default function HomePage({
                         games={games}
                         apiBase={apiBase}
                         onGameClick={handleGameClick}
+                        onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
                         buildCoverUrl={buildCoverUrl}
                         itemRefs={itemRefs}
                       />
@@ -276,6 +277,7 @@ export default function HomePage({
                       <GamesListTable
                         games={games}
                         onGameClick={handleGameClick}
+                        onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
                         itemRefs={itemRefs}
                         scrollContainerRef={tableScrollRef}
                       />

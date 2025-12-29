@@ -41,6 +41,10 @@
   background-color: rgba(59, 130, 246, 0.1);
 }
 
+.games-table th.first-visible-cell {
+  padding: 12px 16px 12px 60px !important;
+}
+
 .games-table th:hover {
   color: rgba(255, 255, 255, 0.9);
 }
@@ -136,7 +140,11 @@
   cursor: pointer;
 }
 
-.games-table tbody tr:hover {
+.games-table tbody tr:hover td.column-menu-cell {
+  background-color: transparent;
+}
+
+.games-table tbody tr:hover td:not(.column-menu-cell) {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
@@ -148,6 +156,7 @@
 .games-table td.column-menu-cell {
   padding: 12px 4px;
   width: 24px;
+  background-color: transparent !important;
 }
 
 .games-table td.even-row {
@@ -167,6 +176,55 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: #f8f8f8;
+}
+
+.games-table td.first-visible-cell {
+  padding: 12px 16px 12px 60px !important;
+  position: relative;
+}
+
+.first-cell-play-button {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  z-index: 10;
+  padding: 0;
+}
+
+.first-cell-play-button:hover {
+  background-color: rgba(229, 160, 13, 0.9);
+  border-color: rgba(229, 160, 13, 0.9);
+}
+
+.games-table tbody tr:hover .first-cell-play-button {
+  opacity: 1;
+}
+
+.first-cell-play-button svg {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+  margin-left: 2px;
+}
+
+.first-cell-text {
+  display: inline-block;
+}
+
+.title-cell-text {
+  display: inline-block;
 }
 
 .games-table td.summary-cell {
