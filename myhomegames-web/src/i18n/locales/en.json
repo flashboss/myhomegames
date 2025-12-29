@@ -91,6 +91,7 @@
     },
     "sort": {
       "label": "Sort",
+      "prefix": "By",
       "title": "Title",
       "year": "Year",
       "stars": "Rating",

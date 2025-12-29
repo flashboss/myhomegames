@@ -67,7 +67,8 @@ export default function HomePage({
   const [error, setError] = useState<string | null>(null);
   const [coverSize, setCoverSize] = useState(150);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [filterField, setFilterField] = useState<"all" | "title" | "year" | "stars" | "summary">("all");
+  const [filterField, setFilterField] = useState<"all" | "year">("all");
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">("title");
   const [sortAscending, setSortAscending] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -229,14 +230,11 @@ export default function HomePage({
     if (filterField !== "all") {
       filtered = filtered.filter((game) => {
         switch (filterField) {
-          case "title":
-            return game.title && game.title.trim() !== "";
           case "year":
+            if (selectedYear !== null) {
+              return game.year === selectedYear;
+            }
             return game.year !== null && game.year !== undefined;
-          case "stars":
-            return game.stars !== null && game.stars !== undefined;
-          case "summary":
-            return game.summary && game.summary.trim() !== "";
           default:
             return true;
         }
@@ -251,22 +249,9 @@ export default function HomePage({
           compareResult = (a.title || "").localeCompare(b.title || "");
           break;
         case "year":
-          // Sort by release date (year, month, day)
           const yearA = a.year ?? 0;
           const yearB = b.year ?? 0;
-          if (yearA !== yearB) {
-            compareResult = yearB - yearA; // Descending (newest first) by default
-          } else {
-            const monthA = a.month ?? 0;
-            const monthB = b.month ?? 0;
-            if (monthA !== monthB) {
-              compareResult = monthB - monthA;
-            } else {
-              const dayA = a.day ?? 0;
-              const dayB = b.day ?? 0;
-              compareResult = dayB - dayA;
-            }
-          }
+          compareResult = yearB - yearA; // Descending (newest first) by default
           break;
         case "stars":
           const starsA = a.stars ?? 0;
@@ -304,7 +289,7 @@ export default function HomePage({
     });
 
     return filtered;
-  }, [games, filterField, sortField, sortAscending]);
+  }, [games, filterField, selectedYear, sortField, sortAscending]);
 
   return (
     <>
@@ -332,10 +317,13 @@ export default function HomePage({
                 {!loading && games.length > 0 && activeLibrary.key === "libreria" && (
                 <GamesListToolbar
                   gamesCount={filteredAndSortedGames.length}
+                  games={games}
                   onFilterChange={setFilterField}
+                  onYearFilterChange={setSelectedYear}
                   onSortChange={setSortField}
                   onSortDirectionChange={setSortAscending}
                   currentFilter={filterField}
+                  selectedYear={selectedYear}
                   currentSort={sortField}
                   sortAscending={sortAscending}
                   viewMode={viewMode}

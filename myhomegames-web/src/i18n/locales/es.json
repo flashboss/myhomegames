@@ -83,7 +83,7 @@
   "gamesListToolbar": {
     "filter": {
       "label": "Filtro",
-      "all": "Todos",
+      "all": "Todo",
       "title": "Título",
       "year": "Año",
       "stars": "Valoración",
@@ -91,6 +91,7 @@
     },
     "sort": {
       "label": "Ordenar",
+      "prefix": "Por",
       "title": "Título",
       "year": "Año",
       "stars": "Valoración",

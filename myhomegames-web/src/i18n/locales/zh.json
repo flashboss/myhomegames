@@ -91,6 +91,7 @@
     },
     "sort": {
       "label": "排序",
+      "prefix": "按",
       "title": "标题",
       "year": "年份",
       "stars": "评分",

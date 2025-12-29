@@ -75,7 +75,7 @@
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s ease;
-  z-index: 10;
+  z-index: 1;
 }
 
 .games-list-detail-cover:hover .games-list-detail-play-button {

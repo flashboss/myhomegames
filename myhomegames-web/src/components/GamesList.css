@@ -54,7 +54,7 @@
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s ease, background-color 0.2s ease;
-  z-index: 10;
+  z-index: 1;
 }
 
 .games-list-play-button:hover {

@@ -91,6 +91,7 @@
     },
     "sort": {
       "label": "並び替え",
+      "prefix": "で",
       "title": "タイトル",
       "year": "年",
       "stars": "評価",
