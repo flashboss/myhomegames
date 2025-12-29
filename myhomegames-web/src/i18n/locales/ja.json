@@ -86,14 +86,14 @@
       "all": "すべて",
       "title": "タイトル",
       "year": "年",
-      "stars": "星",
+      "stars": "評価",
       "summary": "概要"
     },
     "sort": {
       "label": "並び替え",
       "title": "タイトル",
       "year": "年",
-      "stars": "星",
+      "stars": "評価",
       "releaseDate": "リリース日"
     },
     "gamesCount_one": "{{count}} 件のゲームを表示",

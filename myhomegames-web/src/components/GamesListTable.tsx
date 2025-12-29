@@ -19,14 +19,14 @@ type GamesListTableProps = {
   onPlay?: (game: GameItem) => void;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
+  sortField?: "title" | "year" | "stars" | "releaseDate";
+  sortAscending?: boolean;
+  onSortChange?: (field: "title" | "year" | "stars" | "releaseDate") => void;
+  onSortDirectionChange?: (ascending: boolean) => void;
 };
-
-type SortField = "title" | "summary" | "year" | "stars";
-type SortDirection = "asc" | "desc";
 
 type ColumnVisibility = {
   title: boolean;
-  summary: boolean;
   releaseDate: boolean;
   year: boolean;
   stars: boolean;
@@ -38,29 +38,12 @@ export default function GamesListTable({
   onPlay,
   itemRefs,
   scrollContainerRef,
+  sortField,
+  sortAscending = true,
+  onSortChange,
+  onSortDirectionChange,
 }: GamesListTableProps) {
   const { t, i18n } = useTranslation();
-  
-  // Load saved sort state from localStorage
-  const loadSortState = (): {
-    field: SortField | null;
-    direction: SortDirection;
-  } => {
-    const savedField = localStorage.getItem("tableSortField");
-    const savedDirection = localStorage.getItem("tableSortDirection");
-    return {
-      field: savedField ? (savedField as SortField) : null,
-      direction: savedDirection ? (savedDirection as SortDirection) : "asc",
-    };
-  };
-
-  const savedSortState = loadSortState();
-  const [sortField, setSortField] = useState<SortField | null>(
-    savedSortState.field
-  );
-  const [sortDirection, setSortDirection] = useState<SortDirection>(
-    savedSortState.direction
-  );
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(
     () => {
       const saved = localStorage.getItem("tableColumnVisibility");
@@ -70,14 +53,13 @@ export default function GamesListTable({
         } catch {
           return {
             title: true,
-            summary: true,
             releaseDate: true,
             year: false,
             stars: false,
           };
         }
       }
-      return { title: true, summary: true, releaseDate: true };
+      return { title: true, releaseDate: true };
     }
   );
   const [showColumnMenu, setShowColumnMenu] = useState(false);
@@ -95,16 +77,6 @@ export default function GamesListTable({
     };
   }, []);
 
-  // Save sort state to localStorage when it changes
-  useEffect(() => {
-    if (sortField) {
-      localStorage.setItem("tableSortField", sortField);
-      localStorage.setItem("tableSortDirection", sortDirection);
-    } else {
-      localStorage.removeItem("tableSortField");
-      localStorage.removeItem("tableSortDirection");
-    }
-  }, [sortField, sortDirection]);
 
   // Save column visibility to localStorage when it changes
   useEffect(() => {
@@ -114,48 +86,21 @@ export default function GamesListTable({
     );
   }, [columnVisibility]);
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  const handleSort = (field: "title" | "year" | "stars" | "releaseDate") => {
+    if (!onSortChange || !onSortDirectionChange) return;
+    
+    // Map releaseDate to year for sorting
+    const sortFieldMapped = field === "releaseDate" ? "releaseDate" : field;
+    
+    if (sortField === sortFieldMapped) {
+      // If clicking the same field, toggle direction
+      onSortDirectionChange(!sortAscending);
     } else {
-      setSortField(field);
-      setSortDirection("asc");
+      // If selecting a new field, set to ascending by default
+      onSortChange(sortFieldMapped);
+      onSortDirectionChange(true);
     }
   };
-
-  const sortedGames = [...games].sort((a, b) => {
-    if (!sortField) return 0;
-
-    let aValue: string | number | null = null;
-    let bValue: string | number | null = null;
-
-    switch (sortField) {
-      case "title":
-        aValue = a.title.toLowerCase();
-        bValue = b.title.toLowerCase();
-        break;
-      case "summary":
-        aValue = (a.summary || "").toLowerCase();
-        bValue = (b.summary || "").toLowerCase();
-        break;
-      case "year":
-        aValue = a.year ?? 0;
-        bValue = b.year ?? 0;
-        break;
-      case "stars":
-        aValue = a.stars ?? 0;
-        bValue = b.stars ?? 0;
-        break;
-    }
-
-    if (aValue === null && bValue === null) return 0;
-    if (aValue === null) return 1;
-    if (bValue === null) return -1;
-
-    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
 
   // Column definitions with translations
   const columnDefinitions = useMemo(
@@ -163,10 +108,6 @@ export default function GamesListTable({
       {
         key: "title" as keyof ColumnVisibility,
         label: t("table.title"),
-      },
-      {
-        key: "summary" as keyof ColumnVisibility,
-        label: t("table.summary"),
       },
       {
         key: "releaseDate" as keyof ColumnVisibility,
@@ -188,9 +129,11 @@ export default function GamesListTable({
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) return "";
-    return sortDirection === "asc" ? "↑" : "↓";
+  const getSortIcon = (field: "title" | "year" | "stars" | "releaseDate") => {
+    // Map releaseDate to year for comparison
+    const fieldMapped = field === "releaseDate" ? "releaseDate" : field;
+    if (sortField !== fieldMapped) return "";
+    return sortAscending ? "↑" : "↓";
   };
 
   const toggleColumn = (column: keyof ColumnVisibility) => {
@@ -249,21 +192,31 @@ export default function GamesListTable({
                   </button>
                   {showColumnMenu && (
                     <div className="games-table-column-menu-popup">
-                      <div className="games-table-column-menu-header">
-                        {t("table.columns")}
-                      </div>
                       {columnDefinitions.map((col) => (
-                        <label
+                        <button
                           key={col.key}
-                          className="games-table-column-menu-item"
+                          className={`games-table-column-menu-item ${
+                            columnVisibility[col.key] ? "selected" : ""
+                          }`}
+                          onClick={() => toggleColumn(col.key)}
                         >
-                          <input
-                            type="checkbox"
-                            checked={columnVisibility[col.key]}
-                            onChange={() => toggleColumn(col.key)}
-                          />
-                          {col.label}
-                        </label>
+                          <span>{col.label}</span>
+                          {columnVisibility[col.key] && (
+                            <svg
+                              className="games-table-column-menu-check"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+                                fill="#E5A00D"
+                              />
+                            </svg>
+                          )}
+                        </button>
                       ))}
                     </div>
                   )}
@@ -273,8 +226,6 @@ export default function GamesListTable({
                 // Determine the first visible column for header alignment
                 const firstVisibleColumn = columnVisibility.title
                   ? "title"
-                  : columnVisibility.summary
-                  ? "summary"
                   : columnVisibility.releaseDate
                   ? "releaseDate"
                   : columnVisibility.stars
@@ -294,20 +245,9 @@ export default function GamesListTable({
                         <span className="sort-indicator">{getSortIcon("title")}</span>
                       </th>
                     )}
-                    {columnVisibility.summary && (
-                      <th
-                        onClick={() => handleSort("summary")}
-                        className={`has-border-right ${firstVisibleColumn === "summary" ? "first-visible-cell" : ""}`}
-                      >
-                        <span>{t("table.summary")}</span>
-                        <span className="sort-indicator">
-                          {getSortIcon("summary")}
-                        </span>
-                      </th>
-                    )}
                     {columnVisibility.releaseDate && (
                       <th
-                        onClick={() => handleSort("year")}
+                        onClick={() => handleSort("releaseDate")}
                         className={`${
                           columnVisibility.stars || columnVisibility.year
                             ? "has-border-right"
@@ -315,7 +255,7 @@ export default function GamesListTable({
                         } ${firstVisibleColumn === "releaseDate" ? "first-visible-cell" : ""}`}
                       >
                         <span>{t("table.releaseDate")}</span>
-                        <span className="sort-indicator">{getSortIcon("year")}</span>
+                        <span className="sort-indicator">{getSortIcon("releaseDate")}</span>
                       </th>
                     )}
                     {columnVisibility.stars && (
@@ -341,16 +281,14 @@ export default function GamesListTable({
               })()}
             </tr>
           </thead>
-          <tbody>
-            {sortedGames.map((it, index) => {
+                  <tbody>
+                    {games.map((it, index) => {
               const isEven = index % 2 === 0;
               const rowClass = isEven ? "even-row" : "odd-row";
               
               // Determine the first visible column
               const firstVisibleColumn = columnVisibility.title
                 ? "title"
-                : columnVisibility.summary
-                ? "summary"
                 : columnVisibility.releaseDate
                 ? "releaseDate"
                 : columnVisibility.stars
@@ -408,12 +346,6 @@ export default function GamesListTable({
                       >
                         {it.title}
                       </span>
-                    </td>
-                  )}
-                  {columnVisibility.summary && (
-                    <td className={`summary-cell ${rowClass} ${firstVisibleColumn === "summary" ? "first-visible-cell" : ""}`}>
-                      {firstVisibleColumn === "summary" && onPlay && <PlayIcon />}
-                      <span className={firstVisibleColumn === "summary" ? "first-cell-text" : ""}>{it.summary || "-"}</span>
                     </td>
                   )}
                   {columnVisibility.releaseDate && (

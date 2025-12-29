@@ -251,9 +251,22 @@ export default function HomePage({
           compareResult = (a.title || "").localeCompare(b.title || "");
           break;
         case "year":
+          // Sort by release date (year, month, day)
           const yearA = a.year ?? 0;
           const yearB = b.year ?? 0;
-          compareResult = yearB - yearA; // Descending (newest first) by default
+          if (yearA !== yearB) {
+            compareResult = yearB - yearA; // Descending (newest first) by default
+          } else {
+            const monthA = a.month ?? 0;
+            const monthB = b.month ?? 0;
+            if (monthA !== monthB) {
+              compareResult = monthB - monthA;
+            } else {
+              const dayA = a.day ?? 0;
+              const dayB = b.day ?? 0;
+              compareResult = dayB - dayA;
+            }
+          }
           break;
         case "stars":
           const starsA = a.stars ?? 0;
@@ -366,6 +379,10 @@ export default function HomePage({
                         onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
                         itemRefs={itemRefs}
                         scrollContainerRef={tableScrollRef}
+                        sortField={sortField}
+                        sortAscending={sortAscending}
+                        onSortChange={setSortField}
+                        onSortDirectionChange={setSortAscending}
                       />
                     )}
                   </>

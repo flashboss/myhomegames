@@ -86,14 +86,14 @@
       "all": "全部",
       "title": "标题",
       "year": "年份",
-      "stars": "星级",
+      "stars": "评分",
       "summary": "摘要"
     },
     "sort": {
       "label": "排序",
       "title": "标题",
       "year": "年份",
-      "stars": "星级",
+      "stars": "评分",
       "releaseDate": "发布日期"
     },
     "gamesCount_one": "显示 {{count}} 个游戏",

@@ -67,7 +67,7 @@
     "summary": "Zusammenfassung",
     "releaseDate": "Veröffentlichungsdatum",
     "year": "Jahr",
-    "stars": "Sterne",
+    "stars": "Bewertung",
     "noGames": "Keine Spiele gefunden"
   },
   "gameDetail": {
@@ -86,14 +86,14 @@
       "all": "Alle",
       "title": "Titel",
       "year": "Jahr",
-      "stars": "Sterne",
+      "stars": "Bewertung",
       "summary": "Zusammenfassung"
     },
     "sort": {
       "label": "Sortieren",
       "title": "Titel",
       "year": "Jahr",
-      "stars": "Sterne",
+      "stars": "Bewertung",
       "releaseDate": "Veröffentlichungsdatum"
     },
     "gamesCount_one": "{{count}} Spiel angezeigt",

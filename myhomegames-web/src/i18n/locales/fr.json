@@ -67,7 +67,7 @@
     "summary": "Résumé",
     "releaseDate": "Date de Sortie",
     "year": "Année",
-    "stars": "Étoiles",
+    "stars": "Note",
     "noGames": "Aucun jeu trouvé"
   },
   "gameDetail": {
@@ -86,14 +86,14 @@
       "all": "Tous",
       "title": "Titre",
       "year": "Année",
-      "stars": "Étoiles",
+      "stars": "Note",
       "summary": "Résumé"
     },
     "sort": {
       "label": "Trier",
       "title": "Titre",
       "year": "Année",
-      "stars": "Étoiles",
+      "stars": "Note",
       "releaseDate": "Date de sortie"
     },
     "gamesCount_one": "{{count}} jeu affiché",

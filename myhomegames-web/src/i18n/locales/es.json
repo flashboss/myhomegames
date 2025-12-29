@@ -67,7 +67,7 @@
     "summary": "Resumen",
     "releaseDate": "Fecha de Lanzamiento",
     "year": "Año",
-    "stars": "Estrellas",
+    "stars": "Valoración",
     "noGames": "No se encontraron juegos"
   },
   "gameDetail": {
@@ -86,14 +86,14 @@
       "all": "Todos",
       "title": "Título",
       "year": "Año",
-      "stars": "Estrellas",
+      "stars": "Valoración",
       "summary": "Resumen"
     },
     "sort": {
       "label": "Ordenar",
       "title": "Título",
       "year": "Año",
-      "stars": "Estrellas",
+      "stars": "Valoración",
       "releaseDate": "Fecha de lanzamiento"
     },
     "gamesCount_one": "{{count}} juego mostrado",
