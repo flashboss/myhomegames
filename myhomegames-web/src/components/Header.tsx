@@ -16,6 +16,7 @@ type GameItem = {
 type HeaderProps = {
   allGames: GameItem[];
   onGameSelect: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   onHomeClick: () => void;
   onSettingsClick: () => void;
   onAddGameClick: () => void;
@@ -24,6 +25,7 @@ type HeaderProps = {
 export default function Header({
   allGames,
   onGameSelect,
+  onPlay,
   onHomeClick,
   onSettingsClick,
   onAddGameClick,
@@ -44,7 +46,7 @@ export default function Header({
 
         {/* SearchBar in the center */}
         <div className="plex-search-container">
-          <SearchBar games={allGames} onGameSelect={onGameSelect} />
+          <SearchBar games={allGames} onGameSelect={onGameSelect} onPlay={onPlay} />
         </div>
 
         {/* Buttons on the right */}

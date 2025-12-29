@@ -18,12 +18,14 @@ type SearchResultsPageProps = {
   apiBase: string;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
 };
 
 export default function SearchResultsPage({
   apiBase,
   buildCoverUrl,
   onGameClick,
+  onPlay,
 }: SearchResultsPageProps) {
   const { t } = useTranslation();
   const location = useLocation();
@@ -118,6 +120,7 @@ export default function SearchResultsPage({
             games={games}
             apiBase={apiBase}
             onGameClick={onGameClick}
+            onPlay={onPlay}
             buildCoverUrl={buildCoverUrl}
           />
         </div>

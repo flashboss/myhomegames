@@ -18,12 +18,13 @@ type GameItem = {
 type SearchBarProps = {
   games: GameItem[];
   onGameSelect: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
 };
 
 const RECENT_SEARCHES_KEY = "recentSearches";
 const MAX_RECENT_SEARCHES = 10;
 
-export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
+export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProps) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -271,8 +272,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                     <div className="search-result-thumbnail">
                       <CoverPlaceholder
                         title={game.title}
-                        width={48}
-                        height={72}
+                        width={60}
+                        height={90}
                       />
                     </div>
                   ) : (
@@ -292,16 +293,16 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                     />
                   )}
                   <div className="search-result-content">
-                    <div className="text-white text-sm truncate search-result-title">
+                    <div className="text-white text-base truncate search-result-title">
                       {game.title}
                     </div>
                     {game.summary && (
-                      <div className="text-gray-400 text-xs truncate mt-1 search-result-summary">
+                      <div className="text-gray-400 text-sm truncate mt-1 search-result-summary">
                         {game.summary}
                       </div>
                     )}
                     {game.year !== null && game.year !== undefined && (
-                      <div className="text-gray-500 text-xs truncate mt-1 search-result-date">
+                      <div className="text-gray-500 text-sm truncate mt-1 search-result-date">
                         {game.day !== null &&
                         game.day !== undefined &&
                         game.month !== null &&
@@ -311,6 +312,29 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                       </div>
                     )}
                   </div>
+                  {onPlay && (
+                    <button
+                      className="search-result-play-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPlay(game);
+                      }}
+                      aria-label="Play game"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 5v14l11-7z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </button>
               );
             })}
@@ -361,8 +385,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
               >
                 <svg
                   className="search-recent-icon"
-                  width="16"
-                  height="16"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -376,7 +400,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                   />
                 </svg>
                 <div className="search-result-content">
-                  <div className="text-white text-sm truncate search-result-title">
+                  <div className="text-white text-base truncate search-result-title">
                     {query}
                   </div>
                 </div>
@@ -389,8 +413,8 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
                   onClick={(e) => handleRemoveRecentSearch(query, e)}
                 >
                   <svg
-                    width="14"
-                    height="14"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"

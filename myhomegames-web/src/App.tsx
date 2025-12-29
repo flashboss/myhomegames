@@ -85,6 +85,7 @@ function AppContent() {
         }}
       >
         <Header
+          onPlay={openLauncher}
           allGames={allGames}
           onGameSelect={handleGameSelect}
           onHomeClick={() => navigate("/")}
@@ -141,6 +142,7 @@ function AppContent() {
               <SearchResultsPage
                 apiBase={API_BASE}
                 buildCoverUrl={buildCoverUrl}
+                onPlay={openLauncher}
                 onGameClick={handleGameClick}
               />
             }

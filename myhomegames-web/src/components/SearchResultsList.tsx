@@ -18,6 +18,7 @@ type SearchResultsListProps = {
   games: GameItem[];
   apiBase: string;
   onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
 };
 
@@ -27,6 +28,7 @@ type SearchResultItemProps = {
   game: GameItem;
   apiBase: string;
   onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
 };
 
@@ -34,6 +36,7 @@ function SearchResultItem({
   game,
   apiBase,
   onGameClick,
+  onPlay,
   buildCoverUrl,
 }: SearchResultItemProps) {
   const [imageError, setImageError] = useState(false);
@@ -89,6 +92,29 @@ function SearchResultItem({
           </div>
         )}
       </div>
+      {onPlay && (
+        <button
+          className="search-results-list-play-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPlay(game);
+          }}
+          aria-label="Play game"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8 5v14l11-7z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
@@ -97,6 +123,7 @@ export default function SearchResultsList({
   games,
   apiBase,
   onGameClick,
+  onPlay,
   buildCoverUrl,
 }: SearchResultsListProps) {
   const { t } = useTranslation();
@@ -113,6 +140,7 @@ export default function SearchResultsList({
           game={game}
           apiBase={apiBase}
           onGameClick={onGameClick}
+          onPlay={onPlay}
           buildCoverUrl={buildCoverUrl}
         />
       ))}
