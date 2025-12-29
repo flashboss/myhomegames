@@ -39,6 +39,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
     return saved ? JSON.parse(saved) : [];
   });
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const saveRecentSearch = useCallback((query: string) => {
     if (query.trim() !== "") {
@@ -119,6 +120,22 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
     setIsOpen(false);
   };
 
+  const handleRemoveRecentSearch = (query: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setRecentSearches((prev) => {
+      const updated = prev.filter((s) => s !== query);
+      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+      return updated;
+    });
+    // Keep popup open by refocusing the input
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
+  };
+
   const handleRecentSearchClick = (query: string) => {
     setSearchQuery(query);
     
@@ -181,6 +198,7 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
           </svg>
         </div>
         <input
+          ref={inputRef}
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -337,15 +355,55 @@ export default function SearchBar({ games, onGameSelect }: SearchBarProps) {
               <button
                 key={index}
                 onClick={() => handleRecentSearchClick(query)}
-                className={`w-full plex-dropdown-item search-dropdown-item ${
+                className={`w-full plex-dropdown-item search-dropdown-item search-recent-item ${
                   index < recentSearches.length - 1 ? "has-border" : ""
                 }`}
               >
+                <svg
+                  className="search-recent-icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
                 <div className="search-result-content">
                   <div className="text-white text-sm truncate search-result-title">
                     {query}
                   </div>
                 </div>
+                <button
+                  className="search-recent-remove"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onClick={(e) => handleRemoveRecentSearch(query, e)}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
               </button>
             ))}
           </div>
