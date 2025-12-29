@@ -32,14 +32,17 @@
   "search": {
     "noResults": "Aucun résultat trouvé pour le terme \"{{query}}\"",
     "viewAllResults": "Voir tous les résultats ({{count}})",
-    "placeholder": "Rechercher des jeux..."
+    "placeholder": "Rechercher des jeux...",
+    "recentSearches": "Recherches Récentes"
   },
   "searchResults": {
     "title": "Résultats de recherche : \"{{query}}\"",
     "foundGames_one": "{{count}} jeu trouvé",
     "foundGames_other": "{{count}} jeux trouvés",
     "noResults": "Aucun résultat trouvé",
-    "goBack": "Retour à l'accueil"
+    "goBack": "Retour à l'accueil",
+    "noResultsFound": "Aucun résultat trouvé",
+    "tryModifyingSearch": "Essayez de modifier les termes de recherche ou les filtres pour trouver ce que vous cherchez."
   },
   "home": {
     "loadingGames": "Chargement des jeux…",

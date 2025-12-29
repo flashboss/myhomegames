@@ -32,14 +32,17 @@
   "search": {
     "noResults": "未找到术语 \"{{query}}\" 的结果",
     "viewAllResults": "查看所有结果 ({{count}})",
-    "placeholder": "搜索游戏..."
+    "placeholder": "搜索游戏...",
+    "recentSearches": "最近搜索"
   },
   "searchResults": {
     "title": "搜索结果: \"{{query}}\"",
     "foundGames_one": "找到 {{count}} 个游戏",
     "foundGames_other": "找到 {{count}} 个游戏",
     "noResults": "未找到结果",
-    "goBack": "返回首页"
+    "goBack": "返回首页",
+    "noResultsFound": "未找到结果",
+    "tryModifyingSearch": "尝试修改搜索词或筛选条件以找到您要查找的内容。"
   },
   "home": {
     "loadingGames": "加载游戏中…",

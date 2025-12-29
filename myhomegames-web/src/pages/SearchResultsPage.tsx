@@ -33,7 +33,7 @@ export default function SearchResultsPage({
   const { searchQuery, games } =
     (location.state as { searchQuery?: string; games?: GameItem[] }) || {};
 
-  if (!searchQuery || !games || games.length === 0) {
+  if (!searchQuery) {
     return (
       <div className="bg-[#1a1a1a] text-white flex items-center justify-center search-results-page-empty">
         <div className="text-center">
@@ -44,6 +44,57 @@ export default function SearchResultsPage({
           >
             {t("searchResults.goBack")}
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!games || games.length === 0) {
+    return (
+      <div className="bg-[#1a1a1a] text-white search-results-page">
+        <div className="search-results-header">
+          <div className="search-results-header-content">
+            <div className="search-results-title">
+              {t("searchResults.title", { query: searchQuery })}
+            </div>
+          </div>
+        </div>
+        <div className="search-results-content">
+          <div className="search-results-content-inner">
+            <div className="search-results-empty">
+              <div className="search-results-empty-icon">
+                <svg
+                  width="80"
+                  height="80"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="8"
+                    stroke="#E5A00D"
+                    strokeWidth="2.5"
+                    fill="none"
+                  />
+                  <path
+                    d="m20 20-4.5-4.5"
+                    stroke="#000000"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <div className="search-results-empty-message">
+                {t("searchResults.noResultsFound")}
+              </div>
+              <div className="search-results-empty-hint">
+                {t("searchResults.tryModifyingSearch")}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
