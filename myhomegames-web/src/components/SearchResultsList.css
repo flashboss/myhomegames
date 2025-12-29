@@ -12,6 +12,7 @@
   border-radius: 8px;
   transition: background-color 0.2s ease;
   background-color: transparent;
+  cursor: pointer;
 }
 
 .search-results-list-item:hover {
@@ -23,6 +24,7 @@
   height: 150px;
   min-width: 100px;
   min-height: 150px;
+  cursor: pointer;
 }
 
 .search-results-list-content {
@@ -30,6 +32,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  cursor: pointer;
 }
 
 .search-results-list-title {
@@ -37,6 +40,7 @@
   font-size: 1.2rem;
   font-weight: 600;
   color: #f8f8f8;
+  cursor: pointer;
 }
 
 .search-results-list-summary {
