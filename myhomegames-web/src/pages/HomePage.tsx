@@ -129,7 +129,14 @@ export default function HomePage({
       }));
       setLibraries(parsed);
     } catch (err: any) {
-      setError(String(err.message || err));
+      const errorMessage = String(err.message || err);
+      // Translate fetch errors
+      if (errorMessage.toLowerCase().includes("failed to fetch") || 
+          errorMessage.toLowerCase().includes("fetch")) {
+        setError(t("common.fetchError"));
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -164,7 +171,14 @@ export default function HomePage({
       setGames(parsed);
       onGamesLoaded(parsed);
     } catch (err: any) {
-      setError(String(err.message || err));
+      const errorMessage = String(err.message || err);
+      // Translate fetch errors
+      if (errorMessage.toLowerCase().includes("failed to fetch") || 
+          errorMessage.toLowerCase().includes("fetch")) {
+        setError(t("common.fetchError"));
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -214,9 +228,6 @@ export default function HomePage({
         <main className={`flex-1 home-page-content`}>
           {!activeLibrary ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-gray-400 text-center">
-                <div className="text-2xl mb-2">🎮</div>
-              </div>
             </div>
           ) : (
             <div className="home-page-layout">

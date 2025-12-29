@@ -23,6 +23,76 @@ type SearchResultsListProps = {
 
 const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
 
+type SearchResultItemProps = {
+  game: GameItem;
+  apiBase: string;
+  onGameClick: (game: GameItem) => void;
+  buildCoverUrl: (apiBase: string, cover?: string) => string;
+};
+
+function SearchResultItem({
+  game,
+  apiBase,
+  onGameClick,
+  buildCoverUrl,
+}: SearchResultItemProps) {
+  const [imageError, setImageError] = useState(false);
+  const showPlaceholder = !game.cover || imageError;
+  const coverHeight = FIXED_COVER_SIZE * 1.5;
+
+  return (
+    <div
+      key={game.ratingKey}
+      className="group cursor-pointer mb-6 search-results-list-item"
+      onClick={() => onGameClick(game)}
+    >
+      <div
+        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover"
+        style={{
+          height: `${coverHeight}px`,
+        }}
+      >
+        {showPlaceholder ? (
+          <CoverPlaceholder
+            title={game.title}
+            width={FIXED_COVER_SIZE}
+            height={coverHeight}
+          />
+        ) : (
+          <img
+            src={buildCoverUrl(apiBase, game.cover)}
+            alt={game.title}
+            className="object-cover w-full h-full"
+            onError={() => {
+              setImageError(true);
+            }}
+          />
+        )}
+      </div>
+      <div className="search-results-list-content">
+        <div className="text-white mb-2 search-results-list-title">
+          {game.title}
+        </div>
+        {game.summary && (
+          <div className="text-gray-400 mb-2 search-results-list-summary">
+            {game.summary}
+          </div>
+        )}
+        {game.year !== null && game.year !== undefined && (
+          <div className="text-gray-500 search-results-list-date">
+            {game.day !== null &&
+            game.day !== undefined &&
+            game.month !== null &&
+            game.month !== undefined
+              ? `${game.day}/${game.month}/${game.year}`
+              : game.year.toString()}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function SearchResultsList({
   games,
   apiBase,
@@ -35,66 +105,17 @@ export default function SearchResultsList({
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
-  const coverHeight = FIXED_COVER_SIZE * 1.5;
-
   return (
     <div className="search-results-list-container">
-      {games.map((it) => {
-        const [imageError, setImageError] = useState(false);
-        const showPlaceholder = !it.cover || imageError;
-
-        return (
-          <div
-            key={it.ratingKey}
-            className="group cursor-pointer mb-6 search-results-list-item"
-            onClick={() => onGameClick(it)}
-          >
-            <div
-              className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover"
-              style={{
-                height: `${coverHeight}px`,
-              }}
-            >
-              {showPlaceholder ? (
-                <CoverPlaceholder
-                  title={it.title}
-                  width={FIXED_COVER_SIZE}
-                  height={coverHeight}
-                />
-              ) : (
-                <img
-                  src={buildCoverUrl(apiBase, it.cover)}
-                  alt={it.title}
-                  className="object-cover w-full h-full"
-                  onError={() => {
-                    setImageError(true);
-                  }}
-                />
-              )}
-            </div>
-            <div className="search-results-list-content">
-              <div className="text-white mb-2 search-results-list-title">
-                {it.title}
-              </div>
-              {it.summary && (
-                <div className="text-gray-400 mb-2 search-results-list-summary">
-                  {it.summary}
-                </div>
-              )}
-              {it.year !== null && it.year !== undefined && (
-                <div className="text-gray-500 search-results-list-date">
-                  {it.day !== null &&
-                  it.day !== undefined &&
-                  it.month !== null &&
-                  it.month !== undefined
-                    ? `${it.day}/${it.month}/${it.year}`
-                    : it.year.toString()}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
+      {games.map((game) => (
+        <SearchResultItem
+          key={game.ratingKey}
+          game={game}
+          apiBase={apiBase}
+          onGameClick={onGameClick}
+          buildCoverUrl={buildCoverUrl}
+        />
+      ))}
     </div>
   );
 }

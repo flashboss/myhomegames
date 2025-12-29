@@ -20,6 +20,62 @@ type GamesListProps = {
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
+type GameListItemProps = {
+  game: GameItem;
+  apiBase: string;
+  onGameClick: (game: GameItem) => void;
+  buildCoverUrl: (apiBase: string, cover?: string) => string;
+  coverSize: number;
+  itemRefs?: React.RefObject<Map<string, HTMLElement>>;
+};
+
+function GameListItem({
+  game,
+  apiBase,
+  onGameClick,
+  buildCoverUrl,
+  coverSize,
+  itemRefs,
+}: GameListItemProps) {
+  const [imageError, setImageError] = useState(false);
+  const showPlaceholder = !game.cover || imageError;
+  const coverHeight = coverSize * 1.5;
+
+  return (
+    <div
+      key={game.ratingKey}
+      ref={(el) => {
+        if (el && itemRefs?.current) {
+          itemRefs.current.set(game.ratingKey, el);
+        }
+      }}
+      className="group cursor-pointer games-list-item"
+      style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
+      onClick={() => onGameClick(game)}
+    >
+      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">
+        {showPlaceholder ? (
+          <CoverPlaceholder
+            title={game.title}
+            width={coverSize}
+            height={coverHeight}
+          />
+        ) : (
+          <img
+            src={buildCoverUrl(apiBase, game.cover)}
+            alt={game.title}
+            className="object-cover w-full h-full"
+            onError={() => {
+              setImageError(true);
+            }}
+          />
+        )}
+      </div>
+      <div className="truncate games-list-title">{game.title}</div>
+    </div>
+  );
+}
+
 export default function GamesList({
   games,
   apiBase,
@@ -34,51 +90,22 @@ export default function GamesList({
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
-  const coverHeight = coverSize * 1.5;
-
   return (
     <div
       className="games-list-container"
       style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)` }}
     >
-      {games.map((it) => {
-        const [imageError, setImageError] = useState(false);
-        const showPlaceholder = !it.cover || imageError;
-
-        return (
-          <div
-            key={it.ratingKey}
-            ref={(el) => {
-              if (el && itemRefs?.current) {
-                itemRefs.current.set(it.ratingKey, el);
-              }
-            }}
-            className="group cursor-pointer games-list-item"
-            style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
-            onClick={() => onGameClick(it)}
-          >
-            <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-transform group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20">
-              {showPlaceholder ? (
-                <CoverPlaceholder
-                  title={it.title}
-                  width={coverSize}
-                  height={coverHeight}
-                />
-              ) : (
-                <img
-                  src={buildCoverUrl(apiBase, it.cover)}
-                  alt={it.title}
-                  className="object-cover w-full h-full"
-                  onError={() => {
-                    setImageError(true);
-                  }}
-                />
-              )}
-            </div>
-            <div className="truncate games-list-title">{it.title}</div>
-          </div>
-        );
-      })}
+      {games.map((game) => (
+        <GameListItem
+          key={game.ratingKey}
+          game={game}
+          apiBase={apiBase}
+          onGameClick={onGameClick}
+          buildCoverUrl={buildCoverUrl}
+          coverSize={coverSize}
+          itemRefs={itemRefs}
+        />
+      ))}
     </div>
   );
 }

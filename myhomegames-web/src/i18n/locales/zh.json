@@ -74,7 +74,8 @@
   "common": {
     "loading": "加载中...",
     "error": "错误",
-    "close": "关闭"
+    "close": "关闭",
+    "fetchError": "无法连接到服务器"
   }
 }
 

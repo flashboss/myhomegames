@@ -74,7 +74,8 @@
   "common": {
     "loading": "Lädt...",
     "error": "Fehler",
-    "close": "Schließen"
+    "close": "Schließen",
+    "fetchError": "Verbindung zum Server fehlgeschlagen"
   }
 }
 

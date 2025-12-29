@@ -74,7 +74,8 @@
   "common": {
     "loading": "Loading...",
     "error": "Error",
-    "close": "Close"
+    "close": "Close",
+    "fetchError": "Failed to connect to server"
   }
 }
 
