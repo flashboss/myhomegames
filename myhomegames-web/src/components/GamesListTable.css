@@ -137,7 +137,6 @@
 
 .games-table tbody tr {
   transition: background-color 0.2s ease;
-  cursor: pointer;
 }
 
 .games-table tbody tr:hover td.column-menu-cell {
@@ -176,6 +175,17 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: #f8f8f8;
+}
+
+.games-table td.title-cell .first-cell-text,
+.games-table td.title-cell .title-cell-text {
+  cursor: pointer;
+  transition: text-decoration 0.2s ease;
+}
+
+.games-table td.title-cell .first-cell-text:hover,
+.games-table td.title-cell .title-cell-text:hover {
+  text-decoration: underline;
 }
 
 .games-table td.first-visible-cell {

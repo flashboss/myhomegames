@@ -397,14 +397,17 @@ export default function GamesListTable({
                       itemRefs.current.set(it.ratingKey, el);
                     }
                   }}
-                  className="cursor-pointer"
-                  onClick={() => onGameClick(it)}
                 >
                   <td className="column-menu-cell"></td>
                   {columnVisibility.title && (
                     <td className={`title-cell ${rowClass} ${firstVisibleColumn === "title" ? "first-visible-cell" : ""}`}>
                       {firstVisibleColumn === "title" && onPlay && <PlayIcon />}
-                      <span className={firstVisibleColumn === "title" ? "first-cell-text" : ""}>{it.title}</span>
+                      <span 
+                        className={firstVisibleColumn === "title" ? "first-cell-text" : "title-cell-text"}
+                        onClick={() => onGameClick(it)}
+                      >
+                        {it.title}
+                      </span>
                     </td>
                   )}
                   {columnVisibility.summary && (
