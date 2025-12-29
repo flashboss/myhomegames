@@ -79,6 +79,25 @@
     "error": "Error",
     "close": "Cerrar",
     "fetchError": "Error al conectar con el servidor"
+  },
+  "gamesListToolbar": {
+    "filter": {
+      "label": "Filtro",
+      "all": "Todos",
+      "title": "Título",
+      "year": "Año",
+      "stars": "Estrellas",
+      "summary": "Resumen"
+    },
+    "sort": {
+      "label": "Ordenar",
+      "title": "Título",
+      "year": "Año",
+      "stars": "Estrellas",
+      "releaseDate": "Fecha de lanzamiento"
+    },
+    "gamesCount_one": "{{count}} juego mostrado",
+    "gamesCount_other": "{{count}} juegos mostrados"
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import LibrariesBar from "../components/LibrariesBar";
 import type { ViewMode } from "../components/LibrariesBar";
@@ -6,6 +6,7 @@ import GamesList from "../components/GamesList";
 import GamesListDetail from "../components/GamesListDetail";
 import GamesListTable from "../components/GamesListTable";
 import AlphabetNavigator from "../components/AlphabetNavigator";
+import GamesListToolbar from "../components/GamesListToolbar";
 import "./HomePage.css";
 
 type GameLibrarySection = {
@@ -66,6 +67,8 @@ export default function HomePage({
   const [error, setError] = useState<string | null>(null);
   const [coverSize, setCoverSize] = useState(150);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [filterField, setFilterField] = useState<"all" | "title" | "year" | "stars" | "summary">("all");
+  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">("title");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -217,6 +220,60 @@ export default function HomePage({
     onGameClick(game);
   }
 
+  // Filter and sort games
+  const filteredAndSortedGames = useMemo(() => {
+    let filtered = [...games];
+
+    // Apply filter
+    if (filterField !== "all") {
+      filtered = filtered.filter((game) => {
+        switch (filterField) {
+          case "title":
+            return game.title && game.title.trim() !== "";
+          case "year":
+            return game.year !== null && game.year !== undefined;
+          case "stars":
+            return game.stars !== null && game.stars !== undefined;
+          case "summary":
+            return game.summary && game.summary.trim() !== "";
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply sort
+    filtered.sort((a, b) => {
+      switch (sortField) {
+        case "title":
+          return (a.title || "").localeCompare(b.title || "");
+        case "year":
+          const yearA = a.year ?? 0;
+          const yearB = b.year ?? 0;
+          return yearB - yearA; // Descending (newest first)
+        case "stars":
+          const starsA = a.stars ?? 0;
+          const starsB = b.stars ?? 0;
+          return starsB - starsA; // Descending (highest first)
+        case "releaseDate":
+          // Sort by release date (year, month, day)
+          const dateA = a.year ?? 0;
+          const dateB = b.year ?? 0;
+          if (dateA !== dateB) return dateB - dateA;
+          const monthA = a.month ?? 0;
+          const monthB = b.month ?? 0;
+          if (monthA !== monthB) return monthB - monthA;
+          const dayA = a.day ?? 0;
+          const dayB = b.day ?? 0;
+          return dayB - dayA;
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [games, filterField, sortField]);
+
   return (
     <>
       <LibrariesBar
@@ -238,22 +295,30 @@ export default function HomePage({
             </div>
           ) : (
             <div className="home-page-layout">
-              {/* Scrollable lists container */}
-              <div
-                ref={scrollContainerRef}
-                className={`home-page-scroll-container ${
-                  viewMode === "table" ? "table-view" : ""
-                }`}
-              >
-                {loading ? (
-                  <div className="text-sm text-gray-400 text-center">
-                    {t("home.loadingGames")}
-                  </div>
-                ) : (
+              <div className={`home-page-content-wrapper ${!loading && games.length > 0 && activeLibrary.key === "libreria" ? "has-toolbar" : ""}`}>
+                {/* Toolbar with filter and sort - only for libreria */}
+                {!loading && games.length > 0 && activeLibrary.key === "libreria" && (
+                  <GamesListToolbar
+                    gamesCount={filteredAndSortedGames.length}
+                    onFilterChange={setFilterField}
+                    onSortChange={setSortField}
+                    currentFilter={filterField}
+                    currentSort={sortField}
+                    viewMode={viewMode}
+                  />
+                )}
+                {/* Scrollable lists container */}
+                <div
+                  ref={scrollContainerRef}
+                  className={`home-page-scroll-container ${
+                    viewMode === "table" ? "table-view" : ""
+                  }`}
+                >
+                {!loading && (
                   <>
                     {viewMode === "grid" && (
                       <GamesList
-                        games={games}
+                        games={filteredAndSortedGames}
                         apiBase={apiBase}
                         onGameClick={handleGameClick}
                         onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
@@ -265,7 +330,7 @@ export default function HomePage({
                     )}
                     {viewMode === "detail" && (
                       <GamesListDetail
-                        games={games}
+                        games={filteredAndSortedGames}
                         apiBase={apiBase}
                         onGameClick={handleGameClick}
                         onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
@@ -275,7 +340,7 @@ export default function HomePage({
                     )}
                     {viewMode === "table" && (
                       <GamesListTable
-                        games={games}
+                        games={filteredAndSortedGames}
                         onGameClick={handleGameClick}
                         onPlay={activeLibrary.key === "categorie" ? undefined : onPlay}
                         itemRefs={itemRefs}
@@ -284,6 +349,7 @@ export default function HomePage({
                     )}
                   </>
                 )}
+              </div>
               </div>
 
               {/* Alphabet navigator container - separate div */}

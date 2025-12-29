@@ -79,6 +79,25 @@
     "error": "エラー",
     "close": "閉じる",
     "fetchError": "サーバーに接続できませんでした"
+  },
+  "gamesListToolbar": {
+    "filter": {
+      "label": "フィルター",
+      "all": "すべて",
+      "title": "タイトル",
+      "year": "年",
+      "stars": "星",
+      "summary": "概要"
+    },
+    "sort": {
+      "label": "並び替え",
+      "title": "タイトル",
+      "year": "年",
+      "stars": "星",
+      "releaseDate": "リリース日"
+    },
+    "gamesCount_one": "{{count}} 件のゲームを表示",
+    "gamesCount_other": "{{count}} 件のゲームを表示"
   }
 }
 
