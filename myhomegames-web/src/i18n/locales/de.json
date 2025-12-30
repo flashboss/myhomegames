@@ -85,9 +85,12 @@
       "label": "Filter",
       "all": "Alle",
       "title": "Titel",
+      "genre": "Genre",
       "year": "Jahr",
       "stars": "Bewertung",
-      "summary": "Zusammenfassung"
+      "summary": "Zusammenfassung",
+      "searchYear": "Filter Jahr",
+      "searchGenre": "Filter Genre"
     },
     "sort": {
       "label": "Sortieren",

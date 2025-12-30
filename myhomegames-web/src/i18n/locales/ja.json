@@ -85,9 +85,12 @@
       "label": "フィルター",
       "all": "すべて",
       "title": "タイトル",
+      "genre": "ジャンル",
       "year": "年",
       "stars": "評価",
-      "summary": "概要"
+      "summary": "概要",
+      "searchYear": "フィルター年",
+      "searchGenre": "フィルタージャンル"
     },
     "sort": {
       "label": "並び替え",

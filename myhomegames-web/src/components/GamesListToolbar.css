@@ -112,10 +112,102 @@
   background-color: #2a2a2a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
-  min-width: 180px;
+  min-width: 280px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.games-list-toolbar-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.games-list-toolbar-popup-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.games-list-toolbar-popup-back:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.games-list-toolbar-popup-header-title {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+}
+
+.games-list-toolbar-popup-search {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.games-list-toolbar-popup-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.games-list-toolbar-popup-search-input:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.games-list-toolbar-popup-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.games-list-toolbar-popup-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.games-list-toolbar-popup-scrollable {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar for popup */
+.games-list-toolbar-popup-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.games-list-toolbar-popup-scrollable::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.games-list-toolbar-popup-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.games-list-toolbar-popup-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .games-list-toolbar-popup-item {
@@ -131,11 +223,6 @@
   cursor: pointer;
   font-size: 0.875rem;
   transition: background-color 0.2s ease, color 0.2s ease;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.games-list-toolbar-popup-item:last-child {
-  border-bottom: none;
 }
 
 .games-list-toolbar-popup-divider {

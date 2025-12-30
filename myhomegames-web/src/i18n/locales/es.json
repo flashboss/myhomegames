@@ -85,9 +85,12 @@
       "label": "Filtro",
       "all": "Todo",
       "title": "Título",
+      "genre": "Género",
       "year": "Año",
       "stars": "Valoración",
-      "summary": "Resumen"
+      "summary": "Resumen",
+      "searchYear": "Filtro Año",
+      "searchGenre": "Filtro Género"
     },
     "sort": {
       "label": "Ordenar",

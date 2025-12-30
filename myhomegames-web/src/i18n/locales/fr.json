@@ -85,9 +85,12 @@
       "label": "Filtre",
       "all": "Tout",
       "title": "Titre",
+      "genre": "Genre",
       "year": "Année",
       "stars": "Note",
-      "summary": "Résumé"
+      "summary": "Résumé",
+      "searchYear": "Filtre Année",
+      "searchGenre": "Filtre Genre"
     },
     "sort": {
       "label": "Trier",

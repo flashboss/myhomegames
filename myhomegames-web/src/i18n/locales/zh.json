@@ -85,9 +85,12 @@
       "label": "筛选",
       "all": "全部",
       "title": "标题",
+      "genre": "类型",
       "year": "年份",
       "stars": "评分",
-      "summary": "摘要"
+      "summary": "摘要",
+      "searchYear": "筛选年份",
+      "searchGenre": "筛选类型"
     },
     "sort": {
       "label": "排序",

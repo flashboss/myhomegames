@@ -15,6 +15,7 @@ type GameItem = {
   month?: number | null;
   year?: number | null;
   stars?: number | null;
+  genre?: string | string[];
 };
 
 type LibraryPageProps = {
@@ -42,17 +43,123 @@ export default function LibraryPage({
 }: LibraryPageProps) {
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterField, setFilterField] = useState<"all" | "year">("all");
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">("title");
-  const [sortAscending, setSortAscending] = useState(true);
+  const [filterField, setFilterField] = useState<"all" | "genre" | "year">(() => {
+    const saved = localStorage.getItem("libraryFilterField");
+    return (saved as "all" | "genre" | "year") || "all";
+  });
+  const [selectedYear, setSelectedYear] = useState<number | null>(() => {
+    const saved = localStorage.getItem("librarySelectedYear");
+    return saved ? parseInt(saved, 10) : null;
+  });
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(() => {
+    const saved = localStorage.getItem("librarySelectedGenre");
+    return saved || null;
+  });
+  const [allGenres, setAllGenres] = useState<Array<{ id: string; title: string }>>([]);
+  const [availableGenres, setAvailableGenres] = useState<Array<{ id: string; title: string }>>([]);
+  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">(() => {
+    const saved = localStorage.getItem("librarySortField");
+    return (saved as "title" | "year" | "stars" | "releaseDate") || "title";
+  });
+  const [sortAscending, setSortAscending] = useState<boolean>(() => {
+    const saved = localStorage.getItem("librarySortAscending");
+    return saved ? saved === "true" : true;
+  });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   useEffect(() => {
     fetchLibraryGames();
+    fetchCategories();
   }, []);
+
+  // Save filter and sort state to localStorage
+  useEffect(() => {
+    localStorage.setItem("libraryFilterField", filterField);
+  }, [filterField]);
+
+  useEffect(() => {
+    if (selectedYear !== null) {
+      localStorage.setItem("librarySelectedYear", selectedYear.toString());
+    } else {
+      localStorage.removeItem("librarySelectedYear");
+    }
+  }, [selectedYear]);
+
+  useEffect(() => {
+    if (selectedGenre !== null) {
+      localStorage.setItem("librarySelectedGenre", selectedGenre);
+    } else {
+      localStorage.removeItem("librarySelectedGenre");
+    }
+  }, [selectedGenre]);
+
+  useEffect(() => {
+    localStorage.setItem("librarySortField", sortField);
+  }, [sortField]);
+
+  useEffect(() => {
+    localStorage.setItem("librarySortAscending", sortAscending.toString());
+  }, [sortAscending]);
+
+  // Update available genres based on games in the library
+  useEffect(() => {
+    if (games.length === 0 || allGenres.length === 0) return;
+
+    // Extract unique genre IDs and titles from games
+    const genresInGames = new Set<string>();
+    games.forEach((game) => {
+      if (game.genre) {
+        if (Array.isArray(game.genre)) {
+          game.genre.forEach((g) => genresInGames.add(g));
+        } else if (typeof game.genre === "string") {
+          genresInGames.add(game.genre);
+        }
+      }
+    });
+
+    // Filter all genres to only those present in games
+    const filteredGenres = allGenres.filter((genre) => {
+      // Check if the genre ID or title matches any genre in games
+      return genresInGames.has(genre.id) || genresInGames.has(genre.title);
+    });
+
+    setAvailableGenres(filteredGenres);
+
+    // Validate selected genre - if it's no longer available, reset it
+    if (selectedGenre !== null && filterField === "genre") {
+      const genreExists = filteredGenres.some((g) => g.id === selectedGenre);
+      if (!genreExists) {
+        setSelectedGenre(null);
+        setFilterField("all");
+      }
+    }
+  }, [games, allGenres, selectedGenre, filterField]);
+
+  async function fetchCategories() {
+    try {
+      const url = buildApiUrl(apiBase, "/categories");
+      const res = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "X-Auth-Token": apiToken,
+        },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const items = (json.categories || []) as any[];
+      const parsed = items.map((v) => ({
+        id: v.id,
+        title: v.title,
+      }));
+      setAllGenres(parsed);
+    } catch (err: any) {
+      const errorMessage = String(err.message || err);
+      console.error("Error fetching categories:", errorMessage);
+    }
+  }
+
 
   async function fetchLibraryGames() {
     setLoading(true);
@@ -78,6 +185,7 @@ export default function LibraryPage({
         month: v.month,
         year: v.year,
         stars: v.stars,
+        genre: v.genre,
       }));
       setGames(parsed);
       onGamesLoaded(parsed);
@@ -98,6 +206,22 @@ export default function LibraryPage({
     if (filterField !== "all") {
       filtered = filtered.filter((game) => {
         switch (filterField) {
+          case "genre":
+            if (selectedGenre !== null) {
+              // Find the genre object to get both id and title
+              const selectedGenreObj = availableGenres.find((g) => g.id === selectedGenre);
+              if (!selectedGenreObj) return false;
+              
+              // Filter games that have the selected genre
+              // The game.genre field might contain either the ID (e.g., "genre_action") or the title (e.g., "action")
+              if (Array.isArray(game.genre)) {
+                return game.genre.includes(selectedGenreObj.id) || game.genre.includes(selectedGenreObj.title);
+              } else if (typeof game.genre === "string") {
+                return game.genre === selectedGenreObj.id || game.genre === selectedGenreObj.title;
+              }
+              return false;
+            }
+            return true;
           case "year":
             if (selectedYear !== null) {
               return game.year === selectedYear;
@@ -154,7 +278,7 @@ export default function LibraryPage({
     });
 
     return filtered;
-  }, [games, filterField, selectedYear, sortField, sortAscending]);
+  }, [games, filterField, selectedYear, selectedGenre, sortField, sortAscending, availableGenres]);
 
   return (
     <div className="home-page-layout">
@@ -166,13 +290,16 @@ export default function LibraryPage({
             games={games}
             onFilterChange={setFilterField}
             onYearFilterChange={setSelectedYear}
+            onGenreFilterChange={setSelectedGenre}
             onSortChange={setSortField}
             onSortDirectionChange={setSortAscending}
             currentFilter={filterField}
             selectedYear={selectedYear}
+            selectedGenre={selectedGenre}
             currentSort={sortField}
             sortAscending={sortAscending}
             viewMode={viewMode}
+            availableGenres={availableGenres}
           />
         )}
         {/* Scrollable lists container */}

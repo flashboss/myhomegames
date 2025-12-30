@@ -1,0 +1,97 @@
+import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import "./SortPopup.css";
+
+type SortField = "title" | "year" | "stars" | "releaseDate";
+
+type SortPopupProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  currentSort: SortField;
+  sortAscending: boolean;
+  onSortChange?: (field: SortField) => void;
+  onSortDirectionChange?: (ascending: boolean) => void;
+};
+
+export default function SortPopup({
+  isOpen,
+  onClose,
+  currentSort,
+  sortAscending,
+  onSortChange,
+  onSortDirectionChange,
+}: SortPopupProps) {
+  const { t } = useTranslation();
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleClickOutside(event: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
+  const sortOptions: { value: SortField; label: string }[] = [
+    { value: "title", label: t("gamesListToolbar.sort.title") },
+    { value: "year", label: t("gamesListToolbar.sort.year") },
+    { value: "stars", label: t("gamesListToolbar.sort.stars") },
+    { value: "releaseDate", label: t("gamesListToolbar.sort.releaseDate") },
+  ];
+
+  const handleSortSelect = (field: SortField) => {
+    if (field === currentSort && onSortDirectionChange) {
+      // If clicking the same field, toggle direction
+      onSortDirectionChange(!sortAscending);
+    } else {
+      // If selecting a new field, set to ascending by default
+      onSortChange?.(field);
+      if (onSortDirectionChange) {
+        onSortDirectionChange(true);
+      }
+    }
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="sort-popup" ref={sortRef}>
+      {sortOptions.map((option) => (
+        <button
+          key={option.value}
+          className={`sort-popup-item ${
+            currentSort === option.value ? "selected" : ""
+          }`}
+          onClick={() => handleSortSelect(option.value)}
+        >
+          <span>{option.label}</span>
+          {currentSort === option.value && (
+            <svg
+              className={`sort-popup-sort-direction ${sortAscending ? "ascending" : "descending"}`}
+              width="10"
+              height="10"
+              viewBox="0 0 12 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d={sortAscending ? "M6 2L10 8H2L6 2Z" : "M6 10L2 4H10L6 10Z"}
+                fill="currentColor"
+              />
+            </svg>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
