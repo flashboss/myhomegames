@@ -36,6 +36,40 @@
   --font-body-2-line-height: 1.5;
 }
 
+/* Common cover hover effects (darken overlay + yellow border) */
+.cover-hover-effect {
+  position: relative;
+  cursor: pointer;
+  outline: 3px solid transparent;
+  outline-offset: -3px;
+  transition: outline-color 0.2s ease;
+  overflow: hidden;
+}
+
+.cover-hover-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 2;
+  transition: background-color 0.2s ease;
+  pointer-events: none;
+}
+
+.cover-hover-effect:hover,
+*:hover > .cover-hover-effect {
+  outline-color: #E5A00D;
+  border-radius: 4px;
+}
+
+.cover-hover-effect:hover::before,
+*:hover > .cover-hover-effect::before {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
 html,
 body {
   margin: 0;

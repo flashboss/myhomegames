@@ -11,38 +11,11 @@
 }
 
 .categories-list-cover {
-  position: relative;
-  cursor: pointer;
-  outline: 3px solid transparent;
-  outline-offset: -3px;
-  transition: outline-color 0.2s ease;
-  overflow: hidden;
+  /* Common hover effects handled by .cover-hover-effect class */
 }
 
 .categories-list-cover img {
   filter: brightness(40%) blur(1px);
-}
-
-.categories-list-cover::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0);
-  z-index: 4;
-  transition: background-color 0.2s ease;
-  pointer-events: none;
-}
-
-.categories-list-item:hover .categories-list-cover::before {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.categories-list-item:hover .categories-list-cover {
-  outline-color: #E5A00D;
-  border-radius: 4px;
 }
 
 .categories-list-title-overlay {

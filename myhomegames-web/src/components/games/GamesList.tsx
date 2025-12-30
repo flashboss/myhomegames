@@ -63,7 +63,7 @@ function GameListItem({
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
       onClick={() => onGameClick(game)}
     >
-      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 games-list-cover">
+      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 games-list-cover cover-hover-effect">
         {showPlaceholder ? (
           <CoverPlaceholder
             title={game.title}

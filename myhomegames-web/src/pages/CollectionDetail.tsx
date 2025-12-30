@@ -222,7 +222,7 @@ export default function CollectionDetail({
                 {/* Cover */}
                 <div style={{ flexShrink: 0 }}>
                   <div 
-                    className="collection-detail-cover-container relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden" 
+                    className="collection-detail-cover-container cover-hover-effect relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden" 
                     style={{ width: `${collectionCoverWidth}px` }}
                     onClick={() => {
                       // Click on cover plays first game

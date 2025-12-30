@@ -55,7 +55,7 @@ function CategoryListItem({
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
       onClick={handleClick}
     >
-      <div className="relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 categories-list-cover">
+      <div className="relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 categories-list-cover cover-hover-effect">
         {showPlaceholder ? (
           <>
             <CoverPlaceholder

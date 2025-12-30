@@ -31,16 +31,7 @@
   height: 150px;
   min-width: 100px;
   min-height: 150px;
-  cursor: pointer;
-  position: relative;
-  outline: 3px solid transparent;
-  outline-offset: -3px;
-  transition: outline-color 0.2s ease;
-}
-
-.games-list-detail-cover:hover {
-  outline-color: #E5A00D;
-  border-radius: 4px;
+  /* Common hover effects handled by .cover-hover-effect class */
 }
 
 .games-list-detail-content {
@@ -75,7 +66,7 @@
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s ease;
-  z-index: 1;
+  z-index: 3;
 }
 
 .games-list-detail-cover:hover .games-list-detail-play-button {

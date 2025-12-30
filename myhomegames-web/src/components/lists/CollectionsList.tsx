@@ -61,7 +61,7 @@ function CollectionListItem({
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
       onClick={() => onCollectionClick(collection)}
     >
-      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 collections-list-cover">
+      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 collections-list-cover cover-hover-effect">
         {showPlaceholder ? (
           <CoverPlaceholder
             title={collection.title}

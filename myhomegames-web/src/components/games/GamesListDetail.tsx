@@ -71,7 +71,7 @@ function GameDetailItem({
       onClick={() => onGameClick(game)}
     >
       <div
-        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 games-list-detail-cover"
+        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 games-list-detail-cover cover-hover-effect"
         style={{
           height: `${coverHeight}px`,
         }}

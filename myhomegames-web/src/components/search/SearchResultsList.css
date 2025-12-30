@@ -24,7 +24,7 @@
   height: 150px;
   min-width: 100px;
   min-height: 150px;
-  cursor: pointer;
+  /* Common hover effects handled by .cover-hover-effect class */
 }
 
 .search-results-list-content {

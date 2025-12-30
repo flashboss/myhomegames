@@ -50,7 +50,7 @@ function SearchResultItem({
       onClick={() => onGameClick(game)}
     >
       <div
-        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover"
+        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover cover-hover-effect"
         style={{
           height: `${coverHeight}px`,
         }}
