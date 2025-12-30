@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
@@ -33,6 +33,7 @@ export default function SearchResultsPage({
   const location = useLocation();
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
   
   // Restore scroll position
   useScrollRestoration(scrollContainerRef);
@@ -51,6 +52,20 @@ export default function SearchResultsPage({
       navigate(savedFrom, { replace: true });
     }
   }, [searchQuery, navigate]);
+
+  // Hide content until fully rendered
+  useLayoutEffect(() => {
+    if (games && games.length > 0) {
+      // Wait for next frame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsReady(true);
+        });
+      });
+    } else {
+      setIsReady(false);
+    }
+  }, [games]);
 
   if (!searchQuery) {
     return (
@@ -114,7 +129,13 @@ export default function SearchResultsPage({
   }
 
   return (
-    <div className="bg-[#1a1a1a] text-white search-results-page">
+    <div 
+      className="bg-[#1a1a1a] text-white search-results-page"
+      style={{
+        opacity: isReady ? 1 : 0,
+        transition: 'opacity 0.2s ease-in-out',
+      }}
+    >
       <div className="search-results-header">
         <div className="search-results-header-content">
           <div className="search-results-title">

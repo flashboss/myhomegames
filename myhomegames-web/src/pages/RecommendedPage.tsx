@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
 
@@ -36,6 +36,7 @@ export default function RecommendedPage({
 }: RecommendedPageProps) {
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Restore scroll position
@@ -45,6 +46,20 @@ export default function RecommendedPage({
   useEffect(() => {
     fetchLibraryGames();
   }, []);
+
+  // Hide content until fully rendered
+  useLayoutEffect(() => {
+    if (!loading && games.length > 0) {
+      // Wait for next frame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsReady(true);
+        });
+      });
+    } else if (loading) {
+      setIsReady(false);
+    }
+  }, [loading, games.length]);
 
   async function fetchLibraryGames() {
     setLoading(true);
@@ -89,7 +104,13 @@ export default function RecommendedPage({
   return (
     <main className="flex-1 home-page-content">
       <div className="home-page-layout">
-      <div className="home-page-content-wrapper">
+      <div 
+        className="home-page-content-wrapper"
+        style={{
+          opacity: isReady ? 1 : 0,
+          transition: 'opacity 0.2s ease-in-out',
+        }}
+      >
         <div
           ref={scrollContainerRef}
           className="home-page-scroll-container"

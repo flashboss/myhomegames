@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import CollectionsList from "../components/lists/CollectionsList";
@@ -30,6 +30,7 @@ export default function CollectionsPage({
   const navigate = useNavigate();
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [sortAscending] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -40,6 +41,20 @@ export default function CollectionsPage({
   useEffect(() => {
     fetchCollections();
   }, []);
+
+  // Hide content until fully rendered
+  useLayoutEffect(() => {
+    if (!loading && collections.length > 0) {
+      // Wait for next frame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsReady(true);
+        });
+      });
+    } else if (loading) {
+      setIsReady(false);
+    }
+  }, [loading, collections.length]);
 
 
   async function fetchCollections() {
@@ -87,7 +102,13 @@ export default function CollectionsPage({
   return (
     <main className="flex-1 home-page-content">
       <div className="home-page-layout">
-      <div className="home-page-content-wrapper">
+      <div 
+        className="home-page-content-wrapper"
+        style={{
+          opacity: isReady ? 1 : 0,
+          transition: 'opacity 0.2s ease-in-out',
+        }}
+      >
         <div
           ref={scrollContainerRef}
           className="home-page-scroll-container"
@@ -106,12 +127,14 @@ export default function CollectionsPage({
         </div>
       </div>
 
-      <AlphabetNavigator
-        games={sortedCollections as any}
-        scrollContainerRef={scrollContainerRef}
-        itemRefs={itemRefs}
-        ascending={sortAscending}
-      />
+      {isReady && (
+        <AlphabetNavigator
+          games={sortedCollections as any}
+          scrollContainerRef={scrollContainerRef}
+          itemRefs={itemRefs}
+          ascending={sortAscending}
+        />
+      )}
       </div>
     </main>
   );

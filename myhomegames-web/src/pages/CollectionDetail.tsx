@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
@@ -49,6 +49,7 @@ export default function CollectionDetail({
   const [collection, setCollection] = useState<CollectionInfo | null>(null);
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [sortAscending] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [viewMode] = useState<"grid" | "detail" | "table">("grid");
@@ -74,6 +75,20 @@ export default function CollectionDetail({
       fetchCollectionGames(collectionId);
     }
   }, [collectionId]);
+
+  // Hide content until fully rendered
+  useLayoutEffect(() => {
+    if (!loading && collection && games.length > 0) {
+      // Wait for next frame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsReady(true);
+        });
+      });
+    } else if (loading) {
+      setIsReady(false);
+    }
+  }, [loading, collection, games.length]);
 
   async function fetchCollectionInfo(collectionId: string) {
     try {
@@ -213,7 +228,13 @@ export default function CollectionDetail({
       <div className="bg-[#1a1a1a] home-page-main-container">
         <main className="flex-1 home-page-content">
       <div className="home-page-layout">
-        <div className="home-page-content-wrapper">
+        <div 
+          className="home-page-content-wrapper"
+          style={{
+            opacity: isReady ? 1 : 0,
+            transition: 'opacity 0.2s ease-in-out',
+          }}
+        >
           {/* Games List */}
           <div
             ref={scrollContainerRef}

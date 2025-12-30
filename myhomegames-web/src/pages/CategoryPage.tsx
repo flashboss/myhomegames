@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
@@ -43,6 +43,7 @@ export default function CategoryPage({
   const { categoryId } = useParams<{ categoryId: string }>();
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const coverSize = (() => {
     const saved = localStorage.getItem("coverSize");
     return saved ? parseInt(saved, 10) : 150;
@@ -75,6 +76,20 @@ export default function CategoryPage({
     fetchCategories();
     fetchCollections();
   }, []);
+
+  // Hide content until fully rendered
+  useLayoutEffect(() => {
+    if (!loading && games.length > 0) {
+      // Wait for next frame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsReady(true);
+        });
+      });
+    } else if (loading) {
+      setIsReady(false);
+    }
+  }, [loading, games.length]);
 
   // Save view mode to localStorage
   useEffect(() => {
@@ -344,7 +359,13 @@ export default function CategoryPage({
       <div className="bg-[#1a1a1a] home-page-main-container">
         <main className="flex-1 home-page-content">
           <div className="home-page-layout">
-            <div className={`home-page-content-wrapper ${!loading && games.length > 0 ? "has-toolbar" : ""}`}>
+            <div 
+              className={`home-page-content-wrapper ${!loading && games.length > 0 ? "has-toolbar" : ""}`}
+              style={{
+                opacity: isReady ? 1 : 0,
+                transition: 'opacity 0.2s ease-in-out',
+              }}
+            >
         {/* Toolbar with filter and sort */}
         {!loading && games.length > 0 && (
           <GamesListToolbar
@@ -418,7 +439,7 @@ export default function CategoryPage({
           </div>
 
             {/* Alphabet navigator container */}
-            {sortField === "title" && (
+            {sortField === "title" && isReady && (
               <AlphabetNavigator
                 games={filteredAndSortedGames}
                 scrollContainerRef={

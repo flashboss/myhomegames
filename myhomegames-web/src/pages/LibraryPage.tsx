@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
 import GamesListDetail from "../components/games/GamesListDetail";
@@ -45,6 +45,7 @@ export default function LibraryPage({
 }: LibraryPageProps) {
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [filterField, setFilterField] = useState<FilterField>(() => {
     const saved = localStorage.getItem("libraryFilterField");
     return (saved as FilterField) || "all";
@@ -90,6 +91,20 @@ export default function LibraryPage({
     fetchCategories();
     fetchCollections();
   }, []);
+
+  // Hide content until fully rendered
+  useLayoutEffect(() => {
+    if (!loading && games.length > 0) {
+      // Wait for next frame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsReady(true);
+        });
+      });
+    } else if (loading) {
+      setIsReady(false);
+    }
+  }, [loading, games.length]);
 
   // Save filter and sort state to localStorage
   useEffect(() => {
@@ -372,7 +387,13 @@ export default function LibraryPage({
   return (
     <main className="flex-1 home-page-content">
       <div className="home-page-layout">
-      <div className={`home-page-content-wrapper ${!loading && games.length > 0 ? "has-toolbar" : ""}`}>
+      <div 
+        className={`home-page-content-wrapper ${!loading && games.length > 0 ? "has-toolbar" : ""}`}
+        style={{
+          opacity: isReady ? 1 : 0,
+          transition: 'opacity 0.2s ease-in-out',
+        }}
+      >
         {/* Toolbar with filter and sort */}
         {!loading && games.length > 0 && (
           <GamesListToolbar
@@ -446,7 +467,7 @@ export default function LibraryPage({
       </div>
 
       {/* Alphabet navigator container */}
-      {sortField === "title" && (
+      {sortField === "title" && isReady && (
         <AlphabetNavigator
           games={filteredAndSortedGames}
           scrollContainerRef={
