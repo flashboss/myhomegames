@@ -6,6 +6,7 @@ import GamesListTable from "../components/GamesListTable";
 import AlphabetNavigator from "../components/AlphabetNavigator";
 import GamesListToolbar from "../components/GamesListToolbar";
 import LibrariesBar, { type ViewMode } from "../components/LibrariesBar";
+import type { FilterField } from "../components/filters/types";
 
 type GameItem = {
   ratingKey: string;
@@ -49,7 +50,7 @@ export default function CategoryPage({
     const saved = localStorage.getItem("viewMode_category");
     return (saved as ViewMode) || "grid";
   });
-  const [filterField, setFilterField] = useState<"all" | "genre" | "year" | "decade" | "collection">("genre");
+  const [filterField, setFilterField] = useState<FilterField>("genre");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedDecade, setSelectedDecade] = useState<number | null>(null);
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);

@@ -1,17 +1,11 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import FilterPopup from "./FilterPopup";
+import FilterPopup from "./filters/FilterPopup";
 import SortPopup from "./SortPopup";
+import type { FilterField, GameItem } from "./filters/types";
 import "./GamesListToolbar.css";
 
-type FilterField = "all" | "genre" | "year" | "decade" | "collection";
 type SortField = "title" | "year" | "stars" | "releaseDate";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  year?: number | null;
-};
 
 type GamesListToolbarProps = {
   gamesCount: number;

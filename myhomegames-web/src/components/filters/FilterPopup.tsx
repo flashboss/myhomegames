@@ -1,15 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import FilterSubmenu from "./FilterSubmenu";
+import type { FilterField, FilterType, GameItem } from "./types";
 import "./FilterPopup.css";
-
-type FilterField = "all" | "genre" | "year" | "decade" | "collection";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  year?: number | null;
-};
 
 type FilterPopupProps = {
   isOpen: boolean;
@@ -47,9 +40,9 @@ export default function FilterPopup({
   availableCollections = [],
 }: FilterPopupProps) {
   const { t } = useTranslation();
-  const [openSubmenu, setOpenSubmenu] = useState<"year" | "genre" | "decade" | "collection" | null>(null);
+  const [openSubmenu, setOpenSubmenu] = useState<FilterType | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
-  const lastOpenSubmenuRef = useRef<"year" | "genre" | "decade" | "collection" | null>(null);
+  const lastOpenSubmenuRef = useRef<FilterType | null>(null);
   const wentBackRef = useRef(false); // Track if user went back to main menu
   const isFirstOpenRef = useRef(true); // Track if this is the first time opening after page load
 

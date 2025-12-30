@@ -5,6 +5,7 @@ import GamesListTable from "../components/GamesListTable";
 import AlphabetNavigator from "../components/AlphabetNavigator";
 import GamesListToolbar from "../components/GamesListToolbar";
 import type { ViewMode } from "../components/LibrariesBar";
+import type { FilterField } from "../components/filters/types";
 
 type GameItem = {
   ratingKey: string;
@@ -43,9 +44,9 @@ export default function LibraryPage({
 }: LibraryPageProps) {
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterField, setFilterField] = useState<"all" | "genre" | "year" | "decade" | "collection">(() => {
+  const [filterField, setFilterField] = useState<FilterField>(() => {
     const saved = localStorage.getItem("libraryFilterField");
-    return (saved as "all" | "genre" | "year" | "decade" | "collection") || "all";
+    return (saved as FilterField) || "all";
   });
   const [selectedYear, setSelectedYear] = useState<number | null>(() => {
     const saved = localStorage.getItem("librarySelectedYear");
