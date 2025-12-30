@@ -79,7 +79,8 @@
     "error": "Fehler",
     "close": "Schließen",
     "fetchError": "Verbindung zum Server fehlgeschlagen",
-    "games": "Spiele"
+    "games": "Spiele",
+    "play": "Abspielen"
   },
   "gamesListToolbar": {
     "filter": {

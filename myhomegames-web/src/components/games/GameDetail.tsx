@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
 import "./GameDetail.css";
 
@@ -21,6 +22,7 @@ export default function GameDetail({
   coverUrl,
   onPlay,
 }: GameDetailProps) {
+  const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !coverUrl || imageError;
   const coverWidth = 256;
@@ -68,7 +70,7 @@ export default function GameDetail({
                 onClick={() => onPlay(game)}
                 className="bg-[#E5A00D] hover:bg-[#F5B041] text-black px-8 py-3 rounded font-semibold text-lg transition-colors"
               >
-                Play
+                {t("common.play")}
               </button>
             </div>
           </div>

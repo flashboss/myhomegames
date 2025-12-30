@@ -79,7 +79,8 @@
     "error": "Errore",
     "close": "Chiudi",
     "fetchError": "Impossibile connettersi al server",
-    "games": "Giochi"
+    "games": "Giochi",
+    "play": "Gioca"
   },
   "gamesListToolbar": {
     "filter": {

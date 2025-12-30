@@ -79,7 +79,8 @@
     "error": "エラー",
     "close": "閉じる",
     "fetchError": "サーバーに接続できませんでした",
-    "games": "ゲーム"
+    "games": "ゲーム",
+    "play": "再生"
   },
   "gamesListToolbar": {
     "filter": {

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import StarRating from "../common/StarRating";
 import "./GamesListTable.css";
 
 type GameItem = {
@@ -372,11 +373,13 @@ export default function GamesListTable({
                   {columnVisibility.stars && (
                     <td className={`stars-cell ${rowClass} ${firstVisibleColumn === "stars" ? "first-visible-cell" : ""}`}>
                       {firstVisibleColumn === "stars" && onPlay && <PlayIcon />}
-                      <span className={firstVisibleColumn === "stars" ? "first-cell-text" : ""}>
-                        {it.stars !== null && it.stars !== undefined
-                          ? it.stars.toString()
-                          : "-"}
-                      </span>
+                      <div className={firstVisibleColumn === "stars" ? "first-cell-text" : ""} style={{ display: 'flex', alignItems: 'center' }}>
+                        {it.stars !== null && it.stars !== undefined ? (
+                          <StarRating rating={(it.stars / 10) * 5} starSize={14} gap={3} color="rgba(255, 255, 255, 0.4)" noStroke={true} />
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </div>
                     </td>
                   )}
                   {columnVisibility.year && (

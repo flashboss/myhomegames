@@ -79,7 +79,8 @@
     "error": "Error",
     "close": "Close",
     "fetchError": "Failed to connect to server",
-    "games": "Games"
+    "games": "Games",
+    "play": "Play"
   },
   "gamesListToolbar": {
     "filter": {

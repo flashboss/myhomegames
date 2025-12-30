@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import GamesList from "../components/games/GamesList";
 import CoverPlaceholder from "../components/common/CoverPlaceholder";
 import LibrariesBar from "../components/layout/LibrariesBar";
+import StarRating from "../components/common/StarRating";
+import "./CollectionDetail.css";
 
 type GameItem = {
   ratingKey: string;
@@ -219,7 +221,16 @@ export default function CollectionDetail({
               <div className="pt-8" style={{ display: 'flex', flexDirection: 'row', gap: '48px', alignItems: 'flex-start', width: '100%', boxSizing: 'border-box', marginBottom: '32px' }}>
                 {/* Cover */}
                 <div style={{ flexShrink: 0 }}>
-                  <div className="relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden" style={{ width: `${collectionCoverWidth}px` }}>
+                  <div 
+                    className="collection-detail-cover-container relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden" 
+                    style={{ width: `${collectionCoverWidth}px` }}
+                    onClick={() => {
+                      // Click on cover plays first game
+                      if (onPlay && sortedGames[0]) {
+                        onPlay(sortedGames[0]);
+                      }
+                    }}
+                  >
                     {showPlaceholder ? (
                       <CoverPlaceholder
                         title={collection.title}
@@ -235,6 +246,32 @@ export default function CollectionDetail({
                           setImageError(true);
                         }}
                       />
+                    )}
+                    {onPlay && sortedGames.length > 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Play first game in collection
+                          if (sortedGames[0]) {
+                            onPlay(sortedGames[0]);
+                          }
+                        }}
+                        className="collection-detail-play-button"
+                        aria-label={t("common.play")}
+                      >
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 5v14l11-7z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -267,64 +304,55 @@ export default function CollectionDetail({
                       </div>
                     )}
                     {averageRating !== null && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {[1, 2, 3, 4, 5].map((star) => {
-                          const filled = averageRating >= star;
-                          const halfFilled = averageRating >= star - 0.5 && averageRating < star;
-                          const starId = `star-${star}-${averageRating}`;
-                          
-                          return (
-                            <div key={star} style={{ position: 'relative', width: '16px', height: '16px' }}>
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="rgba(255, 255, 255, 0.3)"
-                                strokeWidth="1.5"
-                                style={{ position: 'absolute', top: 0, left: 0 }}
-                              >
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                              </svg>
-                              {filled && (
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill="#ffffff"
-                                  stroke="#ffffff"
-                                  strokeWidth="1.5"
-                                  style={{ position: 'absolute', top: 0, left: 0 }}
-                                >
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              )}
-                              {halfFilled && (
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#ffffff"
-                                  strokeWidth="1.5"
-                                  style={{ position: 'absolute', top: 0, left: 0 }}
-                                >
-                                  <defs>
-                                    <linearGradient id={starId} x1="0%" y1="0%" x2="100%" y2="0%">
-                                      <stop offset="50%" stopColor="#ffffff" />
-                                      <stop offset="50%" stopColor="transparent" />
-                                    </linearGradient>
-                                  </defs>
-                                  <path
-                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                    fill={`url(#${starId})`}
-                                  />
-                                </svg>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
+                      <StarRating rating={averageRating} />
+                    )}
+                    {onPlay && sortedGames.length > 0 && (
+                      <button
+                        onClick={() => {
+                          // Play first game in collection
+                          if (sortedGames[0]) {
+                            onPlay(sortedGames[0]);
+                          }
+                        }}
+                        style={{
+                          backgroundColor: '#E5A00D',
+                          color: '#000000',
+                          border: 'none',
+                          borderRadius: '4px',
+                          paddingTop: '6px',
+                          paddingBottom: '6px',
+                          paddingLeft: '8px',
+                          paddingRight: '12px',
+                          fontSize: '1.25rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s ease',
+                          marginTop: '16px',
+                          width: 'fit-content',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          lineHeight: '1.2'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#F5B041';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#E5A00D';
+                        }}
+                      >
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          style={{ display: 'block' }}
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        {t("common.play")}
+                      </button>
                     )}
                     {/* Additional information can be added here */}
                   </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
+import StarRating from "../common/StarRating";
 import "./GamesListDetail.css";
 
 type GameItem = {
@@ -128,16 +129,23 @@ function GameDetailItem({
             {game.summary}
           </div>
         )}
-        {game.year !== null && game.year !== undefined && (
-          <div className="text-gray-500" style={{ fontSize: "0.85rem" }}>
-            {game.day !== null &&
-            game.day !== undefined &&
-            game.month !== null &&
-            game.month !== undefined
-              ? `${game.day}/${game.month}/${game.year}`
-              : game.year.toString()}
+        {(game.year !== null && game.year !== undefined) || (game.stars !== null && game.stars !== undefined) ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {game.year !== null && game.year !== undefined && (
+              <div className="text-gray-500" style={{ fontSize: "0.85rem" }}>
+                {game.day !== null &&
+                game.day !== undefined &&
+                game.month !== null &&
+                game.month !== undefined
+                  ? `${game.day}/${game.month}/${game.year}`
+                  : game.year.toString()}
+              </div>
+            )}
+            {game.stars !== null && game.stars !== undefined && (
+              <StarRating rating={(game.stars / 10) * 5} starSize={14} gap={3} />
+            )}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

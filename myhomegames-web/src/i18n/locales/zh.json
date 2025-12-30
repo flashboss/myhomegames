@@ -79,7 +79,8 @@
     "error": "错误",
     "close": "关闭",
     "fetchError": "无法连接到服务器",
-    "games": "游戏"
+    "games": "游戏",
+    "play": "播放"
   },
   "gamesListToolbar": {
     "filter": {

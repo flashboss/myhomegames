@@ -79,7 +79,8 @@
     "error": "Error",
     "close": "Cerrar",
     "fetchError": "Error al conectar con el servidor",
-    "games": "Juegos"
+    "games": "Juegos",
+    "play": "Reproducir"
   },
   "gamesListToolbar": {
     "filter": {
