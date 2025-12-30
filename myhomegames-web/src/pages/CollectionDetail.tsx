@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
 import CoverPlaceholder from "../components/common/CoverPlaceholder";
 import LibrariesBar from "../components/layout/LibrariesBar";
@@ -57,6 +58,9 @@ export default function CollectionDetail({
   });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  
+  // Restore scroll position
+  useScrollRestoration(scrollContainerRef);
 
   // Handler to change cover size
   const handleCoverSizeChange = (size: number) => {

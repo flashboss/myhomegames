@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import CollectionsList from "../components/lists/CollectionsList";
 import AlphabetNavigator from "../components/ui/AlphabetNavigator";
 
@@ -32,6 +33,9 @@ export default function CollectionsPage({
   const [sortAscending] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  
+  // Restore scroll position
+  useScrollRestoration(scrollContainerRef);
 
   useEffect(() => {
     fetchCollections();

@@ -1,6 +1,7 @@
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import SearchResultsList from "../components/search/SearchResultsList";
 import "./SearchResultsPage.css";
 
@@ -31,6 +32,10 @@ export default function SearchResultsPage({
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Restore scroll position
+  useScrollRestoration(scrollContainerRef);
 
   // Retrieve data from location state
   const { searchQuery, games } =
@@ -120,7 +125,7 @@ export default function SearchResultsPage({
           </div>
         </div>
       </div>
-      <div className="search-results-content">
+      <div ref={scrollContainerRef} className="search-results-content">
         <div className="search-results-content-inner">
           <SearchResultsList
             games={games}

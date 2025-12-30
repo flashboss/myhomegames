@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
 import GamesListDetail from "../components/games/GamesListDetail";
 import GamesListTable from "../components/games/GamesListTable";
@@ -79,6 +80,10 @@ export default function LibraryPage({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  
+  // Restore scroll position (use the appropriate ref based on view mode)
+  const activeScrollRef = viewMode === "table" ? tableScrollRef : scrollContainerRef;
+  useScrollRestoration(activeScrollRef);
 
   useEffect(() => {
     fetchLibraryGames();

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import CategoriesList from "../components/lists/CategoriesList";
 
 type CategoryItem = {
@@ -24,7 +25,11 @@ export default function CategoriesPage({
 }: CategoriesPageProps) {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  
+  // Restore scroll position
+  useScrollRestoration(scrollContainerRef);
 
   useEffect(() => {
     fetchCategories();
@@ -61,7 +66,7 @@ export default function CategoriesPage({
     <main className="flex-1 home-page-content">
       <div className="home-page-layout">
         <div className="home-page-content-wrapper">
-        <div className="home-page-scroll-container">
+        <div ref={scrollContainerRef} className="home-page-scroll-container">
           {!loading && (
             <CategoriesList
               categories={categories}

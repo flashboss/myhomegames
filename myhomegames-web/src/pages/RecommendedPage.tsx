@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
 
 type GameItem = {
@@ -36,6 +37,9 @@ export default function RecommendedPage({
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Restore scroll position
+  useScrollRestoration(scrollContainerRef);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   useEffect(() => {
