@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import CoverSizeSlider from "../ui/CoverSizeSlider";
 import ViewModeSelector from "../ui/ViewModeSelector";
+import BackgroundToggle from "../ui/BackgroundToggle";
 import "./LibrariesBar.css";
 
 type GameLibrarySection = {
@@ -22,6 +23,9 @@ type LibrariesBarProps = {
   onCoverSizeChange?: (size: number) => void;
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
+  hasBackground?: boolean;
+  isBackgroundVisible?: boolean;
+  onBackgroundVisibilityChange?: (visible: boolean) => void;
 };
 
 export default function LibrariesBar({
@@ -34,6 +38,9 @@ export default function LibrariesBar({
   onCoverSizeChange,
   viewMode = "grid",
   onViewModeChange,
+  hasBackground = false,
+  isBackgroundVisible = false,
+  onBackgroundVisibilityChange,
 }: LibrariesBarProps) {
   const { t } = useTranslation();
   const [isNarrow, setIsNarrow] = useState(false);
@@ -132,6 +139,14 @@ export default function LibrariesBar({
         )}
 
         <div className="plex-libraries-actions" ref={actionsRef}>
+          {hasBackground && onBackgroundVisibilityChange && (
+            <div className="plex-libraries-actions-background-toggle-container">
+              <BackgroundToggle
+                isVisible={isBackgroundVisible}
+                onChange={onBackgroundVisibilityChange}
+              />
+            </div>
+          )}
           {onCoverSizeChange && (
             <div
               className={`plex-libraries-actions-slider-container ${

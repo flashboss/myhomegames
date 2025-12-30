@@ -82,7 +82,11 @@
     "close": "关闭",
     "fetchError": "无法连接到服务器",
     "games": "游戏",
-    "play": "播放"
+    "play": "播放",
+    "more": "更多",
+    "less": "更少",
+    "showBackground": "显示背景",
+    "hideBackground": "隐藏背景"
   },
   "gamesListToolbar": {
     "filter": {

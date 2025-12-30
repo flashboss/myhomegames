@@ -82,7 +82,11 @@
     "close": "Chiudi",
     "fetchError": "Impossibile connettersi al server",
     "games": "Giochi",
-    "play": "Gioca"
+    "play": "Gioca",
+    "more": "Altro",
+    "less": "Meno",
+    "showBackground": "Mostra sfondo",
+    "hideBackground": "Nascondi sfondo"
   },
   "gamesListToolbar": {
     "filter": {

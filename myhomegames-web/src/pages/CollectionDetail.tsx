@@ -6,6 +6,8 @@ import GamesList from "../components/games/GamesList";
 import CoverPlaceholder from "../components/common/CoverPlaceholder";
 import LibrariesBar from "../components/layout/LibrariesBar";
 import StarRating from "../components/common/StarRating";
+import Summary from "../components/common/Summary";
+import BackgroundManager from "../components/common/BackgroundManager";
 import "./CollectionDetail.css";
 
 type GameItem = {
@@ -22,6 +24,7 @@ type GameItem = {
 type CollectionInfo = {
   id: string;
   title: string;
+  summary?: string;
   cover?: string;
   background?: string;
 };
@@ -53,7 +56,7 @@ export default function CollectionDetail({
   const [isReady, setIsReady] = useState(false);
   const [sortAscending] = useState(true);
   const [imageError, setImageError] = useState(false);
-  const [backgroundError, setBackgroundError] = useState(false);
+  const [isBackgroundVisible, setIsBackgroundVisible] = useState(true);
   const [viewMode] = useState<"grid" | "detail" | "table">("grid");
   const [coverSize, setCoverSize] = useState(() => {
     const saved = localStorage.getItem("coverSize");
@@ -109,6 +112,7 @@ export default function CollectionDetail({
         setCollection({
           id: found.id,
           title: found.title,
+          summary: found.summary,
           cover: found.cover,
           background: found.background,
         });
@@ -223,54 +227,16 @@ export default function CollectionDetail({
   }
   
   const backgroundUrl = buildBackgroundUrl(apiBase, collection?.background);
-  const hasBackground = backgroundUrl && backgroundUrl.trim() !== "" && !backgroundError;
+  const hasBackground = Boolean(backgroundUrl && backgroundUrl.trim() !== "");
 
   return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: hasBackground ? 'transparent' : '#1a1a1a',
-          backgroundImage: hasBackground ? `url(${backgroundUrl})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          zIndex: 0
-        }}
-      >
-        {hasBackground && (
-          <>
-            <div
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(26, 26, 26, 0.85)',
-                zIndex: 1
-              }}
-            />
-            <img
-              src={backgroundUrl}
-              alt=""
-              style={{ display: 'none' }}
-              onError={() => {
-                setBackgroundError(true);
-              }}
-              onLoad={() => {
-                setBackgroundError(false);
-              }}
-            />
-          </>
-        )}
-      </div>
-      <div className={hasBackground ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
+    <BackgroundManager 
+      backgroundUrl={backgroundUrl} 
+      hasBackground={hasBackground}
+      isBackgroundVisible={isBackgroundVisible}
+      onBackgroundVisibilityChange={setIsBackgroundVisible}
+    >
+      <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
         <LibrariesBar
         libraries={[]}
         activeLibrary={{ key: "collection", type: "collection" }}
@@ -281,6 +247,9 @@ export default function CollectionDetail({
         onCoverSizeChange={handleCoverSizeChange}
         viewMode={viewMode}
         onViewModeChange={() => {}}
+        hasBackground={hasBackground}
+        isBackgroundVisible={isBackgroundVisible}
+        onBackgroundVisibilityChange={setIsBackgroundVisible}
       />
       </div>
       <div style={{ position: 'relative', zIndex: 2, minHeight: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
@@ -448,6 +417,7 @@ export default function CollectionDetail({
                         {t("common.play")}
                       </button>
                     )}
+                    {collection.summary && <Summary summary={collection.summary} />}
                     {/* Additional information can be added here */}
                   </div>
                 </div>
@@ -494,7 +464,7 @@ export default function CollectionDetail({
       </main>
         </div>
       </div>
-    </>
+    </BackgroundManager>
   );
 }
 

@@ -82,7 +82,11 @@
     "close": "Close",
     "fetchError": "Failed to connect to server",
     "games": "Games",
-    "play": "Play"
+    "play": "Play",
+    "more": "More",
+    "less": "Less",
+    "showBackground": "Show background",
+    "hideBackground": "Hide background"
   },
   "gamesListToolbar": {
     "filter": {

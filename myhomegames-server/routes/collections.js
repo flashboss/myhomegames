@@ -37,6 +37,7 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
         const collectionData = {
           id: c.id,
           title: c.title,
+          summary: c.summary || "",
           cover: `/collection-covers/${encodeURIComponent(c.id)}`,
         };
         const background = getCollectionBackgroundPath(metadataPath, c.id);

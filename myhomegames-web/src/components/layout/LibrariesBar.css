@@ -17,6 +17,13 @@
   visibility: hidden;
 }
 
+.plex-libraries-actions-background-toggle-container {
+  display: flex;
+  align-items: center;
+  margin-right: 3px;
+  transform: translateY(2px);
+}
+
 .plex-libraries-actions-view-mode-container {
   display: flex;
   align-items: center;

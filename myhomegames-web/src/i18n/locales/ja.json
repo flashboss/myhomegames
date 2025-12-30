@@ -82,7 +82,11 @@
     "close": "閉じる",
     "fetchError": "サーバーに接続できませんでした",
     "games": "ゲーム",
-    "play": "再生"
+    "play": "再生",
+    "more": "もっと",
+    "less": "少なく",
+    "showBackground": "背景を表示",
+    "hideBackground": "背景を非表示"
   },
   "gamesListToolbar": {
     "filter": {

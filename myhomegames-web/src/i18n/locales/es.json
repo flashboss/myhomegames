@@ -82,7 +82,11 @@
     "close": "Cerrar",
     "fetchError": "Error al conectar con el servidor",
     "games": "Juegos",
-    "play": "Reproducir"
+    "play": "Reproducir",
+    "more": "Más",
+    "less": "Menos",
+    "showBackground": "Mostrar fondo",
+    "hideBackground": "Ocultar fondo"
   },
   "gamesListToolbar": {
     "filter": {

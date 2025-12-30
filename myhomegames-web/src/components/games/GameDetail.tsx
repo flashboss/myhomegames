@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
 import StarRating from "../common/StarRating";
+import Summary from "../common/Summary";
+import BackgroundManager from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
 import "./GameDetail.css";
 
@@ -32,11 +34,11 @@ export default function GameDetail({
 }: GameDetailProps) {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
-  const [backgroundError, setBackgroundError] = useState(false);
+  const [isBackgroundVisible, setIsBackgroundVisible] = useState(true);
   const showPlaceholder = !coverUrl || imageError;
   const coverWidth = 256;
   const coverHeight = 384; // 256 * 1.5
-  const hasBackground = backgroundUrl && backgroundUrl.trim() !== "" && !backgroundError;
+  const hasBackground = Boolean(backgroundUrl && backgroundUrl.trim() !== "");
 
   // Format release date
   const releaseDate = useMemo(() => {
@@ -68,51 +70,13 @@ export default function GameDetail({
   };
 
   return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: hasBackground ? 'transparent' : '#1a1a1a',
-          backgroundImage: hasBackground ? `url(${backgroundUrl})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          zIndex: 0
-        }}
-      >
-        {hasBackground && (
-          <>
-            <div
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(26, 26, 26, 0.85)',
-                zIndex: 1
-              }}
-            />
-            <img
-              src={backgroundUrl}
-              alt=""
-              style={{ display: 'none' }}
-              onError={() => {
-                setBackgroundError(true);
-              }}
-              onLoad={() => {
-                setBackgroundError(false);
-              }}
-            />
-          </>
-        )}
-      </div>
-      <div className={hasBackground ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
+    <BackgroundManager 
+      backgroundUrl={backgroundUrl} 
+      hasBackground={hasBackground}
+      isBackgroundVisible={isBackgroundVisible}
+      onBackgroundVisibilityChange={setIsBackgroundVisible}
+    >
+      <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
         <LibrariesBar
           libraries={[]}
           activeLibrary={{ key: "game", type: "game" }}
@@ -123,6 +87,9 @@ export default function GameDetail({
           onCoverSizeChange={handleCoverSizeChange}
           viewMode="grid"
           onViewModeChange={() => {}}
+          hasBackground={hasBackground}
+          isBackgroundVisible={isBackgroundVisible}
+          onBackgroundVisibilityChange={setIsBackgroundVisible}
         />
       </div>
       <div style={{ position: 'relative', zIndex: 2, minHeight: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
@@ -228,20 +195,6 @@ export default function GameDetail({
               {rating !== null && (
                 <StarRating rating={rating} />
               )}
-              {game.summary && (
-                <div 
-                  className="text-white" 
-                  style={{ 
-                    opacity: 0.8,
-                    fontFamily: 'var(--font-body-2-font-family)',
-                    fontSize: 'var(--font-body-2-font-size)',
-                    lineHeight: 'var(--font-body-2-line-height)',
-                    marginTop: '8px'
-                  }}
-                >
-                  {game.summary}
-                </div>
-              )}
               <button
                 onClick={() => onPlay(game)}
                 style={{
@@ -283,6 +236,7 @@ export default function GameDetail({
                 </svg>
                 {t("common.play")}
               </button>
+              {game.summary && <Summary summary={game.summary} />}
             </div>
           </div>
         </div>
@@ -292,6 +246,6 @@ export default function GameDetail({
         </main>
         </div>
       </div>
-    </>
+    </BackgroundManager>
   );
 }
