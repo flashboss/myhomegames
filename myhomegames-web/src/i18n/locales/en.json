@@ -88,11 +88,13 @@
       "genre": "Genre",
       "year": "Year",
       "decade": "Decade",
+      "collection": "Collection",
       "stars": "Rating",
       "summary": "Summary",
       "searchYear": "Filter Year",
       "searchGenre": "Filter Genre",
-      "searchDecade": "Filter Decade"
+      "searchDecade": "Filter Decade",
+      "searchCollection": "Filter Collection"
     },
     "sort": {
       "label": "Sort",

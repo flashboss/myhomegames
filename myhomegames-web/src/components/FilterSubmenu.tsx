@@ -9,7 +9,7 @@ type GameItem = {
 };
 
 type FilterSubmenuProps = {
-  type: "year" | "genre" | "decade";
+  type: "year" | "genre" | "decade" | "collection";
   isOpen: boolean;
   onClose: () => void;
   onCloseCompletely: () => void;
@@ -17,6 +17,7 @@ type FilterSubmenuProps = {
   onSelect: (value: number | string | null) => void;
   games?: GameItem[];
   availableGenres?: Array<{ id: string; title: string }>;
+  availableCollections?: Array<{ id: string; title: string }>;
 };
 
 export default function FilterSubmenu({
@@ -28,6 +29,7 @@ export default function FilterSubmenu({
   onSelect,
   games = [],
   availableGenres = [],
+  availableCollections = [],
 }: FilterSubmenuProps) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -83,6 +85,16 @@ export default function FilterSubmenu({
       return genreLabel.includes(query) || genre.title.toLowerCase().includes(query);
     });
   }, [availableGenres, searchQuery, t]);
+
+  // Filter collections based on search query
+  const filteredCollections = useMemo(() => {
+    if (!searchQuery) return availableCollections || [];
+    const query = searchQuery.toLowerCase();
+    return (availableCollections || []).filter((collection) => {
+      const collectionLabel = collection.title.toLowerCase();
+      return collectionLabel.includes(query);
+    });
+  }, [availableCollections, searchQuery]);
 
   // Close submenu when clicking outside
   useEffect(() => {
@@ -291,6 +303,61 @@ export default function FilterSubmenu({
               onClick={() => handleSelect(decade)}
             >
               {decade}s
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "collection") {
+    return (
+      <div className="filter-popup" ref={submenuRef}>
+        <div className="filter-popup-header">
+          <button
+            className="filter-popup-back"
+            onClick={handleBack}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <span className="filter-popup-header-title">
+            {t("gamesListToolbar.filter.collection")}
+          </span>
+        </div>
+        <div className="filter-popup-search">
+          <input
+            type="text"
+            className="filter-popup-search-input"
+            placeholder={t("gamesListToolbar.filter.searchCollection")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+        <div className="filter-popup-content filter-popup-scrollable">
+          {filteredCollections.map((collection) => (
+            <button
+              key={collection.id}
+              className={`filter-popup-item ${
+                selectedValue === collection.id ? "active" : ""
+              }`}
+              onClick={() => handleSelect(collection.id)}
+            >
+              {collection.title}
             </button>
           ))}
         </div>

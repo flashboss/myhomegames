@@ -88,11 +88,13 @@
       "genre": "ジャンル",
       "year": "年",
       "decade": "年代",
+      "collection": "コレクション",
       "stars": "評価",
       "summary": "概要",
       "searchYear": "フィルター年",
       "searchGenre": "フィルタージャンル",
-      "searchDecade": "フィルター年代"
+      "searchDecade": "フィルター年代",
+      "searchCollection": "フィルターコレクション"
     },
     "sort": {
       "label": "並び替え",

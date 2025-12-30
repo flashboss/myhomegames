@@ -88,11 +88,13 @@
       "genre": "Genre",
       "year": "Année",
       "decade": "Décennie",
+      "collection": "Collection",
       "stars": "Note",
       "summary": "Résumé",
       "searchYear": "Filtre Année",
       "searchGenre": "Filtre Genre",
-      "searchDecade": "Filtre Décennie"
+      "searchDecade": "Filtre Décennie",
+      "searchCollection": "Filtre Collection"
     },
     "sort": {
       "label": "Trier",

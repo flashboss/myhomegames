@@ -4,7 +4,7 @@ import FilterPopup from "./FilterPopup";
 import SortPopup from "./SortPopup";
 import "./GamesListToolbar.css";
 
-type FilterField = "all" | "genre" | "year" | "decade";
+type FilterField = "all" | "genre" | "year" | "decade" | "collection";
 type SortField = "title" | "year" | "stars" | "releaseDate";
 
 type GameItem = {
@@ -20,16 +20,19 @@ type GamesListToolbarProps = {
   onYearFilterChange?: (year: number | null) => void;
   onGenreFilterChange?: (genre: string | null) => void;
   onDecadeFilterChange?: (decade: number | null) => void;
+  onCollectionFilterChange?: (collection: string | null) => void;
   onSortChange?: (field: SortField) => void;
   onSortDirectionChange?: (ascending: boolean) => void;
   currentFilter?: FilterField;
   selectedYear?: number | null;
   selectedGenre?: string | null;
   selectedDecade?: number | null;
+  selectedCollection?: string | null;
   currentSort?: SortField;
   sortAscending?: boolean;
   viewMode?: "grid" | "detail" | "table";
   availableGenres?: Array<{ id: string; title: string }>;
+  availableCollections?: Array<{ id: string; title: string }>;
 };
 
 export default function GamesListToolbar({
@@ -39,16 +42,19 @@ export default function GamesListToolbar({
   onYearFilterChange,
   onGenreFilterChange,
   onDecadeFilterChange,
+  onCollectionFilterChange,
   onSortChange,
   onSortDirectionChange,
   currentFilter = "all",
   selectedYear = null,
   selectedGenre = null,
   selectedDecade = null,
+  selectedCollection = null,
   currentSort = "title",
   sortAscending = true,
   viewMode = "grid",
   availableGenres = [],
+  availableCollections = [],
 }: GamesListToolbarProps) {
   const { t } = useTranslation();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -63,6 +69,10 @@ export default function GamesListToolbar({
     if (currentFilter === "decade" && selectedDecade !== null) {
       return `${selectedDecade}s`;
     }
+    if (currentFilter === "collection" && selectedCollection !== null) {
+      const collection = availableCollections?.find((c: { id: string; title: string }) => c.id === selectedCollection);
+      return collection ? collection.title : selectedCollection;
+    }
     if (currentFilter === "genre" && selectedGenre !== null) {
       const genre = availableGenres.find((g) => g.id === selectedGenre);
       return genre ? t(`genre.${genre.title}`, genre.title) : selectedGenre;
@@ -72,6 +82,7 @@ export default function GamesListToolbar({
       { value: "genre" as FilterField, label: t("gamesListToolbar.filter.genre") },
       { value: "year" as FilterField, label: t("gamesListToolbar.filter.year") },
       { value: "decade" as FilterField, label: t("gamesListToolbar.filter.decade") },
+      { value: "collection" as FilterField, label: t("gamesListToolbar.filter.collection") },
     ];
     return filterOptions.find((opt) => opt.value === currentFilter)?.label || "";
   };
@@ -110,6 +121,9 @@ export default function GamesListToolbar({
                   }
                   if (onDecadeFilterChange) {
                     onDecadeFilterChange(null);
+                  }
+                  if (onCollectionFilterChange) {
+                    onCollectionFilterChange(null);
                   }
                   setIsFilterOpen(false);
                 }}
@@ -153,12 +167,15 @@ export default function GamesListToolbar({
             selectedYear={selectedYear}
             selectedGenre={selectedGenre}
             selectedDecade={selectedDecade}
+            selectedCollection={selectedCollection}
             onFilterChange={onFilterChange}
             onYearFilterChange={onYearFilterChange}
             onGenreFilterChange={onGenreFilterChange}
             onDecadeFilterChange={onDecadeFilterChange}
+            onCollectionFilterChange={onCollectionFilterChange}
             games={games}
             availableGenres={availableGenres}
+            availableCollections={availableCollections}
           />
         </div>
 

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import FilterSubmenu from "./FilterSubmenu";
 import "./FilterPopup.css";
 
-type FilterField = "all" | "genre" | "year" | "decade";
+type FilterField = "all" | "genre" | "year" | "decade" | "collection";
 
 type GameItem = {
   ratingKey: string;
@@ -18,12 +18,15 @@ type FilterPopupProps = {
   selectedYear: number | null;
   selectedGenre: string | null;
   selectedDecade: number | null;
+  selectedCollection: string | null;
   onFilterChange?: (field: FilterField) => void;
   onYearFilterChange?: (year: number | null) => void;
   onGenreFilterChange?: (genre: string | null) => void;
   onDecadeFilterChange?: (decade: number | null) => void;
+  onCollectionFilterChange?: (collection: string | null) => void;
   games?: GameItem[];
   availableGenres?: Array<{ id: string; title: string }>;
+  availableCollections?: Array<{ id: string; title: string }>;
 };
 
 export default function FilterPopup({
@@ -33,17 +36,20 @@ export default function FilterPopup({
   selectedYear,
   selectedGenre,
   selectedDecade,
+  selectedCollection,
   onFilterChange,
   onYearFilterChange,
   onGenreFilterChange,
   onDecadeFilterChange,
+  onCollectionFilterChange,
   games = [],
   availableGenres = [],
+  availableCollections = [],
 }: FilterPopupProps) {
   const { t } = useTranslation();
-  const [openSubmenu, setOpenSubmenu] = useState<"year" | "genre" | "decade" | null>(null);
+  const [openSubmenu, setOpenSubmenu] = useState<"year" | "genre" | "decade" | "collection" | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
-  const lastOpenSubmenuRef = useRef<"year" | "genre" | "decade" | null>(null);
+  const lastOpenSubmenuRef = useRef<"year" | "genre" | "decade" | "collection" | null>(null);
   const wentBackRef = useRef(false); // Track if user went back to main menu
   const isFirstOpenRef = useRef(true); // Track if this is the first time opening after page load
 
@@ -77,6 +83,8 @@ export default function FilterPopup({
             lastOpenSubmenuRef.current = "genre";
           } else if (currentFilter === "decade") {
             lastOpenSubmenuRef.current = "decade";
+          } else if (currentFilter === "collection") {
+            lastOpenSubmenuRef.current = "collection";
           }
         } else if (currentFilter === "year") {
           setOpenSubmenu("year");
@@ -87,6 +95,9 @@ export default function FilterPopup({
         } else if (currentFilter === "decade") {
           setOpenSubmenu("decade");
           lastOpenSubmenuRef.current = "decade";
+        } else if (currentFilter === "collection") {
+          setOpenSubmenu("collection");
+          lastOpenSubmenuRef.current = "collection";
         } else if (lastOpenSubmenuRef.current) {
           // Restore the last open submenu even if no filter is active
           setOpenSubmenu(lastOpenSubmenuRef.current);
@@ -163,6 +174,10 @@ export default function FilterPopup({
       setOpenSubmenu("decade");
       lastOpenSubmenuRef.current = "decade";
       wentBackRef.current = false; // Reset went back flag when selecting a filter
+    } else if (field === "collection") {
+      setOpenSubmenu("collection");
+      lastOpenSubmenuRef.current = "collection";
+      wentBackRef.current = false; // Reset went back flag when selecting a filter
     } else {
       onFilterChange?.(field);
       if (onYearFilterChange) {
@@ -215,6 +230,9 @@ export default function FilterPopup({
       if (onDecadeFilterChange) {
         onDecadeFilterChange(null);
       }
+      if (onCollectionFilterChange) {
+        onCollectionFilterChange(null);
+      }
       // Keep the genre submenu state, just close the popup
       lastOpenSubmenuRef.current = "genre";
       onClose();
@@ -239,8 +257,38 @@ export default function FilterPopup({
       if (onGenreFilterChange) {
         onGenreFilterChange(null);
       }
+      if (onCollectionFilterChange) {
+        onCollectionFilterChange(null);
+      }
       // Keep the decade submenu state, just close the popup
       lastOpenSubmenuRef.current = "decade";
+      onClose();
+    }
+  };
+
+  const handleCollectionSelect = (value: number | string | null) => {
+    const collectionId = typeof value === "string" ? value : null;
+    if (collectionId === null) {
+      onFilterChange?.("all");
+      onCollectionFilterChange?.(null);
+      setOpenSubmenu(null);
+      lastOpenSubmenuRef.current = null;
+      onClose();
+    } else {
+      onFilterChange?.("collection");
+      onCollectionFilterChange?.(collectionId);
+      // Reset other filters
+      if (onYearFilterChange) {
+        onYearFilterChange(null);
+      }
+      if (onGenreFilterChange) {
+        onGenreFilterChange(null);
+      }
+      if (onDecadeFilterChange) {
+        onDecadeFilterChange(null);
+      }
+      // Keep the collection submenu state, just close the popup
+      lastOpenSubmenuRef.current = "collection";
       onClose();
     }
   };
@@ -300,6 +348,21 @@ export default function FilterPopup({
         selectedValue={selectedDecade}
         onSelect={handleDecadeSelect}
         games={games}
+      />
+    );
+  }
+
+  if (isOpen && openSubmenu === "collection") {
+    return (
+      <FilterSubmenu
+        type="collection"
+        isOpen={true}
+        onClose={handleSubmenuClose}
+        onCloseCompletely={handleSubmenuCloseCompletely}
+        selectedValue={selectedCollection}
+        onSelect={handleCollectionSelect}
+        games={games}
+        availableCollections={availableCollections}
       />
     );
   }
@@ -388,6 +451,29 @@ export default function FilterPopup({
       >
         <span>{t("gamesListToolbar.filter.decade")}</span>
         {currentFilter === "decade" && (
+          <svg
+            className="filter-popup-check"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+              fill="#E5A00D"
+            />
+          </svg>
+        )}
+      </button>
+      <button
+        className={`filter-popup-item ${
+          currentFilter === "collection" ? "selected" : ""
+        }`}
+        onClick={() => handleFilterSelect("collection")}
+      >
+        <span>{t("gamesListToolbar.filter.collection")}</span>
+        {currentFilter === "collection" && (
           <svg
             className="filter-popup-check"
             width="16"

@@ -43,9 +43,9 @@ export default function LibraryPage({
 }: LibraryPageProps) {
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterField, setFilterField] = useState<"all" | "genre" | "year" | "decade">(() => {
+  const [filterField, setFilterField] = useState<"all" | "genre" | "year" | "decade" | "collection">(() => {
     const saved = localStorage.getItem("libraryFilterField");
-    return (saved as "all" | "genre" | "year" | "decade") || "all";
+    return (saved as "all" | "genre" | "year" | "decade" | "collection") || "all";
   });
   const [selectedYear, setSelectedYear] = useState<number | null>(() => {
     const saved = localStorage.getItem("librarySelectedYear");
@@ -55,12 +55,18 @@ export default function LibraryPage({
     const saved = localStorage.getItem("librarySelectedDecade");
     return saved ? parseInt(saved, 10) : null;
   });
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(() => {
+    const saved = localStorage.getItem("librarySelectedCollection");
+    return saved || null;
+  });
   const [selectedGenre, setSelectedGenre] = useState<string | null>(() => {
     const saved = localStorage.getItem("librarySelectedGenre");
     return saved || null;
   });
   const [allGenres, setAllGenres] = useState<Array<{ id: string; title: string }>>([]);
   const [availableGenres, setAvailableGenres] = useState<Array<{ id: string; title: string }>>([]);
+  const [availableCollections, setAvailableCollections] = useState<Array<{ id: string; title: string }>>([]);
+  const [collectionGameIds, setCollectionGameIds] = useState<Map<string, string[]>>(new Map());
   const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">(() => {
     const saved = localStorage.getItem("librarySortField");
     return (saved as "title" | "year" | "stars" | "releaseDate") || "title";
@@ -76,6 +82,7 @@ export default function LibraryPage({
   useEffect(() => {
     fetchLibraryGames();
     fetchCategories();
+    fetchCollections();
   }, []);
 
   // Save filter and sort state to localStorage
@@ -106,6 +113,14 @@ export default function LibraryPage({
       localStorage.removeItem("librarySelectedDecade");
     }
   }, [selectedDecade]);
+
+  useEffect(() => {
+    if (selectedCollection !== null) {
+      localStorage.setItem("librarySelectedCollection", selectedCollection);
+    } else {
+      localStorage.removeItem("librarySelectedCollection");
+    }
+  }, [selectedCollection]);
 
   useEffect(() => {
     localStorage.setItem("librarySortField", sortField);
@@ -172,6 +187,50 @@ export default function LibraryPage({
     }
   }
 
+  async function fetchCollections() {
+    try {
+      const url = buildApiUrl(apiBase, "/collections");
+      const res = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "X-Auth-Token": apiToken,
+        },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const items = (json.collections || []) as any[];
+      const parsed = items.map((v) => ({
+        id: v.id,
+        title: v.title,
+      }));
+      setAvailableCollections(parsed);
+
+      // Fetch game IDs for each collection
+      const gameIdsMap = new Map<string, string[]>();
+      for (const collection of parsed) {
+        try {
+          const gamesUrl = buildApiUrl(apiBase, `/collections/${collection.id}/games`);
+          const gamesRes = await fetch(gamesUrl, {
+            headers: {
+              Accept: "application/json",
+              "X-Auth-Token": apiToken,
+            },
+          });
+          if (gamesRes.ok) {
+            const gamesJson = await gamesRes.json();
+            const gameIds = (gamesJson.games || []).map((g: any) => g.id);
+            gameIdsMap.set(collection.id, gameIds);
+          }
+        } catch (err: any) {
+          console.error(`Error fetching games for collection ${collection.id}:`, err.message);
+        }
+      }
+      setCollectionGameIds(gameIdsMap);
+    } catch (err: any) {
+      const errorMessage = String(err.message || err);
+      console.error("Error fetching collections:", errorMessage);
+    }
+  }
 
   async function fetchLibraryGames() {
     setLoading(true);
@@ -245,6 +304,12 @@ export default function LibraryPage({
               return decade === selectedDecade;
             }
             return false;
+          case "collection":
+            if (selectedCollection !== null) {
+              const gameIds = collectionGameIds.get(selectedCollection);
+              return gameIds ? gameIds.includes(game.ratingKey) : false;
+            }
+            return false;
           default:
             return true;
         }
@@ -296,7 +361,7 @@ export default function LibraryPage({
     });
 
     return filtered;
-  }, [games, filterField, selectedYear, selectedDecade, selectedGenre, sortField, sortAscending, availableGenres]);
+  }, [games, filterField, selectedYear, selectedDecade, selectedGenre, selectedCollection, sortField, sortAscending, availableGenres, collectionGameIds]);
 
   return (
     <div className="home-page-layout">
@@ -316,10 +381,13 @@ export default function LibraryPage({
             selectedYear={selectedYear}
             selectedGenre={selectedGenre}
             selectedDecade={selectedDecade}
+            selectedCollection={selectedCollection}
+            onCollectionFilterChange={setSelectedCollection}
             currentSort={sortField}
             sortAscending={sortAscending}
             viewMode={viewMode}
             availableGenres={availableGenres}
+            availableCollections={availableCollections}
           />
         )}
         {/* Scrollable lists container */}
