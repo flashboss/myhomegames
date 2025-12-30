@@ -19,6 +19,10 @@
   overflow: hidden;
 }
 
+.categories-list-cover img {
+  filter: brightness(40%) blur(1px);
+}
+
 .categories-list-cover::before {
   content: '';
   position: absolute;

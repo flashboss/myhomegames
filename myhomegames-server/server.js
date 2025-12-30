@@ -62,8 +62,8 @@ function loadGamesForLibrary(libraryKey) {
 }
 
 function loadAllGames() {
-  // Load games for each library
-  const libraries = ["consigliati", "libreria", "raccolte", "categorie"];
+  // Load games for each library (raccolte is now separate, not a library)
+  const libraries = ["consigliati", "libreria", "categorie"];
   libraries.forEach((lib) => {
     loadGamesForLibrary(lib);
   });
@@ -74,10 +74,10 @@ loadAllGames();
 // Endpoint: list libraries (simple grouped view)
 app.get("/libraries", requireToken, (req, res) => {
   // Return only keys - titles will be translated on the client side
+  // raccolte is now separate, not a library
   const libs = [
     { key: "consigliati", type: "games" },
     { key: "libreria", type: "games" },
-    { key: "raccolte", type: "games" },
     { key: "categorie", type: "games" },
   ];
   res.json({ libraries: libs });
@@ -141,6 +141,79 @@ app.get("/categories", requireToken, (req, res) => {
       cover: `/category-covers/${encodeURIComponent(c.id)}`,
     })),
   });
+});
+
+// Load collections from games-raccolte.json file
+function loadCollections() {
+  const fileName = "games-raccolte.json";
+  const filePath = path.join(METADATA_GAMES_DIR, fileName);
+  try {
+    const txt = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(txt);
+  } catch (e) {
+    console.error(`Failed to load ${fileName}:`, e.message);
+    return [];
+  }
+}
+
+let collectionsCache = loadCollections();
+
+// Endpoint: list collections
+app.get("/collections", requireToken, (req, res) => {
+  res.json({
+    collections: collectionsCache.map((c) => ({
+      id: c.id,
+      title: c.title,
+      cover: `/collection-covers/${encodeURIComponent(c.id)}`,
+    })),
+  });
+});
+
+// Endpoint: get games for a collection (returns games by their IDs)
+app.get("/collections/:id/games", requireToken, (req, res) => {
+  const collectionId = req.params.id;
+  const collection = collectionsCache.find((c) => c.id === collectionId);
+  
+  if (!collection) {
+    return res.status(404).json({ error: "Collection not found" });
+  }
+
+  // Get games by their IDs from the collection
+  const gameIds = collection.games || [];
+  const collectionGames = [];
+
+  gameIds.forEach((gameId) => {
+    const game = allGames[gameId];
+    if (game) {
+      collectionGames.push({
+        id: game.id,
+        title: game.title,
+        summary: game.summary || "",
+        cover: `/covers/${encodeURIComponent(game.id)}`,
+        day: game.day || null,
+        month: game.month || null,
+        year: game.year || null,
+        stars: game.stars || null,
+      });
+    }
+  });
+
+  res.json({ games: collectionGames });
+});
+
+// Endpoint: serve collection cover image (public, no auth required for images)
+app.get("/collection-covers/:collectionId", (req, res) => {
+  const collectionId = decodeURIComponent(req.params.collectionId);
+  const coverPath = path.join(METADATA_PATH, "content", "collections", collectionId, "cover.webp");
+
+  // Check if file exists
+  if (!fs.existsSync(coverPath)) {
+    return res.status(404).json({ error: "Cover not found" });
+  }
+
+  // Set appropriate content type for webp
+  res.type("image/webp");
+  res.sendFile(coverPath);
 });
 
 // Endpoint: launcher — launches a whitelisted command for a game
@@ -216,8 +289,9 @@ app.post("/reload-games", requireToken, (req, res) => {
   allGames = {};
   gamesByLibrary = {};
   loadAllGames();
+  collectionsCache = loadCollections();
   const totalCount = Object.keys(allGames).length;
-  res.json({ status: "reloaded", count: totalCount });
+  res.json({ status: "reloaded", count: totalCount, collections: collectionsCache.length });
 });
 
 // IGDB Access Token cache

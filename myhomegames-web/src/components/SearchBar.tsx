@@ -259,7 +259,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
                 !game.cover || imageErrors.has(game.ratingKey);
 
               return (
-                <button
+                <div
                   key={game.ratingKey}
                   onClick={() => {
                     handleGameSelect(game);
@@ -267,6 +267,14 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
                   className={`w-full plex-dropdown-item search-dropdown-item ${
                     index < filteredGames.length - 1 ? "has-border" : ""
                   }`}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleGameSelect(game);
+                    }
+                  }}
                 >
                   {showPlaceholder ? (
                     <div className="search-result-thumbnail">
@@ -335,7 +343,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
                       </svg>
                     </button>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>

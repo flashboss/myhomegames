@@ -1,13 +1,11 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import LibrariesBar from "../components/LibrariesBar";
 import type { ViewMode } from "../components/LibrariesBar";
-import GamesList from "../components/GamesList";
-import GamesListDetail from "../components/GamesListDetail";
-import GamesListTable from "../components/GamesListTable";
-import CategoriesList from "../components/CategoriesList";
-import AlphabetNavigator from "../components/AlphabetNavigator";
-import GamesListToolbar from "../components/GamesListToolbar";
+import LibraryPage from "./LibraryPage";
+import RecommendedPage from "./RecommendedPage";
+import CollectionsPage from "./CollectionsPage";
+import CategoriesPage from "./CategoriesPage";
 import "./HomePage.css";
 
 type GameLibrarySection = {
@@ -32,6 +30,8 @@ type CategoryItem = {
   title: string;
   cover?: string;
 };
+
+export type { GameItem, CategoryItem };
 
 type HomePageProps = {
   apiBase: string;
@@ -69,8 +69,6 @@ export default function HomePage({
   const [activeLibrary, setActiveLibrary] = useState<GameLibrarySection | null>(
     null
   );
-  const [games, setGames] = useState<GameItem[]>([]);
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coverSize, setCoverSize] = useState(() => {
@@ -78,13 +76,6 @@ export default function HomePage({
     return saved ? parseInt(saved, 10) : 150;
   });
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [filterField, setFilterField] = useState<"all" | "year">("all");
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">("title");
-  const [sortAscending, setSortAscending] = useState(true);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const tableScrollRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   // Function to save view mode for a library
   const saveViewModeForLibrary = (libraryKey: string, mode: ViewMode) => {
@@ -118,25 +109,17 @@ export default function HomePage({
   // Restore last selected library or auto-select first library when libraries are loaded
   useEffect(() => {
     if (libraries.length > 0 && !activeLibrary) {
-      // Try to restore last selected library from localStorage
       const savedLibraryKey = localStorage.getItem("lastSelectedLibrary");
       const libraryToSelect = savedLibraryKey
         ? libraries.find((lib) => lib.key === savedLibraryKey) || libraries[0]
         : libraries[0];
 
       setActiveLibrary(libraryToSelect);
-      // Load saved view mode for this library (only for libreria)
-      // For consigliati, raccolte and categorie, always use grid view
       if (libraryToSelect.key === "libreria") {
         const savedViewMode = loadViewModeForLibrary(libraryToSelect.key);
         setViewMode(savedViewMode);
       } else {
         setViewMode("grid");
-      }
-      if (libraryToSelect.key === "categorie") {
-        fetchCategories();
-      } else {
-        fetchLibraryGames(libraryToSelect.key);
       }
     }
   }, [libraries]);
@@ -160,6 +143,14 @@ export default function HomePage({
         title: d.title, // Optional, will be translated using key in LibrariesBar
         type: d.type,
       }));
+      // Add "raccolte" (collections) as a separate section, before "categorie"
+      const categorieIndex = parsed.findIndex((lib) => lib.key === "categorie");
+      const raccolteItem = { key: "raccolte", title: undefined, type: "collections" };
+      if (categorieIndex >= 0) {
+        parsed.splice(categorieIndex, 0, raccolteItem);
+      } else {
+        parsed.push(raccolteItem);
+      }
       setLibraries(parsed);
     } catch (err: any) {
       const errorMessage = String(err.message || err);
@@ -175,107 +166,15 @@ export default function HomePage({
     }
   }
 
-  async function fetchLibraryGames(sectionKey: string) {
-    setLoading(true);
-    setError(null);
-    try {
-      const url = buildApiUrl(apiBase, `/libraries/${sectionKey}/games`, {
-        sort: "title",
-      });
-      const res = await fetch(url, {
-        headers: {
-          Accept: "application/json",
-          "X-Auth-Token": apiToken,
-        },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const items = (json.games || []) as any[];
-      const parsed = items.map((v) => ({
-        ratingKey: v.id,
-        title: v.title,
-        summary: v.summary,
-        cover: v.cover,
-        day: v.day,
-        month: v.month,
-        year: v.year,
-        stars: v.stars,
-      }));
-      setGames(parsed);
-      onGamesLoaded(parsed);
-    } catch (err: any) {
-      const errorMessage = String(err.message || err);
-      // Translate fetch errors
-      if (errorMessage.toLowerCase().includes("failed to fetch") || 
-          errorMessage.toLowerCase().includes("fetch")) {
-        setError(t("common.fetchError"));
-      } else {
-        setError(errorMessage);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchCategories() {
-    setLoading(true);
-    setError(null);
-    try {
-      const url = buildApiUrl(apiBase, "/categories");
-      const res = await fetch(url, {
-        headers: {
-          Accept: "application/json",
-          "X-Auth-Token": apiToken,
-        },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const items = (json.categories || []) as any[];
-      const parsed = items.map((v) => ({
-        ratingKey: v.id,
-        title: v.title,
-        cover: v.cover,
-      }));
-      setCategories(parsed);
-      setGames([]); // Clear games when showing categories
-    } catch (err: any) {
-      const errorMessage = String(err.message || err);
-      // Translate fetch errors
-      if (errorMessage.toLowerCase().includes("failed to fetch") || 
-          errorMessage.toLowerCase().includes("fetch")) {
-        setError(t("common.fetchError"));
-      } else {
-        setError(errorMessage);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function onSelectLibrary(s: GameLibrarySection) {
-    // Save selected library to localStorage
     localStorage.setItem("lastSelectedLibrary", s.key);
-    // Update active library immediately for instant visual feedback
     setActiveLibrary(s);
-    // Load saved view mode for this library (only for libreria)
-    // For consigliati, raccolte and categorie, always use grid view
     if (s.key === "libreria") {
       const savedViewMode = loadViewModeForLibrary(s.key);
       setViewMode(savedViewMode);
     } else {
       setViewMode("grid");
-    }
-    // Clear previous games/categories immediately
-    setGames([]);
-    setCategories([]);
-    // Set loading state immediately
-    setLoading(true);
-    setError(null);
-    // Then fetch new data
-    if (s.key === "categorie") {
-      fetchCategories();
-    } else {
-      fetchLibraryGames(s.key);
     }
   }
 
@@ -283,74 +182,9 @@ export default function HomePage({
     onGameClick(game as GameItem);
   }
 
-  // Filter and sort games
-  const filteredAndSortedGames = useMemo(() => {
-    let filtered = [...games];
-
-    // Apply filter
-    if (filterField !== "all") {
-      filtered = filtered.filter((game) => {
-        switch (filterField) {
-          case "year":
-            if (selectedYear !== null) {
-              return game.year === selectedYear;
-            }
-            return game.year !== null && game.year !== undefined;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Apply sort
-    filtered.sort((a, b) => {
-      let compareResult = 0;
-      switch (sortField) {
-        case "title":
-          compareResult = (a.title || "").localeCompare(b.title || "");
-          break;
-        case "year":
-          const yearA = a.year ?? 0;
-          const yearB = b.year ?? 0;
-          compareResult = yearB - yearA; // Descending (newest first) by default
-          break;
-        case "stars":
-          const starsA = a.stars ?? 0;
-          const starsB = b.stars ?? 0;
-          compareResult = starsB - starsA; // Descending (highest first) by default
-          break;
-        case "releaseDate":
-          // Sort by release date (year, month, day)
-          const dateA = a.year ?? 0;
-          const dateB = b.year ?? 0;
-          if (dateA !== dateB) {
-            compareResult = dateB - dateA; // Descending (newest first) by default
-          } else {
-            const monthA = a.month ?? 0;
-            const monthB = b.month ?? 0;
-            if (monthA !== monthB) {
-              compareResult = monthB - monthA;
-            } else {
-              const dayA = a.day ?? 0;
-              const dayB = b.day ?? 0;
-              compareResult = dayB - dayA;
-            }
-          }
-          break;
-        default:
-          return 0;
-      }
-      // Apply direction: if ascending, reverse the default descending order for year, stars, releaseDate
-      if (sortField === "title") {
-        return sortAscending ? compareResult : -compareResult;
-      } else {
-        // For year, stars, releaseDate: default is descending, so reverse if ascending
-        return sortAscending ? -compareResult : compareResult;
-      }
-    });
-
-    return filtered;
-  }, [games, filterField, selectedYear, sortField, sortAscending]);
+  function handleGamesLoaded(loadedGames: GameItem[]) {
+    onGamesLoaded(loadedGames);
+  }
 
   return (
     <>
@@ -372,103 +206,55 @@ export default function HomePage({
             <div className="flex items-center justify-center h-full">
             </div>
           ) : (
-            <div className="home-page-layout">
-              <div className={`home-page-content-wrapper ${!loading && games.length > 0 && activeLibrary.key === "libreria" ? "has-toolbar" : ""}`}>
-                {/* Toolbar with filter and sort - only for libreria */}
-                {!loading && games.length > 0 && activeLibrary.key === "libreria" && (
-                <GamesListToolbar
-                  gamesCount={filteredAndSortedGames.length}
-                  games={games}
-                  onFilterChange={setFilterField}
-                  onYearFilterChange={setSelectedYear}
-                  onSortChange={setSortField}
-                  onSortDirectionChange={setSortAscending}
-                  currentFilter={filterField}
-                  selectedYear={selectedYear}
-                  currentSort={sortField}
-                  sortAscending={sortAscending}
+            <>
+              {activeLibrary.key === "libreria" && (
+                <LibraryPage
+                  apiBase={apiBase}
+                  apiToken={apiToken}
+                  onGameClick={handleGameClick}
+                  onGamesLoaded={handleGamesLoaded}
+                  onPlay={onPlay}
+                  buildApiUrl={buildApiUrl}
+                  buildCoverUrl={buildCoverUrl}
+                  coverSize={coverSize}
                   viewMode={viewMode}
                 />
-                )}
-                {/* Scrollable lists container */}
-                <div
-                  ref={scrollContainerRef}
-                  className={`home-page-scroll-container ${
-                    viewMode === "table" ? "table-view" : ""
-                  }`}
-                >
-                {!loading && (
-                  <>
-                    {activeLibrary.key === "categorie" ? (
-                      <CategoriesList
-                        categories={categories}
-                        apiBase={apiBase}
-                        onCategoryClick={handleGameClick}
-                        buildCoverUrl={buildCoverUrl}
-                        coverSize={coverSize * 2}
-                        itemRefs={itemRefs}
-                      />
-                    ) : (
-                      <>
-                        {viewMode === "grid" && (
-                          <GamesList
-                            games={filteredAndSortedGames}
-                            apiBase={apiBase}
-                            onGameClick={handleGameClick}
-                            onPlay={onPlay}
-                            buildCoverUrl={buildCoverUrl}
-                            coverSize={coverSize}
-                            itemRefs={itemRefs}
-                          />
-                        )}
-                        {viewMode === "detail" && (
-                          <GamesListDetail
-                            games={filteredAndSortedGames}
-                            apiBase={apiBase}
-                            onGameClick={handleGameClick}
-                            onPlay={onPlay}
-                            buildCoverUrl={buildCoverUrl}
-                            itemRefs={itemRefs}
-                          />
-                        )}
-                        {viewMode === "table" && (
-                          <GamesListTable
-                            games={filteredAndSortedGames}
-                            onGameClick={handleGameClick}
-                            onPlay={onPlay}
-                            itemRefs={itemRefs}
-                            scrollContainerRef={tableScrollRef}
-                            sortField={sortField}
-                            sortAscending={sortAscending}
-                            onSortChange={setSortField}
-                            onSortDirectionChange={setSortAscending}
-                          />
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-              </div>
-
-              {/* Alphabet navigator container - separate div */}
-              {games.length > 0 && 
-               activeLibrary && 
-               activeLibrary.key !== "consigliati" && 
-               activeLibrary.key !== "categorie" &&
-               sortField === "title" && (
-                <div className="home-page-alphabet-container">
-                  <AlphabetNavigator
-                    games={filteredAndSortedGames}
-                    scrollContainerRef={
-                      viewMode === "table" ? tableScrollRef : scrollContainerRef
-                    }
-                    itemRefs={itemRefs}
-                    ascending={sortAscending}
-                  />
-                </div>
               )}
-            </div>
+              {activeLibrary.key === "consigliati" && (
+                <RecommendedPage
+                  apiBase={apiBase}
+                  apiToken={apiToken}
+                  onGameClick={handleGameClick}
+                  onGamesLoaded={handleGamesLoaded}
+                  onPlay={onPlay}
+                  buildApiUrl={buildApiUrl}
+                  buildCoverUrl={buildCoverUrl}
+                  coverSize={coverSize}
+                />
+              )}
+              {activeLibrary.key === "raccolte" && (
+                <CollectionsPage
+                  apiBase={apiBase}
+                  apiToken={apiToken}
+                  onGameClick={handleGameClick}
+                  onGamesLoaded={handleGamesLoaded}
+                  onPlay={onPlay}
+                  buildApiUrl={buildApiUrl}
+                  buildCoverUrl={buildCoverUrl}
+                  coverSize={coverSize}
+                />
+              )}
+              {activeLibrary.key === "categorie" && (
+                <CategoriesPage
+                  apiBase={apiBase}
+                  apiToken={apiToken}
+                  onGameClick={handleGameClick}
+                  buildApiUrl={buildApiUrl}
+                  buildCoverUrl={buildCoverUrl}
+                  coverSize={coverSize}
+                />
+              )}
+            </>
           )}
         </main>
       </div>

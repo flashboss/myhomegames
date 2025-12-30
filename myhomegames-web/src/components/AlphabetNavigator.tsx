@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import "./AlphabetNavigator.css";
 
 type GameItem = {
@@ -24,6 +25,77 @@ export default function AlphabetNavigator({
   itemRefs,
   ascending = true,
 }: AlphabetNavigatorProps) {
+  const [needsScroll, setNeedsScroll] = useState(false);
+
+  // Check if scrolling is needed
+  useEffect(() => {
+    const checkScrollNeeded = () => {
+      const container = scrollContainerRef.current;
+      if (!container) {
+        setNeedsScroll(false);
+        return;
+      }
+
+      // Use requestAnimationFrame to check after DOM updates
+      requestAnimationFrame(() => {
+        if (!container) {
+          setNeedsScroll(false);
+          return;
+        }
+        // Check if content height exceeds container height
+        const hasScroll = container.scrollHeight > container.clientHeight;
+        setNeedsScroll(hasScroll);
+      });
+    };
+
+    // Check initially and after delays to account for rendering
+    checkScrollNeeded();
+    const timeoutId1 = setTimeout(checkScrollNeeded, 100);
+    const timeoutId2 = setTimeout(checkScrollNeeded, 300);
+    const timeoutId3 = setTimeout(checkScrollNeeded, 500);
+
+    // Also check on window resize
+    window.addEventListener("resize", checkScrollNeeded);
+
+    // Check when games change - use MutationObserver to detect DOM changes
+    if (scrollContainerRef.current) {
+      // Use ResizeObserver to detect when container size changes
+      const resizeObserver = new ResizeObserver(() => {
+        // Add a small delay after resize to allow content to settle
+        setTimeout(checkScrollNeeded, 50);
+      });
+      resizeObserver.observe(scrollContainerRef.current);
+
+      // Use MutationObserver to detect when content is added/removed or attributes change
+      const mutationObserver = new MutationObserver(() => {
+        // Add a small delay after mutation to allow content to settle
+        setTimeout(checkScrollNeeded, 50);
+      });
+      mutationObserver.observe(scrollContainerRef.current, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+      });
+
+      return () => {
+        clearTimeout(timeoutId1);
+        clearTimeout(timeoutId2);
+        clearTimeout(timeoutId3);
+        window.removeEventListener("resize", checkScrollNeeded);
+        resizeObserver.disconnect();
+        mutationObserver.disconnect();
+      };
+    }
+
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+      window.removeEventListener("resize", checkScrollNeeded);
+    };
+  }, [games, scrollContainerRef]);
+
   const alphabet = ascending
     ? ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")]
     : [..."ZYXWVUTSRQPONMLKJIHGFEDCBA".split(""), "#"];
@@ -89,21 +161,28 @@ export default function AlphabetNavigator({
     });
   };
 
+  // Don't render if no scroll is needed or no games
+  if (!needsScroll || games.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="alphabet-navigator">
-      {alphabet.map((letter) => {
-        const hasGames = hasGamesForLetter(letter);
-        return (
-          <button
-            key={letter}
-            onClick={() => scrollToLetter(letter)}
-            disabled={!hasGames}
-            className="alphabet-button"
-          >
-            {letter}
-          </button>
-        );
-      })}
+    <div className="home-page-alphabet-container">
+      <div className="alphabet-navigator">
+        {alphabet.map((letter) => {
+          const hasGames = hasGamesForLetter(letter);
+          return (
+            <button
+              key={letter}
+              onClick={() => scrollToLetter(letter)}
+              disabled={!hasGames}
+              className="alphabet-button"
+            >
+              {letter}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

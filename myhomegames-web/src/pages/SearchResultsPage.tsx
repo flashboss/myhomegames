@@ -1,3 +1,4 @@
+import { useLayoutEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import SearchResultsList from "../components/SearchResultsList";
@@ -34,6 +35,17 @@ export default function SearchResultsPage({
   // Retrieve data from location state
   const { searchQuery, games } =
     (location.state as { searchQuery?: string; games?: GameItem[] }) || {};
+
+  // Check if we came from game detail page and should redirect
+  useLayoutEffect(() => {
+    const savedFrom = sessionStorage.getItem("gameDetailFrom");
+    // If we have a saved "from" that's not search-results, and we don't have search state,
+    // redirect to the saved location
+    if (!searchQuery && savedFrom && savedFrom !== "/search-results") {
+      sessionStorage.removeItem("gameDetailFrom");
+      navigate(savedFrom, { replace: true });
+    }
+  }, [searchQuery, navigate]);
 
   if (!searchQuery) {
     return (

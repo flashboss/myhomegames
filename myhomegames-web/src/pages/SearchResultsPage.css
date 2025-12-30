@@ -42,6 +42,29 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) #1a1a1a;
+}
+
+.search-results-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.search-results-content::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.search-results-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.search-results-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-results-content::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .search-results-content-inner {
