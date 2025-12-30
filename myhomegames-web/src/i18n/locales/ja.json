@@ -5,6 +5,12 @@
     "collections": "コレクション",
     "categories": "カテゴリ"
   },
+  "recommended": {
+    "most_played": "最もプレイされた",
+    "recently_installed": "最近インストールされた",
+    "best_western": "最高のウェスタンゲーム",
+    "recommended": "おすすめ"
+  },
   "settings": {
     "title": "設定",
     "subtitle": "アプリケーションの設定を構成",

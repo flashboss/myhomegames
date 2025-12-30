@@ -24,13 +24,16 @@ describe('Helper Functions', () => {
       expect(response.body.games.length).toBeGreaterThan(0);
     });
 
-    test('should load recommended games from JSON file', async () => {
+    test('should load recommended sections from JSON file', async () => {
       const response = await request(app)
         .get('/recommended')
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
-      expect(response.body.games.length).toBeGreaterThan(0);
+      expect(response.body.sections.length).toBeGreaterThan(0);
+      // Check that sections have games
+      const totalGames = response.body.sections.reduce((sum, section) => sum + section.games.length, 0);
+      expect(totalGames).toBeGreaterThan(0);
     });
 
     test('should reload games correctly', async () => {
@@ -47,7 +50,9 @@ describe('Helper Functions', () => {
         .get('/recommended')
         .set('X-Auth-Token', 'test-token');
       
-      expect(afterReload.body.games.length).toBe(beforeReload.body.games.length);
+      const beforeTotal = beforeReload.body.sections.reduce((sum, section) => sum + section.games.length, 0);
+      const afterTotal = afterReload.body.sections.reduce((sum, section) => sum + section.games.length, 0);
+      expect(afterTotal).toBe(beforeTotal);
     });
   });
 
@@ -126,8 +131,10 @@ describe('Helper Functions', () => {
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
-      if (response.body.games.length > 0) {
-        const game = response.body.games[0];
+      // Find a section with games
+      const sectionWithGames = response.body.sections.find(s => s.games.length > 0);
+      if (sectionWithGames && sectionWithGames.games.length > 0) {
+        const game = sectionWithGames.games[0];
         expect(game).toHaveProperty('id');
         expect(game).toHaveProperty('title');
         expect(game).toHaveProperty('summary');
@@ -141,19 +148,22 @@ describe('Helper Functions', () => {
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
-      response.body.games.forEach(game => {
-        // Optional fields should be null if not present
-        if (game.year === null || game.year === undefined) {
-          // That's fine, year is optional
-        } else {
-          expect(typeof game.year).toBe('number');
-        }
-        
-        if (game.stars === null || game.stars === undefined) {
-          // That's fine, stars is optional
-        } else {
-          expect(typeof game.stars).toBe('number');
-        }
+      // Check all games in all sections
+      response.body.sections.forEach(section => {
+        section.games.forEach(game => {
+          // Optional fields should be null if not present
+          if (game.year === null || game.year === undefined) {
+            // That's fine, year is optional
+          } else {
+            expect(typeof game.year).toBe('number');
+          }
+          
+          if (game.stars === null || game.stars === undefined) {
+            // That's fine, stars is optional
+          } else {
+            expect(typeof game.stars).toBe('number');
+          }
+        });
       });
     });
 
@@ -163,8 +173,10 @@ describe('Helper Functions', () => {
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
-      if (response.body.games.length > 0) {
-        const game = response.body.games[0];
+      // Find a section with games
+      const sectionWithGames = response.body.sections.find(s => s.games.length > 0);
+      if (sectionWithGames && sectionWithGames.games.length > 0) {
+        const game = sectionWithGames.games[0];
         expect(game.cover).toMatch(/^\/covers\//);
         expect(game.cover).toContain(game.id);
       }

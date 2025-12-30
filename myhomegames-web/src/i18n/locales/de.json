@@ -5,6 +5,12 @@
     "collections": "Sammlungen",
     "categories": "Kategorien"
   },
+  "recommended": {
+    "most_played": "Meist Gespielt",
+    "recently_installed": "Kürzlich Installiert",
+    "best_western": "Beste Western-Spiele",
+    "recommended": "Empfohlen"
+  },
   "settings": {
     "title": "Einstellungen",
     "subtitle": "Anwendungseinstellungen konfigurieren",

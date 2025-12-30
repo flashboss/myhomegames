@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
-import GamesList from "../components/games/GamesList";
-import { compareTitles } from "../utils/stringUtils";
+import RecommendedSection from "../components/recommended/RecommendedSection";
 
 type GameItem = {
   ratingKey: string;
@@ -12,6 +11,11 @@ type GameItem = {
   month?: number | null;
   year?: number | null;
   stars?: number | null;
+};
+
+type RecommendedSection = {
+  id: string;
+  games: GameItem[];
 };
 
 type RecommendedPageProps = {
@@ -35,22 +39,29 @@ export default function RecommendedPage({
   buildCoverUrl,
   coverSize,
 }: RecommendedPageProps) {
-  const [games, setGames] = useState<GameItem[]>([]);
+  const [sections, setSections] = useState<RecommendedSection[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
+  // Funzione per calcolare il padding in base al numero di elementi
+  const calculatePadding = (numGames: number): number => {
+    // Base: 64px (allineamento con il titolo)
+    // Margine aggiuntivo proporzionale al numero di elementi
+    // Formula: 64 + (numero elementi * 80px) per garantire spazio sufficiente
+    return 64 + (numGames * 80);
+  };
+  
   // Restore scroll position
   useScrollRestoration(scrollContainerRef);
-  const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   useEffect(() => {
-    fetchLibraryGames();
+    fetchRecommendedSections();
   }, []);
 
   // Hide content until fully rendered
   useLayoutEffect(() => {
-    if (!loading && games.length > 0) {
+    if (!loading && sections.length > 0) {
       // Wait for next frame to ensure DOM is ready
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -60,14 +71,12 @@ export default function RecommendedPage({
     } else if (loading) {
       setIsReady(false);
     }
-  }, [loading, games.length]);
+  }, [loading, sections.length]);
 
-  async function fetchLibraryGames() {
+  async function fetchRecommendedSections() {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, `/recommended`, {
-        sort: "title",
-      });
+      const url = buildApiUrl(apiBase, `/recommended`);
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
@@ -76,31 +85,34 @@ export default function RecommendedPage({
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      const items = (json.games || []) as any[];
-      const parsed = items.map((v) => ({
-        ratingKey: v.id,
-        title: v.title,
-        summary: v.summary,
-        cover: v.cover,
-        day: v.day,
-        month: v.month,
-        year: v.year,
-        stars: v.stars,
+      const sectionsData = (json.sections || []) as any[];
+      
+      const parsedSections = sectionsData.map((section) => ({
+        id: section.id,
+        games: (section.games || []).map((v: any) => ({
+          ratingKey: v.id,
+          title: v.title,
+          summary: v.summary,
+          cover: v.cover,
+          day: v.day,
+          month: v.month,
+          year: v.year,
+          stars: v.stars,
+        })),
       }));
-      setGames(parsed);
-      onGamesLoaded(parsed);
+      
+      setSections(parsedSections);
+      
+      // Collect all games for onGamesLoaded callback
+      const allGames = parsedSections.flatMap(section => section.games);
+      onGamesLoaded(allGames);
     } catch (err: any) {
       const errorMessage = String(err.message || err);
-      console.error("Error fetching recommended games:", errorMessage);
+      console.error("Error fetching recommended sections:", errorMessage);
     } finally {
       setLoading(false);
     }
   }
-
-  // Sort games by title for alphabet navigator
-  const sortedGames = [...games].sort((a, b) => 
-    compareTitles(a.title || "", b.title || "")
-  );
 
   return (
     <main className="flex-1 home-page-content">
@@ -115,18 +127,21 @@ export default function RecommendedPage({
         <div
           ref={scrollContainerRef}
           className="home-page-scroll-container"
+          style={{ paddingTop: '32px', paddingBottom: '32px' }}
         >
-          {!loading && (
-            <GamesList
-              games={sortedGames}
+          {!loading && sections.map((section) => (
+            <RecommendedSection
+              key={section.id}
+              sectionId={section.id}
+              games={section.games}
               apiBase={apiBase}
               onGameClick={onGameClick}
               onPlay={onPlay}
               buildCoverUrl={buildCoverUrl}
               coverSize={coverSize}
-              itemRefs={itemRefs}
+              paddingLeft={calculatePadding(section.games.length)}
             />
-          )}
+          ))}
         </div>
       </div>
       </div>

@@ -6,20 +6,30 @@ const path = require("path");
  * Handles the recommended games endpoint
  */
 
-function loadRecommendedGameIds(metadataGamesDir) {
+function loadRecommendedSections(metadataGamesDir) {
   const fileName = "games-recommended.json";
   const filePath = path.join(metadataGamesDir, fileName);
   try {
     const txt = fs.readFileSync(filePath, "utf8");
     const data = JSON.parse(txt);
-    // Support both old format (array of objects) and new format (array of IDs)
+    
+    // New format: array of sections with id and games
     if (Array.isArray(data)) {
-      if (data.length > 0 && typeof data[0] === "string") {
-        // New format: array of IDs
+      if (data.length > 0 && typeof data[0] === "object" && data[0].id && Array.isArray(data[0].games)) {
+        // New format: array of sections
         return data;
+      } else if (data.length > 0 && typeof data[0] === "string") {
+        // Old format: array of IDs, convert to single section
+        return [{
+          id: "recommended",
+          games: data
+        }];
       } else if (data.length > 0 && typeof data[0] === "object" && data[0].id) {
-        // Old format: array of objects, extract IDs
-        return data.map((game) => game.id);
+        // Old format: array of objects, extract IDs and convert to single section
+        return [{
+          id: "recommended",
+          games: data.map((game) => game.id)
+        }];
       }
     }
     return [];
@@ -30,32 +40,41 @@ function loadRecommendedGameIds(metadataGamesDir) {
 }
 
 function registerRecommendedRoutes(app, requireToken, metadataGamesDir, allGames) {
-  // Endpoint: get recommended games
+  // Endpoint: get recommended games sections
   app.get("/recommended", requireToken, (req, res) => {
-    const recommendedIds = loadRecommendedGameIds(metadataGamesDir);
-    // Get full game data from allGames
-    const recommendedGames = recommendedIds
-      .map((id) => allGames[id])
-      .filter((game) => game != null); // Filter out any missing games
+    const sections = loadRecommendedSections(metadataGamesDir);
+    
+    const sectionsWithGames = sections.map((section) => {
+      // Get full game data from allGames
+      const games = section.games
+        .map((id) => allGames[id])
+        .filter((game) => game != null) // Filter out any missing games
+        .map((g) => ({
+          id: g.id,
+          title: g.title,
+          summary: g.summary || "",
+          cover: `/covers/${encodeURIComponent(g.id)}`,
+          day: g.day || null,
+          month: g.month || null,
+          year: g.year || null,
+          stars: g.stars || null,
+          genre: g.genre || null,
+        }));
+      
+      return {
+        id: section.id,
+        games: games,
+      };
+    });
     
     res.json({
-      games: recommendedGames.map((g) => ({
-        id: g.id,
-        title: g.title,
-        summary: g.summary || "",
-        cover: `/covers/${encodeURIComponent(g.id)}`,
-        day: g.day || null,
-        month: g.month || null,
-        year: g.year || null,
-        stars: g.stars || null,
-        genre: g.genre || null,
-      })),
+      sections: sectionsWithGames,
     });
   });
 }
 
 module.exports = {
-  loadRecommendedGameIds,
+  loadRecommendedSections,
   registerRecommendedRoutes,
 };
 

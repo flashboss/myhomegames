@@ -1,5 +1,19 @@
 [
-  "test_game_1",
-  "test_game_2"
+  {
+    "id": "most_played",
+    "games": ["test_game_1", "test_game_2"]
+  },
+  {
+    "id": "recently_installed",
+    "games": ["test_game_2", "test_game_3"]
+  },
+  {
+    "id": "best_western",
+    "games": ["test_game_1"]
+  },
+  {
+    "id": "recommended",
+    "games": ["test_game_1", "test_game_2", "test_game_3"]
+  }
 ]
 

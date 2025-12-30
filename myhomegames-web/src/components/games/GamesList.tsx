@@ -22,6 +22,7 @@ type GamesListProps = {
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   draggable?: boolean;
   onDragEnd?: (sourceIndex: number, destinationIndex: number) => void;
+  style?: React.CSSProperties;
 };
 
 type GameListItemProps = {
@@ -177,6 +178,7 @@ export default function GamesList({
   itemRefs,
   draggable = false,
   onDragEnd,
+  style,
 }: GamesListProps) {
   const { t } = useTranslation();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -206,7 +208,7 @@ export default function GamesList({
   return (
     <div
       className="games-list-container"
-      style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)` }}
+      style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)`, ...style }}
     >
       {games.map((game, index) => (
         <GameListItem
