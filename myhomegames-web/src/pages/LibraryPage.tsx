@@ -43,12 +43,16 @@ export default function LibraryPage({
 }: LibraryPageProps) {
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterField, setFilterField] = useState<"all" | "genre" | "year">(() => {
+  const [filterField, setFilterField] = useState<"all" | "genre" | "year" | "decade">(() => {
     const saved = localStorage.getItem("libraryFilterField");
-    return (saved as "all" | "genre" | "year") || "all";
+    return (saved as "all" | "genre" | "year" | "decade") || "all";
   });
   const [selectedYear, setSelectedYear] = useState<number | null>(() => {
     const saved = localStorage.getItem("librarySelectedYear");
+    return saved ? parseInt(saved, 10) : null;
+  });
+  const [selectedDecade, setSelectedDecade] = useState<number | null>(() => {
+    const saved = localStorage.getItem("librarySelectedDecade");
     return saved ? parseInt(saved, 10) : null;
   });
   const [selectedGenre, setSelectedGenre] = useState<string | null>(() => {
@@ -94,6 +98,14 @@ export default function LibraryPage({
       localStorage.removeItem("librarySelectedGenre");
     }
   }, [selectedGenre]);
+
+  useEffect(() => {
+    if (selectedDecade !== null) {
+      localStorage.setItem("librarySelectedDecade", selectedDecade.toString());
+    } else {
+      localStorage.removeItem("librarySelectedDecade");
+    }
+  }, [selectedDecade]);
 
   useEffect(() => {
     localStorage.setItem("librarySortField", sortField);
@@ -227,6 +239,12 @@ export default function LibraryPage({
               return game.year === selectedYear;
             }
             return game.year !== null && game.year !== undefined;
+          case "decade":
+            if (selectedDecade !== null && game.year !== null && game.year !== undefined) {
+              const decade = Math.floor(game.year / 10) * 10;
+              return decade === selectedDecade;
+            }
+            return false;
           default:
             return true;
         }
@@ -278,7 +296,7 @@ export default function LibraryPage({
     });
 
     return filtered;
-  }, [games, filterField, selectedYear, selectedGenre, sortField, sortAscending, availableGenres]);
+  }, [games, filterField, selectedYear, selectedDecade, selectedGenre, sortField, sortAscending, availableGenres]);
 
   return (
     <div className="home-page-layout">
@@ -291,11 +309,13 @@ export default function LibraryPage({
             onFilterChange={setFilterField}
             onYearFilterChange={setSelectedYear}
             onGenreFilterChange={setSelectedGenre}
+            onDecadeFilterChange={setSelectedDecade}
             onSortChange={setSortField}
             onSortDirectionChange={setSortAscending}
             currentFilter={filterField}
             selectedYear={selectedYear}
             selectedGenre={selectedGenre}
+            selectedDecade={selectedDecade}
             currentSort={sortField}
             sortAscending={sortAscending}
             viewMode={viewMode}

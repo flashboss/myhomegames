@@ -87,10 +87,12 @@
       "title": "标题",
       "genre": "类型",
       "year": "年份",
+      "decade": "年代",
       "stars": "评分",
       "summary": "摘要",
       "searchYear": "筛选年份",
-      "searchGenre": "筛选类型"
+      "searchGenre": "筛选类型",
+      "searchDecade": "筛选年代"
     },
     "sort": {
       "label": "排序",

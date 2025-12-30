@@ -87,10 +87,12 @@
       "title": "タイトル",
       "genre": "ジャンル",
       "year": "年",
+      "decade": "年代",
       "stars": "評価",
       "summary": "概要",
       "searchYear": "フィルター年",
-      "searchGenre": "フィルタージャンル"
+      "searchGenre": "フィルタージャンル",
+      "searchDecade": "フィルター年代"
     },
     "sort": {
       "label": "並び替え",

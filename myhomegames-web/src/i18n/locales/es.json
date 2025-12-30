@@ -87,10 +87,12 @@
       "title": "Título",
       "genre": "Género",
       "year": "Año",
+      "decade": "Década",
       "stars": "Valoración",
       "summary": "Resumen",
       "searchYear": "Filtro Año",
-      "searchGenre": "Filtro Género"
+      "searchGenre": "Filtro Género",
+      "searchDecade": "Filtro Década"
     },
     "sort": {
       "label": "Ordenar",

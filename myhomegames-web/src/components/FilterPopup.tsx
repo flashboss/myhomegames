@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import FilterSubmenu from "./FilterSubmenu";
 import "./FilterPopup.css";
 
-type FilterField = "all" | "genre" | "year";
+type FilterField = "all" | "genre" | "year" | "decade";
 
 type GameItem = {
   ratingKey: string;
@@ -17,9 +17,11 @@ type FilterPopupProps = {
   currentFilter: FilterField;
   selectedYear: number | null;
   selectedGenre: string | null;
+  selectedDecade: number | null;
   onFilterChange?: (field: FilterField) => void;
   onYearFilterChange?: (year: number | null) => void;
   onGenreFilterChange?: (genre: string | null) => void;
+  onDecadeFilterChange?: (decade: number | null) => void;
   games?: GameItem[];
   availableGenres?: Array<{ id: string; title: string }>;
 };
@@ -30,16 +32,18 @@ export default function FilterPopup({
   currentFilter,
   selectedYear,
   selectedGenre,
+  selectedDecade,
   onFilterChange,
   onYearFilterChange,
   onGenreFilterChange,
+  onDecadeFilterChange,
   games = [],
   availableGenres = [],
 }: FilterPopupProps) {
   const { t } = useTranslation();
-  const [openSubmenu, setOpenSubmenu] = useState<"year" | "genre" | null>(null);
+  const [openSubmenu, setOpenSubmenu] = useState<"year" | "genre" | "decade" | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
-  const lastOpenSubmenuRef = useRef<"year" | "genre" | null>(null);
+  const lastOpenSubmenuRef = useRef<"year" | "genre" | "decade" | null>(null);
   const wentBackRef = useRef(false); // Track if user went back to main menu
   const isFirstOpenRef = useRef(true); // Track if this is the first time opening after page load
 
@@ -55,6 +59,8 @@ export default function FilterPopup({
           lastOpenSubmenuRef.current = "year";
         } else if (currentFilter === "genre") {
           lastOpenSubmenuRef.current = "genre";
+        } else if (currentFilter === "decade") {
+          lastOpenSubmenuRef.current = "decade";
         } else {
           lastOpenSubmenuRef.current = null;
         }
@@ -69,6 +75,8 @@ export default function FilterPopup({
             lastOpenSubmenuRef.current = "year";
           } else if (currentFilter === "genre") {
             lastOpenSubmenuRef.current = "genre";
+          } else if (currentFilter === "decade") {
+            lastOpenSubmenuRef.current = "decade";
           }
         } else if (currentFilter === "year") {
           setOpenSubmenu("year");
@@ -76,6 +84,9 @@ export default function FilterPopup({
         } else if (currentFilter === "genre") {
           setOpenSubmenu("genre");
           lastOpenSubmenuRef.current = "genre";
+        } else if (currentFilter === "decade") {
+          setOpenSubmenu("decade");
+          lastOpenSubmenuRef.current = "decade";
         } else if (lastOpenSubmenuRef.current) {
           // Restore the last open submenu even if no filter is active
           setOpenSubmenu(lastOpenSubmenuRef.current);
@@ -148,6 +159,10 @@ export default function FilterPopup({
       setOpenSubmenu("genre");
       lastOpenSubmenuRef.current = "genre";
       wentBackRef.current = false; // Reset went back flag when selecting a filter
+    } else if (field === "decade") {
+      setOpenSubmenu("decade");
+      lastOpenSubmenuRef.current = "decade";
+      wentBackRef.current = false; // Reset went back flag when selecting a filter
     } else {
       onFilterChange?.(field);
       if (onYearFilterChange) {
@@ -155,6 +170,9 @@ export default function FilterPopup({
       }
       if (onGenreFilterChange) {
         onGenreFilterChange(null);
+      }
+      if (onDecadeFilterChange) {
+        onDecadeFilterChange(null);
       }
       setOpenSubmenu(null);
       lastOpenSubmenuRef.current = null;
@@ -190,8 +208,39 @@ export default function FilterPopup({
     } else {
       onFilterChange?.("genre");
       onGenreFilterChange?.(genreId);
+      // Reset other filters
+      if (onYearFilterChange) {
+        onYearFilterChange(null);
+      }
+      if (onDecadeFilterChange) {
+        onDecadeFilterChange(null);
+      }
       // Keep the genre submenu state, just close the popup
       lastOpenSubmenuRef.current = "genre";
+      onClose();
+    }
+  };
+
+  const handleDecadeSelect = (value: number | string | null) => {
+    const decade = typeof value === "number" ? value : null;
+    if (decade === null) {
+      onFilterChange?.("all");
+      onDecadeFilterChange?.(null);
+      setOpenSubmenu(null);
+      lastOpenSubmenuRef.current = null;
+      onClose();
+    } else {
+      onFilterChange?.("decade");
+      onDecadeFilterChange?.(decade);
+      // Reset other filters
+      if (onYearFilterChange) {
+        onYearFilterChange(null);
+      }
+      if (onGenreFilterChange) {
+        onGenreFilterChange(null);
+      }
+      // Keep the decade submenu state, just close the popup
+      lastOpenSubmenuRef.current = "decade";
       onClose();
     }
   };
@@ -237,6 +286,20 @@ export default function FilterPopup({
         onSelect={handleGenreSelect}
         games={games}
         availableGenres={availableGenres}
+      />
+    );
+  }
+
+  if (isOpen && openSubmenu === "decade") {
+    return (
+      <FilterSubmenu
+        type="decade"
+        isOpen={true}
+        onClose={handleSubmenuClose}
+        onCloseCompletely={handleSubmenuCloseCompletely}
+        selectedValue={selectedDecade}
+        onSelect={handleDecadeSelect}
+        games={games}
       />
     );
   }
@@ -302,6 +365,29 @@ export default function FilterPopup({
       >
         <span>{t("gamesListToolbar.filter.year")}</span>
         {currentFilter === "year" && (
+          <svg
+            className="filter-popup-check"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+              fill="#E5A00D"
+            />
+          </svg>
+        )}
+      </button>
+      <button
+        className={`filter-popup-item ${
+          currentFilter === "decade" ? "selected" : ""
+        }`}
+        onClick={() => handleFilterSelect("decade")}
+      >
+        <span>{t("gamesListToolbar.filter.decade")}</span>
+        {currentFilter === "decade" && (
           <svg
             className="filter-popup-check"
             width="16"

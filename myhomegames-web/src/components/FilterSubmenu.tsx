@@ -9,7 +9,7 @@ type GameItem = {
 };
 
 type FilterSubmenuProps = {
-  type: "year" | "genre";
+  type: "year" | "genre" | "decade";
   isOpen: boolean;
   onClose: () => void;
   onCloseCompletely: () => void;
@@ -44,6 +44,18 @@ export default function FilterSubmenu({
     return Array.from(years).sort((a, b) => b - a); // Sort descending (newest first)
   }, [games]);
 
+  // Get available decades from games
+  const availableDecades = useMemo(() => {
+    const decades = new Set<number>();
+    games.forEach((game) => {
+      if (game.year !== null && game.year !== undefined) {
+        const decade = Math.floor(game.year / 10) * 10;
+        decades.add(decade);
+      }
+    });
+    return Array.from(decades).sort((a, b) => b - a); // Sort descending (newest first)
+  }, [games]);
+
   // Filter years based on search query
   const filteredYears = useMemo(() => {
     if (!searchQuery) return availableYears;
@@ -52,6 +64,15 @@ export default function FilterSubmenu({
       year.toString().includes(query)
     );
   }, [availableYears, searchQuery]);
+
+  // Filter decades based on search query
+  const filteredDecades = useMemo(() => {
+    if (!searchQuery) return availableDecades;
+    const query = searchQuery.toLowerCase();
+    return availableDecades.filter((decade) => 
+      decade.toString().includes(query) || `${decade}s`.toLowerCase().includes(query)
+    );
+  }, [availableDecades, searchQuery]);
 
   // Filter genres based on search query
   const filteredGenres = useMemo(() => {
@@ -215,6 +236,61 @@ export default function FilterSubmenu({
               onClick={() => handleSelect(genre.id)}
             >
               {t(`genre.${genre.title}`, genre.title)}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "decade") {
+    return (
+      <div className="filter-popup" ref={submenuRef}>
+        <div className="filter-popup-header">
+          <button
+            className="filter-popup-back"
+            onClick={handleBack}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <span className="filter-popup-header-title">
+            {t("gamesListToolbar.filter.decade")}
+          </span>
+        </div>
+        <div className="filter-popup-search">
+          <input
+            type="text"
+            className="filter-popup-search-input"
+            placeholder={t("gamesListToolbar.filter.searchDecade")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+        <div className="filter-popup-content">
+          {filteredDecades.map((decade) => (
+            <button
+              key={decade}
+              className={`filter-popup-item ${
+                selectedValue === decade ? "active" : ""
+              }`}
+              onClick={() => handleSelect(decade)}
+            >
+              {decade}s
             </button>
           ))}
         </div>

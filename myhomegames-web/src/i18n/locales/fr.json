@@ -87,10 +87,12 @@
       "title": "Titre",
       "genre": "Genre",
       "year": "Année",
+      "decade": "Décennie",
       "stars": "Note",
       "summary": "Résumé",
       "searchYear": "Filtre Année",
-      "searchGenre": "Filtre Genre"
+      "searchGenre": "Filtre Genre",
+      "searchDecade": "Filtre Décennie"
     },
     "sort": {
       "label": "Trier",
