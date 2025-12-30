@@ -78,7 +78,8 @@
     "loading": "Carregando...",
     "error": "Erro",
     "close": "Fechar",
-    "fetchError": "Falha ao conectar ao servidor"
+    "fetchError": "Falha ao conectar ao servidor",
+    "games": "Jogos"
   },
   "gamesListToolbar": {
     "filter": {

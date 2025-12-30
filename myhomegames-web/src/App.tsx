@@ -180,7 +180,6 @@ function AppContent() {
                   buildApiUrl(path, params)
                 }
                 buildCoverUrl={buildCoverUrl}
-                coverSize={200}
               />
             }
           />

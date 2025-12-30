@@ -78,7 +78,8 @@
     "loading": "Caricamento...",
     "error": "Errore",
     "close": "Chiudi",
-    "fetchError": "Impossibile connettersi al server"
+    "fetchError": "Impossibile connettersi al server",
+    "games": "Giochi"
   },
   "gamesListToolbar": {
     "filter": {

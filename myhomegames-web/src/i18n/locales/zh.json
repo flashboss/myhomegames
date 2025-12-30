@@ -78,7 +78,8 @@
     "loading": "加载中...",
     "error": "错误",
     "close": "关闭",
-    "fetchError": "无法连接到服务器"
+    "fetchError": "无法连接到服务器",
+    "games": "游戏"
   },
   "gamesListToolbar": {
     "filter": {
