@@ -338,7 +338,6 @@ function GameDetailPage({
       game={game}
       coverUrl={buildCoverUrl(API_BASE, game.cover)}
       onPlay={onPlay}
-      onBack={handleBack}
     />
   );
 }

@@ -14,14 +14,12 @@ type GameDetailProps = {
   game: GameItem;
   coverUrl: string;
   onPlay: (game: GameItem) => void;
-  onBack?: () => void;
 };
 
 export default function GameDetail({
   game,
   coverUrl,
   onPlay,
-  onBack,
 }: GameDetailProps) {
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !coverUrl || imageError;
@@ -66,14 +64,6 @@ export default function GameDetail({
 
             {/* Action Buttons */}
             <div className="flex gap-4">
-              {onBack && (
-                <button
-                  onClick={onBack}
-                  className="bg-gray-700 hover:bg-gray-600 text-white px-8 py-3 rounded font-semibold text-lg transition-colors"
-                >
-                  Back
-                </button>
-              )}
               <button
                 onClick={() => onPlay(game)}
                 className="bg-[#E5A00D] hover:bg-[#F5B041] text-black px-8 py-3 rounded font-semibold text-lg transition-colors"

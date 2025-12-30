@@ -43,6 +43,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
   const inputRef = useRef<HTMLInputElement>(null);
   const [isClosing, setIsClosing] = useState(false);
   const blurTimeoutRef = useRef<number | null>(null);
+  const isSelectingGameRef = useRef(false);
 
   const saveRecentSearch = useCallback((query: string) => {
     if (query.trim() !== "") {
@@ -54,9 +55,20 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
     }
   }, []);
 
+  // Remove focus from searchbox when arriving at search results page
   useEffect(() => {
-    // Don't update if we're in the process of closing
-    if (isClosing) {
+    if (isOnSearchResultsPage) {
+      setIsFocused(false);
+      setIsOpen(false);
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
+    }
+  }, [isOnSearchResultsPage]);
+
+  useEffect(() => {
+    // Don't update if we're in the process of closing or selecting a game
+    if (isClosing || isSelectingGameRef.current) {
       return;
     }
     
@@ -176,11 +188,27 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
   };
 
   const handleGameSelect = (game: GameItem) => {
+    // Mark that we're selecting a game to prevent popup from reopening
+    isSelectingGameRef.current = true;
+    
     // Save search query to recent searches
     saveRecentSearch(searchQuery);
     onGameSelect(game);
-    setSearchQuery("");
+    
+    // Close everything
     setIsOpen(false);
+    setIsFocused(false);
+    setSearchQuery("");
+    
+    // Blur the input to remove focus
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
+    
+    // Reset the flag after a short delay to allow state updates to complete
+    setTimeout(() => {
+      isSelectingGameRef.current = false;
+    }, 100);
   };
 
   const handleRemoveRecentSearch = (query: string, e: React.MouseEvent) => {
@@ -328,7 +356,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
         )}
       </div>
 
-      {isOpen && !isOnSearchResultsPage && filteredGames.length > 0 && (
+      {isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && filteredGames.length > 0 && (
         <div className="plex-dropdown search-dropdown">
           <div className="search-dropdown-scroll">
             {filteredGames.map((game, index) => {
