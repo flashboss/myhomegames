@@ -49,7 +49,7 @@ let allGames = {}; // Store all games by ID for launcher
 
 // Load all games on startup
 libraryRoutes.loadLibraryGames(METADATA_GAMES_DIR, allGames);
-recommendedRoutes.loadRecommendedGames(METADATA_GAMES_DIR, allGames);
+// Recommended games are now just IDs pointing to games already in allGames
 
 // Register routes
 libraryRoutes.registerLibraryRoutes(app, requireToken, METADATA_GAMES_DIR, allGames);
@@ -150,7 +150,7 @@ app.get("/launcher", requireToken, (req, res) => {
 app.post("/reload-games", requireToken, (req, res) => {
   allGames = {};
   libraryRoutes.loadLibraryGames(METADATA_GAMES_DIR, allGames);
-  recommendedRoutes.loadRecommendedGames(METADATA_GAMES_DIR, allGames);
+  // Recommended games are now just IDs pointing to games already in allGames
   const collectionsCache = collectionsHandler.reload();
   const totalCount = Object.keys(allGames).length;
   res.json({ status: "reloaded", count: totalCount, collections: collectionsCache.length });
