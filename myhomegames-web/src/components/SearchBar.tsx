@@ -41,6 +41,8 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
   });
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const blurTimeoutRef = useRef<number | null>(null);
 
   const saveRecentSearch = useCallback((query: string) => {
     if (query.trim() !== "") {
@@ -53,6 +55,11 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
   }, []);
 
   useEffect(() => {
+    // Don't update if we're in the process of closing
+    if (isClosing) {
+      return;
+    }
+    
     if (searchQuery.trim() === "") {
       setFilteredGames([]);
       setAllFilteredGames([]);
@@ -83,9 +90,12 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
       });
       setIsOpen(false);
     } else {
-      setIsOpen(true); // Always show dropdown when there's a search query (even if no results)
+      // Only open if focused and not closing
+      if (isFocused && !isClosing) {
+        setIsOpen(true); // Always show dropdown when there's a search query (even if no results)
+      }
     }
-  }, [searchQuery, games, isFocused, isOnSearchResultsPage, navigate, saveRecentSearch]);
+  }, [searchQuery, games, isFocused, isOnSearchResultsPage, navigate, saveRecentSearch, isClosing]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -93,14 +103,66 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
         searchRef.current &&
         !searchRef.current.contains(event.target as Node)
       ) {
+        // Mark that we're closing FIRST, before anything else
+        setIsClosing(true);
+        
+        // Clear any pending blur timeout immediately
+        if (blurTimeoutRef.current) {
+          clearTimeout(blurTimeoutRef.current);
+          blurTimeoutRef.current = null;
+        }
+        
+        // Close both popup and searchbox together immediately
         setIsOpen(false);
         setIsFocused(false);
+        
+        // Also blur the input to remove focus
+        if (inputRef.current) {
+          inputRef.current.blur();
+        }
+        
+        // Reset the flag after blur timeout would have passed
+        setTimeout(() => {
+          setIsClosing(false);
+        }, 300);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        // Mark that we're closing FIRST
+        setIsClosing(true);
+        
+        // Clear any pending blur timeout
+        if (blurTimeoutRef.current) {
+          clearTimeout(blurTimeoutRef.current);
+          blurTimeoutRef.current = null;
+        }
+        
+        // Close both popup and searchbox together
+        setIsOpen(false);
+        setIsFocused(false);
+        // Also blur the input to remove focus
+        if (inputRef.current) {
+          inputRef.current.blur();
+        }
+        
+        // Reset the flag after a short delay
+        setTimeout(() => {
+          setIsClosing(false);
+        }, 300);
+      }
+    }
+
+    // Use pointerdown to catch it as early as possible, before blur
+    document.addEventListener("pointerdown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("pointerdown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -168,14 +230,29 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
     setIsOpen(true);
   };
 
-  const handleBlur = () => {
-    // Delay to allow click on dropdown items
-    setTimeout(() => {
-      setIsFocused(false);
-      if (searchQuery.trim() === "") {
-        setIsOpen(false);
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // If we're already closing, don't do anything
+    if (isClosing) {
+      return;
+    }
+    
+    // Check if the related target (where focus is going) is inside our container
+    const relatedTarget = e.relatedTarget as Node | null;
+    const isClickingInside = relatedTarget && searchRef.current?.contains(relatedTarget);
+    
+    // If clicking inside (e.g., on a dropdown item), keep the popup open
+    if (isClickingInside) {
+      return;
+    }
+    
+    // Don't close on blur - let click outside handle it
+    // Just update focus state after a delay to allow clicks on dropdown items
+    blurTimeoutRef.current = setTimeout(() => {
+      if (!isClosing) {
+        setIsFocused(false);
       }
-    }, 200);
+      blurTimeoutRef.current = null;
+    }, 150);
   };
 
   return (

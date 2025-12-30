@@ -127,6 +127,7 @@ app.get("/libraries/:id/games", requireToken, (req, res) => {
       month: g.month || null,
       year: g.year || null,
       stars: g.stars || null,
+      genre: g.genre || null,
     })),
   });
 });

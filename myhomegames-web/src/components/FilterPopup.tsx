@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import FilterSubmenu from "./FilterSubmenu";
 import "./FilterPopup.css";
 
 type FilterField = "all" | "genre" | "year";
@@ -36,57 +37,44 @@ export default function FilterPopup({
   availableGenres = [],
 }: FilterPopupProps) {
   const { t } = useTranslation();
-  const [isYearFilterOpen, setIsYearFilterOpen] = useState(false);
-  const [isGenreFilterOpen, setIsGenreFilterOpen] = useState(false);
-  const [yearSearchQuery, setYearSearchQuery] = useState("");
-  const [genreSearchQuery, setGenreSearchQuery] = useState("");
+  const [openSubmenu, setOpenSubmenu] = useState<"year" | "genre" | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
-  const yearFilterRef = useRef<HTMLDivElement>(null);
-  const genreFilterRef = useRef<HTMLDivElement>(null);
 
-  // Get available years from games
-  const availableYears = useMemo(() => {
-    const years = new Set<number>();
-    games.forEach((game) => {
-      if (game.year !== null && game.year !== undefined) {
-        years.add(game.year);
-      }
-    });
-    return Array.from(years).sort((a, b) => b - a); // Sort descending (newest first)
-  }, [games]);
-
-  // Filter years based on search query
-  const filteredYears = useMemo(() => {
-    if (!yearSearchQuery) return availableYears;
-    const query = yearSearchQuery.toLowerCase();
-    return availableYears.filter((year) => 
-      year.toString().includes(query)
-    );
-  }, [availableYears, yearSearchQuery]);
-
-  // Filter genres based on search query
-  const filteredGenres = useMemo(() => {
-    if (!genreSearchQuery) return availableGenres;
-    const query = genreSearchQuery.toLowerCase();
-    return availableGenres.filter((genre) => {
-      const genreLabel = t(`genre.${genre.title}`, genre.title).toLowerCase();
-      return genreLabel.includes(query) || genre.title.toLowerCase().includes(query);
-    });
-  }, [availableGenres, genreSearchQuery, t]);
-
-  // Close popups when clicking outside
+  // When popup opens, show the appropriate submenu if a filter is active or if there was a last open submenu
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen) {
+      if (currentFilter === "year") {
+        setOpenSubmenu("year");
+      } else if (currentFilter === "genre") {
+        setOpenSubmenu("genre");
+      } else if (openSubmenu) {
+        // Keep the last open submenu even if no filter is active
+        // openSubmenu state persists
+      } else {
+        setOpenSubmenu(null);
+      }
+    }
+    // Don't reset openSubmenu when popup closes - it will persist
+  }, [isOpen, currentFilter]);
+
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    if (!isOpen && !openSubmenu) return;
 
     function handleClickOutside(event: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      
+      // Check which popup is currently visible
+      let clickedOutside = false;
+      
+      if (isOpen && filterRef.current) {
+        clickedOutside = !filterRef.current.contains(target);
+      }
+      
+      // If clicked outside the main menu, close everything
+      if (clickedOutside && !openSubmenu) {
         onClose();
-      }
-      if (yearFilterRef.current && !yearFilterRef.current.contains(event.target as Node)) {
-        setIsYearFilterOpen(false);
-      }
-      if (genreFilterRef.current && !genreFilterRef.current.contains(event.target as Node)) {
-        setIsGenreFilterOpen(false);
       }
     }
 
@@ -94,15 +82,32 @@ export default function FilterPopup({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, openSubmenu, onClose]);
+
+  // Close popup on ESC key
+  useEffect(() => {
+    if (!isOpen && !openSubmenu) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        if (openSubmenu) {
+          setOpenSubmenu(null);
+        }
+        onClose();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, openSubmenu, onClose]);
 
   const handleFilterSelect = (field: FilterField) => {
     if (field === "year") {
-      setIsYearFilterOpen(true);
-      setYearSearchQuery("");
+      setOpenSubmenu("year");
     } else if (field === "genre") {
-      setIsGenreFilterOpen(true);
-      setGenreSearchQuery("");
+      setOpenSubmenu("genre");
     } else {
       onFilterChange?.(field);
       if (onYearFilterChange) {
@@ -111,154 +116,84 @@ export default function FilterPopup({
       if (onGenreFilterChange) {
         onGenreFilterChange(null);
       }
+      setOpenSubmenu(null);
       onClose();
     }
   };
 
-  const handleYearSelect = (year: number | null) => {
+  const handleYearSelect = (value: number | string | null) => {
+    const year = typeof value === "number" ? value : null;
     if (year === null) {
       onFilterChange?.("all");
       onYearFilterChange?.(null);
+      setOpenSubmenu(null);
+      onClose();
     } else {
       onFilterChange?.("year");
       onYearFilterChange?.(year);
+      // Keep the year submenu state, just close the popup
+      onClose();
     }
-    setIsYearFilterOpen(false);
-    onClose();
   };
 
-  const handleGenreSelect = (genreId: string | null) => {
+  const handleGenreSelect = (value: number | string | null) => {
+    const genreId = typeof value === "string" ? value : null;
     if (genreId === null) {
       onFilterChange?.("all");
       onGenreFilterChange?.(null);
+      setOpenSubmenu(null);
+      onClose();
     } else {
       onFilterChange?.("genre");
       onGenreFilterChange?.(genreId);
+      // Keep the genre submenu state, just close the popup
+      onClose();
     }
-    setIsGenreFilterOpen(false);
+  };
+
+  const handleSubmenuClose = () => {
+    setOpenSubmenu(null);
+    // Don't close the main popup, just go back to main menu
+  };
+
+  const handleSubmenuCloseCompletely = () => {
+    setOpenSubmenu(null);
     onClose();
+    // Close the popup completely
   };
 
-  const handleBackToFilters = () => {
-    setIsYearFilterOpen(false);
-    setIsGenreFilterOpen(false);
-    setYearSearchQuery("");
-    setGenreSearchQuery("");
-  };
-
-  if (!isOpen && !isYearFilterOpen && !isGenreFilterOpen) return null;
-
-  // Show year filter submenu
-  if (isYearFilterOpen) {
+  // Show submenu if open (only if main popup is also open or submenu was just opened)
+  if (openSubmenu === "year" && (isOpen || openSubmenu)) {
     return (
-      <div className="filter-popup" ref={yearFilterRef}>
-        <div className="filter-popup-header">
-          <button
-            className="filter-popup-back"
-            onClick={handleBackToFilters}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M15 18l-6-6 6-6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <span className="filter-popup-header-title">
-            {t("gamesListToolbar.filter.year")}
-          </span>
-        </div>
-        <div className="filter-popup-search">
-          <input
-            type="text"
-            className="filter-popup-search-input"
-            placeholder={t("gamesListToolbar.filter.searchYear")}
-            value={yearSearchQuery}
-            onChange={(e) => setYearSearchQuery(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-        <div className="filter-popup-content">
-          {filteredYears.map((year) => (
-            <button
-              key={year}
-              className={`filter-popup-item ${
-                selectedYear === year ? "active" : ""
-              }`}
-              onClick={() => handleYearSelect(year)}
-            >
-              {year}
-            </button>
-          ))}
-        </div>
-      </div>
+      <FilterSubmenu
+        type="year"
+        isOpen={true}
+        onClose={handleSubmenuClose}
+        onCloseCompletely={handleSubmenuCloseCompletely}
+        selectedValue={selectedYear}
+        onSelect={handleYearSelect}
+        games={games}
+      />
     );
   }
 
-  // Show genre filter submenu
-  if (isGenreFilterOpen) {
+  if (openSubmenu === "genre" && (isOpen || openSubmenu)) {
     return (
-      <div className="filter-popup" ref={genreFilterRef}>
-        <div className="filter-popup-header">
-          <button
-            className="filter-popup-back"
-            onClick={handleBackToFilters}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M15 18l-6-6 6-6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <span className="filter-popup-header-title">
-            {t("gamesListToolbar.filter.genre")}
-          </span>
-        </div>
-        <div className="filter-popup-search">
-          <input
-            type="text"
-            className="filter-popup-search-input"
-            placeholder={t("gamesListToolbar.filter.searchGenre")}
-            value={genreSearchQuery}
-            onChange={(e) => setGenreSearchQuery(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-        <div className="filter-popup-content filter-popup-scrollable">
-          {filteredGenres.map((genre) => (
-            <button
-              key={genre.id}
-              className={`filter-popup-item ${
-                selectedGenre === genre.id ? "active" : ""
-              }`}
-              onClick={() => handleGenreSelect(genre.id)}
-            >
-              {t(`genre.${genre.title}`, genre.title)}
-            </button>
-          ))}
-        </div>
-      </div>
+      <FilterSubmenu
+        type="genre"
+        isOpen={true}
+        onClose={handleSubmenuClose}
+        onCloseCompletely={handleSubmenuCloseCompletely}
+        selectedValue={selectedGenre}
+        onSelect={handleGenreSelect}
+        games={games}
+        availableGenres={availableGenres}
+      />
     );
   }
+
+  // Only show main menu if popup is open and no submenu is active
+  if (!isOpen || openSubmenu) return null;
 
   // Show main filter menu
   return (
