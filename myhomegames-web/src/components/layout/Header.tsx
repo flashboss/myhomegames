@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import Logo from "./Logo";
-import SearchBar from "./SearchBar";
+import Logo from "../common/Logo";
+import SearchBar from "../search/SearchBar";
 
 type GameItem = {
   ratingKey: string;

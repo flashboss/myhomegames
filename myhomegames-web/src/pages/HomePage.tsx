@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import LibrariesBar from "../components/LibrariesBar";
-import type { ViewMode } from "../components/LibrariesBar";
+import LibrariesBar from "../components/layout/LibrariesBar";
+import type { ViewMode } from "../components/layout/LibrariesBar";
 import LibraryPage from "./LibraryPage";
 import RecommendedPage from "./RecommendedPage";
 import CollectionsPage from "./CollectionsPage";

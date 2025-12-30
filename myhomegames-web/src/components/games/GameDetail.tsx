@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CoverPlaceholder from "./CoverPlaceholder";
+import CoverPlaceholder from "../common/CoverPlaceholder";
 import "./GameDetail.css";
 
 type GameItem = {

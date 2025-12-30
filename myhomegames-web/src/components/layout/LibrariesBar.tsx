@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import CoverSizeSlider from "./ui/CoverSizeSlider";
-import ViewModeSelector from "./ui/ViewModeSelector";
+import CoverSizeSlider from "../ui/CoverSizeSlider";
+import ViewModeSelector from "../ui/ViewModeSelector";
 import "./LibrariesBar.css";
 
 type GameLibrarySection = {

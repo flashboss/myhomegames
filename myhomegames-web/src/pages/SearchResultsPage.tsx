@@ -1,7 +1,7 @@
 import { useLayoutEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import SearchResultsList from "../components/SearchResultsList";
+import SearchResultsList from "../components/search/SearchResultsList";
 import "./SearchResultsPage.css";
 
 type GameItem = {

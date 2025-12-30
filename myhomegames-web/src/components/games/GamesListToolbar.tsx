@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import FilterPopup from "./filters/FilterPopup";
-import SortPopup from "./toolbar/SortPopup";
-import type { FilterField, GameItem } from "./filters/types";
+import FilterPopup from "../filters/FilterPopup";
+import SortPopup from "../toolbar/SortPopup";
+import type { FilterField, GameItem } from "../filters/types";
 import "./GamesListToolbar.css";
 
 type SortField = "title" | "year" | "stars" | "releaseDate";

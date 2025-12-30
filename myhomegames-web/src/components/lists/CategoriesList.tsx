@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "./CoverPlaceholder";
+import CoverPlaceholder from "../common/CoverPlaceholder";
 import "./CategoriesList.css";
 
 type CategoryItem = {

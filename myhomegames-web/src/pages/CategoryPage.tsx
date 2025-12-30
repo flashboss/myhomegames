@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import GamesList from "../components/GamesList";
-import GamesListDetail from "../components/GamesListDetail";
-import GamesListTable from "../components/GamesListTable";
-import AlphabetNavigator from "../components/AlphabetNavigator";
-import GamesListToolbar from "../components/GamesListToolbar";
-import LibrariesBar, { type ViewMode } from "../components/LibrariesBar";
+import GamesList from "../components/games/GamesList";
+import GamesListDetail from "../components/games/GamesListDetail";
+import GamesListTable from "../components/games/GamesListTable";
+import AlphabetNavigator from "../components/ui/AlphabetNavigator";
+import GamesListToolbar from "../components/games/GamesListToolbar";
+import LibrariesBar, { type ViewMode } from "../components/layout/LibrariesBar";
 import type { FilterField } from "../components/filters/types";
 
 type GameItem = {

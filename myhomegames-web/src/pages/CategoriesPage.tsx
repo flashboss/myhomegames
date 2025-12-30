@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import CategoriesList from "../components/CategoriesList";
+import CategoriesList from "../components/lists/CategoriesList";
 
 type CategoryItem = {
   ratingKey: string;

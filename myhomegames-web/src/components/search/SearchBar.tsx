@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "./CoverPlaceholder";
+import CoverPlaceholder from "../common/CoverPlaceholder";
 import "./SearchBar.css";
 
 type GameItem = {

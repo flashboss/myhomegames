@@ -1,50 +1,55 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "./CoverPlaceholder";
-import "./GamesList.css";
+import CoverPlaceholder from "../common/CoverPlaceholder";
+import "./GamesListDetail.css";
 
 type GameItem = {
   ratingKey: string;
   title: string;
   summary?: string;
   cover?: string;
+  day?: number | null;
+  month?: number | null;
+  year?: number | null;
   stars?: number | null;
 };
 
-type GamesListProps = {
+type GamesListDetailProps = {
   games: GameItem[];
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
-  coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
-type GameListItemProps = {
+const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
+
+type GameDetailItemProps = {
   game: GameItem;
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
-  coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
+  index: number;
 };
 
-function GameListItem({
+function GameDetailItem({
   game,
   apiBase,
   onGameClick,
   onPlay,
   buildCoverUrl,
-  coverSize,
   itemRefs,
-}: GameListItemProps) {
+  index,
+}: GameDetailItemProps) {
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !game.cover || imageError;
-  const coverHeight = coverSize * 1.5;
+  const isEven = index % 2 === 0;
+  const coverHeight = FIXED_COVER_SIZE * 1.5;
 
-  const handlePlayClick = (e: React.MouseEvent) => {
+  const handleCoverClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onPlay) {
       onPlay(game);
@@ -59,33 +64,38 @@ function GameListItem({
           itemRefs.current.set(game.ratingKey, el);
         }
       }}
-      className="group cursor-pointer games-list-item"
-      style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
+      className={`group cursor-pointer mb-6 games-list-detail-item ${
+        isEven ? "even" : "odd"
+      }`}
       onClick={() => onGameClick(game)}
     >
-      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 games-list-cover">
+      <div
+        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 games-list-detail-cover"
+        style={{
+          height: `${coverHeight}px`,
+        }}
+        onClick={handleCoverClick}
+      >
         {showPlaceholder ? (
           <CoverPlaceholder
             title={game.title}
-            width={coverSize}
+            width={FIXED_COVER_SIZE}
             height={coverHeight}
           />
         ) : (
-          <>
-            <img
-              src={buildCoverUrl(apiBase, game.cover)}
-              alt={game.title}
-              className="object-cover w-full h-full"
-              onError={() => {
-                setImageError(true);
-              }}
-            />
-          </>
+          <img
+            src={buildCoverUrl(apiBase, game.cover)}
+            alt={game.title}
+            className="object-cover w-full h-full"
+            onError={() => {
+              setImageError(true);
+            }}
+          />
         )}
         {onPlay && (
           <button
-            onClick={handlePlayClick}
-            className="games-list-play-button"
+            onClick={handleCoverClick}
+            className="games-list-detail-play-button"
             aria-label="Play game"
           >
             <svg
@@ -103,20 +113,44 @@ function GameListItem({
           </button>
         )}
       </div>
-      <div className="truncate games-list-title">{game.title}</div>
+      <div className="games-list-detail-content">
+        <div className="text-white mb-2 games-list-detail-title">
+          {game.title}
+        </div>
+        {game.summary && (
+          <div
+            className="text-gray-400 mb-2"
+            style={{
+              fontSize: "0.95rem",
+              lineHeight: "1.5",
+            }}
+          >
+            {game.summary}
+          </div>
+        )}
+        {game.year !== null && game.year !== undefined && (
+          <div className="text-gray-500" style={{ fontSize: "0.85rem" }}>
+            {game.day !== null &&
+            game.day !== undefined &&
+            game.month !== null &&
+            game.month !== undefined
+              ? `${game.day}/${game.month}/${game.year}`
+              : game.year.toString()}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-export default function GamesList({
+export default function GamesListDetail({
   games,
   apiBase,
   onGameClick,
   onPlay,
   buildCoverUrl,
-  coverSize = 150,
   itemRefs,
-}: GamesListProps) {
+}: GamesListDetailProps) {
   const { t } = useTranslation();
   
   if (games.length === 0) {
@@ -124,20 +158,17 @@ export default function GamesList({
   }
 
   return (
-    <div
-      className="games-list-container"
-      style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)` }}
-    >
-      {games.map((game) => (
-        <GameListItem
+    <div className="games-list-detail-container">
+      {games.map((game, index) => (
+        <GameDetailItem
           key={game.ratingKey}
           game={game}
           apiBase={apiBase}
           onGameClick={onGameClick}
           onPlay={onPlay}
           buildCoverUrl={buildCoverUrl}
-          coverSize={coverSize}
           itemRefs={itemRefs}
+          index={index}
         />
       ))}
     </div>

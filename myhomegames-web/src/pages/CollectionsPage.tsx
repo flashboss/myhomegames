@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import CollectionsList from "../components/CollectionsList";
-import AlphabetNavigator from "../components/AlphabetNavigator";
+import CollectionsList from "../components/lists/CollectionsList";
+import AlphabetNavigator from "../components/ui/AlphabetNavigator";
 
 type CollectionItem = {
   ratingKey: string;

@@ -9,16 +9,16 @@ import {
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./App.css";
-import Favicon from "./components/Favicon";
-import Header from "./components/Header";
+import Favicon from "./components/common/Favicon";
+import Header from "./components/layout/Header";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingsPage";
 import AddGamePage from "./pages/AddGamePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import CollectionDetail from "./pages/CollectionDetail";
 import CategoryPage from "./pages/CategoryPage";
-import AddGame from "./components/AddGame";
-import GameDetail from "./components/GameDetail";
+import AddGame from "./components/common/AddGame";
+import GameDetail from "./components/games/GameDetail";
 
 type GameItem = {
   ratingKey: string;

@@ -1,78 +1,80 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "./CoverPlaceholder";
-import "./CollectionsList.css";
+import CoverPlaceholder from "../common/CoverPlaceholder";
+import "./GamesList.css";
 
-type CollectionItem = {
+type GameItem = {
   ratingKey: string;
   title: string;
+  summary?: string;
   cover?: string;
+  stars?: number | null;
 };
 
-type CollectionsListProps = {
-  collections: CollectionItem[];
+type GamesListProps = {
+  games: GameItem[];
   apiBase: string;
-  onCollectionClick: (collection: CollectionItem) => void;
-  onPlay?: (collection: CollectionItem) => void;
+  onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
-type CollectionListItemProps = {
-  collection: CollectionItem;
+type GameListItemProps = {
+  game: GameItem;
   apiBase: string;
-  onCollectionClick: (collection: CollectionItem) => void;
-  onPlay?: (collection: CollectionItem) => void;
+  onGameClick: (game: GameItem) => void;
+  onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
-function CollectionListItem({
-  collection,
+function GameListItem({
+  game,
   apiBase,
-  onCollectionClick,
+  onGameClick,
   onPlay,
   buildCoverUrl,
   coverSize,
   itemRefs,
-}: CollectionListItemProps) {
+}: GameListItemProps) {
   const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !collection.cover || imageError;
+  const showPlaceholder = !game.cover || imageError;
   const coverHeight = coverSize * 1.5;
 
   const handlePlayClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onPlay) {
-      onPlay(collection);
+      onPlay(game);
     }
   };
 
   return (
     <div
-      key={collection.ratingKey}
+      key={game.ratingKey}
       ref={(el) => {
         if (el && itemRefs?.current) {
-          itemRefs.current.set(collection.ratingKey, el);
+          itemRefs.current.set(game.ratingKey, el);
         }
       }}
-      className="group cursor-pointer collections-list-item"
+      className="group cursor-pointer games-list-item"
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
-      onClick={() => onCollectionClick(collection)}
+      onClick={() => onGameClick(game)}
     >
-      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 collections-list-cover">
+      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 games-list-cover">
         {showPlaceholder ? (
           <CoverPlaceholder
-            title={collection.title}
+            title={game.title}
             width={coverSize}
             height={coverHeight}
           />
         ) : (
           <>
             <img
-              src={buildCoverUrl(apiBase, collection.cover)}
-              alt={collection.title}
+              src={buildCoverUrl(apiBase, game.cover)}
+              alt={game.title}
               className="object-cover w-full h-full"
               onError={() => {
                 setImageError(true);
@@ -83,8 +85,8 @@ function CollectionListItem({
         {onPlay && (
           <button
             onClick={handlePlayClick}
-            className="collections-list-play-button"
-            aria-label="Play collection"
+            className="games-list-play-button"
+            aria-label="Play game"
           >
             <svg
               width="48"
@@ -101,37 +103,37 @@ function CollectionListItem({
           </button>
         )}
       </div>
-      <div className="truncate collections-list-title">{collection.title}</div>
+      <div className="truncate games-list-title">{game.title}</div>
     </div>
   );
 }
 
-export default function CollectionsList({
-  collections,
+export default function GamesList({
+  games,
   apiBase,
-  onCollectionClick,
+  onGameClick,
   onPlay,
   buildCoverUrl,
   coverSize = 150,
   itemRefs,
-}: CollectionsListProps) {
+}: GamesListProps) {
   const { t } = useTranslation();
   
-  if (collections.length === 0) {
+  if (games.length === 0) {
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
   return (
     <div
-      className="collections-list-container"
+      className="games-list-container"
       style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)` }}
     >
-      {collections.map((collection) => (
-        <CollectionListItem
-          key={collection.ratingKey}
-          collection={collection}
+      {games.map((game) => (
+        <GameListItem
+          key={game.ratingKey}
+          game={game}
           apiBase={apiBase}
-          onCollectionClick={onCollectionClick}
+          onGameClick={onGameClick}
           onPlay={onPlay}
           buildCoverUrl={buildCoverUrl}
           coverSize={coverSize}
@@ -141,4 +143,3 @@ export default function CollectionsList({
     </div>
   );
 }
-
