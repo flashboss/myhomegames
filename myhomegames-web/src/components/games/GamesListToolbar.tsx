@@ -102,7 +102,7 @@ export default function GamesListToolbar({
             }}
           >
             {currentFilter && currentFilter !== "all" && (
-              <button
+              <span
                 className="games-list-toolbar-clear-button"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -121,6 +121,28 @@ export default function GamesListToolbar({
                   }
                   setIsFilterOpen(false);
                 }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onFilterChange?.("all");
+                    if (onYearFilterChange) {
+                      onYearFilterChange(null);
+                    }
+                    if (onGenreFilterChange) {
+                      onGenreFilterChange(null);
+                    }
+                    if (onDecadeFilterChange) {
+                      onDecadeFilterChange(null);
+                    }
+                    if (onCollectionFilterChange) {
+                      onCollectionFilterChange(null);
+                    }
+                    setIsFilterOpen(false);
+                  }
+                }}
               >
                 <svg
                   width="12"
@@ -137,7 +159,7 @@ export default function GamesListToolbar({
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
+              </span>
             )}
             <span className="games-list-toolbar-value">{currentFilterLabel}</span>
             <svg

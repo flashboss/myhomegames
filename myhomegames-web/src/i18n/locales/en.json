@@ -33,7 +33,8 @@
     "noResults": "No results found for the term \"{{query}}\"",
     "viewAllResults": "View all results ({{count}})",
     "placeholder": "Search games...",
-    "recentSearches": "Recent Searches"
+    "recentSearches": "Recent Searches",
+    "collection": "Collection"
   },
   "searchResults": {
     "title": "Search results: \"{{query}}\"",

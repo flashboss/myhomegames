@@ -15,8 +15,15 @@ type GameItem = {
   stars?: number | null;
 };
 
+type CollectionItem = {
+  ratingKey: string;
+  title: string;
+  cover?: string;
+};
+
 type SearchBarProps = {
   games: GameItem[];
+  collections: CollectionItem[];
   onGameSelect: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
 };
@@ -24,7 +31,7 @@ type SearchBarProps = {
 const RECENT_SEARCHES_KEY = "recentSearches";
 const MAX_RECENT_SEARCHES = 10;
 
-export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProps) {
+export default function SearchBar({ games, collections, onGameSelect, onPlay }: SearchBarProps) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,7 +40,9 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [filteredGames, setFilteredGames] = useState<GameItem[]>([]);
+  const [filteredCollections, setFilteredCollections] = useState<CollectionItem[]>([]);
   const [allFilteredGames, setAllFilteredGames] = useState<GameItem[]>([]);
+  const [allFilteredCollections, setAllFilteredCollections] = useState<CollectionItem[]>([]);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
@@ -74,7 +83,9 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
     
     if (searchQuery.trim() === "") {
       setFilteredGames([]);
+      setFilteredCollections([]);
       setAllFilteredGames([]);
+      setAllFilteredCollections([]);
       // Show recent searches when focused and query is empty
       if (isFocused) {
         setIsOpen(true);
@@ -84,11 +95,18 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
       return;
     }
 
+    const queryLower = searchQuery.toLowerCase();
     const filtered = games.filter((game) =>
-      game.title.toLowerCase().includes(searchQuery.toLowerCase())
+      game.title.toLowerCase().includes(queryLower)
     );
+    const filteredCols = collections.filter((collection) =>
+      collection.title.toLowerCase().includes(queryLower)
+    );
+    
     setAllFilteredGames(filtered); // Save all results
+    setAllFilteredCollections(filteredCols); // Save all collection results
     setFilteredGames(filtered.slice(0, 10)); // Limit to 10 results
+    setFilteredCollections(filteredCols.slice(0, 10)); // Limit to 10 collection results
     
     // If on search results page, navigate directly instead of showing popup
     if (isOnSearchResultsPage) {
@@ -97,6 +115,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
         state: {
           searchQuery: searchQuery,
           games: filtered,
+          collections: filteredCols,
         },
         replace: true, // Replace current history entry
       });
@@ -107,7 +126,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
         setIsOpen(true); // Always show dropdown when there's a search query (even if no results)
       }
     }
-  }, [searchQuery, games, isFocused, isOnSearchResultsPage, navigate, saveRecentSearch, isClosing]);
+  }, [searchQuery, games, collections, isFocused, isOnSearchResultsPage, navigate, saveRecentSearch, isClosing]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -232,9 +251,13 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
     
     // If on search results page, navigate directly
     if (isOnSearchResultsPage) {
-      // Filter games with the selected query
+      // Filter games and collections with the selected query
+      const queryLower = query.toLowerCase();
       const filtered = games.filter((game) =>
-        game.title.toLowerCase().includes(query.toLowerCase())
+        game.title.toLowerCase().includes(queryLower)
+      );
+      const filteredCols = collections.filter((collection) =>
+        collection.title.toLowerCase().includes(queryLower)
       );
       // Save the search
       saveRecentSearch(query);
@@ -243,6 +266,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
         state: {
           searchQuery: query,
           games: filtered,
+          collections: filteredCols,
         },
       });
       setIsOpen(false);
@@ -318,13 +342,14 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
             if (e.key === "Escape") {
               setIsOpen(false);
               setIsFocused(false);
-            } else if (e.key === "Enter" && searchQuery.trim() !== "" && allFilteredGames.length > 0) {
+            } else if (e.key === "Enter" && searchQuery.trim() !== "" && (allFilteredGames.length > 0 || allFilteredCollections.length > 0)) {
               // Save search query to recent searches
               saveRecentSearch(searchQuery);
               navigate("/search-results", {
                 state: {
                   searchQuery: searchQuery,
                   games: allFilteredGames,
+                  collections: allFilteredCollections,
                 },
               });
               setSearchQuery("");
@@ -356,9 +381,66 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
         )}
       </div>
 
-      {isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && filteredGames.length > 0 && (
+      {isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && (filteredGames.length > 0 || filteredCollections.length > 0) && (
         <div className="plex-dropdown search-dropdown">
           <div className="search-dropdown-scroll">
+            {filteredCollections.map((collection, index) => {
+              const showPlaceholder =
+                !collection.cover || imageErrors.has(collection.ratingKey);
+
+              return (
+                <div
+                  key={`collection-${collection.ratingKey}`}
+                  onClick={() => {
+                    navigate(`/collections/${collection.ratingKey}`);
+                    setIsOpen(false);
+                    setIsFocused(false);
+                    setSearchQuery("");
+                  }}
+                  className={`w-full plex-dropdown-item search-dropdown-item ${
+                    index < filteredCollections.length - 1 || filteredGames.length > 0 ? "has-border" : ""
+                  }`}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      navigate(`/collections/${collection.ratingKey}`);
+                      setIsOpen(false);
+                      setIsFocused(false);
+                      setSearchQuery("");
+                    }
+                  }}
+                >
+                  {showPlaceholder ? (
+                    <div className="search-result-thumbnail">
+                      <CoverPlaceholder title={collection.title} width={40} height={60} />
+                    </div>
+                  ) : (
+                    <img
+                      src={
+                        collection.cover && collection.cover.startsWith("http")
+                          ? collection.cover
+                          : `http://127.0.0.1:4000${collection.cover || ""}`
+                      }
+                      alt={collection.title}
+                      className="object-cover rounded flex-shrink-0 search-result-thumbnail"
+                      onError={() => {
+                        setImageErrors((prev) => new Set(prev).add(collection.ratingKey));
+                      }}
+                    />
+                  )}
+                  <div className="search-result-content">
+                    <div className="text-white text-base truncate search-result-title">
+                      {collection.title}
+                    </div>
+                    <div className="text-gray-400 text-sm truncate mt-1 search-result-type">
+                      {t("search.collection")}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
             {filteredGames.map((game, index) => {
               const showPlaceholder =
                 !game.cover || imageErrors.has(game.ratingKey);
@@ -452,7 +534,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
               );
             })}
           </div>
-          {allFilteredGames.length > 0 && (
+          {(allFilteredGames.length > 0 || allFilteredCollections.length > 0) && (
             <div className="search-dropdown-footer">
               <button
                 onClick={() => {
@@ -462,6 +544,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
                     state: {
                       searchQuery: searchQuery,
                       games: allFilteredGames,
+                      collections: allFilteredCollections,
                     },
                   });
                   setSearchQuery("");
@@ -469,7 +552,7 @@ export default function SearchBar({ games, onGameSelect, onPlay }: SearchBarProp
                 }}
                 className="search-view-all-button"
               >
-                {t("search.viewAllResults", { count: allFilteredGames.length })}
+                {t("search.viewAllResults", { count: allFilteredGames.length + allFilteredCollections.length })}
               </button>
             </div>
           )}

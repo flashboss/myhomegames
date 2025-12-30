@@ -13,8 +13,15 @@ type GameItem = {
   stars?: number | null;
 };
 
+type CollectionItem = {
+  ratingKey: string;
+  title: string;
+  cover?: string;
+};
+
 type HeaderProps = {
   allGames: GameItem[];
+  allCollections: CollectionItem[];
   onGameSelect: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onHomeClick: () => void;
@@ -24,6 +31,7 @@ type HeaderProps = {
 
 export default function Header({
   allGames,
+  allCollections,
   onGameSelect,
   onPlay,
   onHomeClick,
@@ -46,7 +54,7 @@ export default function Header({
 
         {/* SearchBar in the center */}
         <div className="plex-search-container">
-          <SearchBar games={allGames} onGameSelect={onGameSelect} onPlay={onPlay} />
+          <SearchBar games={allGames} collections={allCollections} onGameSelect={onGameSelect} onPlay={onPlay} />
         </div>
 
         {/* Buttons on the right */}

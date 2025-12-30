@@ -50,12 +50,82 @@ function buildCoverUrl(apiBase: string, cover?: string) {
   return u.toString();
 }
 
+type CollectionItem = {
+  ratingKey: string;
+  title: string;
+  cover?: string;
+};
+
 function AppContent() {
   const [allGames, setAllGames] = useState<GameItem[]>([]);
+  const [allCollections, setAllCollections] = useState<CollectionItem[]>([]);
   const [playerUrl, setPlayerUrl] = useState<string | null>(null);
   const [addGameOpen, setAddGameOpen] = useState(false);
   const navigate = useNavigate();
   const { i18n } = useTranslation();
+
+  // Load games on app startup for search
+  useEffect(() => {
+    async function loadGames() {
+      try {
+        const url = buildApiUrl("/libraries/library/games", {
+          sort: "title",
+        });
+        const res = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+            "X-Auth-Token": API_TOKEN,
+          },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const items = (json.games || []) as any[];
+        const parsed = items.map((v) => ({
+          ratingKey: v.id,
+          title: v.title,
+          summary: v.summary,
+          cover: v.cover,
+          day: v.day,
+          month: v.month,
+          year: v.year,
+          stars: v.stars,
+        }));
+        setAllGames(parsed);
+      } catch (err: any) {
+        const errorMessage = String(err.message || err);
+        console.error("Error loading games for search:", errorMessage);
+      }
+    }
+    loadGames();
+  }, []);
+
+  // Load collections on app startup
+  useEffect(() => {
+    async function loadCollections() {
+      try {
+        const url = buildApiUrl("/collections");
+        const res = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+            "X-Auth-Token": API_TOKEN,
+          },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const items = (json.collections || []) as any[];
+        const parsed = items.map((v) => ({
+          ratingKey: v.id,
+          title: v.title,
+          cover: v.cover,
+        }));
+        setAllCollections(parsed);
+      } catch (err: any) {
+        const errorMessage = String(err.message || err);
+        console.error("Error loading collections:", errorMessage);
+      }
+    }
+    loadCollections();
+  }, []);
 
   // Load settings from server on app startup
   useEffect(() => {
@@ -121,6 +191,7 @@ function AppContent() {
         <Header
           onPlay={openLauncher}
           allGames={allGames}
+          allCollections={allCollections}
           onGameSelect={handleGameSelect}
           onHomeClick={() => navigate("/")}
           onSettingsClick={() => navigate("/settings")}

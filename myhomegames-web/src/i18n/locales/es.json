@@ -33,7 +33,8 @@
     "noResults": "No se encontraron resultados para el término \"{{query}}\"",
     "viewAllResults": "Ver todos los resultados ({{count}})",
     "placeholder": "Buscar juegos...",
-    "recentSearches": "Búsquedas Recientes"
+    "recentSearches": "Búsquedas Recientes",
+    "collection": "Colección"
   },
   "searchResults": {
     "title": "Resultados de búsqueda: \"{{query}}\"",

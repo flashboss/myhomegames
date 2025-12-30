@@ -33,7 +33,8 @@
     "noResults": "用語 \"{{query}}\" の結果が見つかりません",
     "viewAllResults": "すべての結果を表示 ({{count}})",
     "placeholder": "ゲームを検索...",
-    "recentSearches": "最近の検索"
+    "recentSearches": "最近の検索",
+    "collection": "コレクション"
   },
   "searchResults": {
     "title": "検索結果: \"{{query}}\"",

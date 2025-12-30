@@ -33,7 +33,8 @@
     "noResults": "Keine Ergebnisse für den Begriff \"{{query}}\" gefunden",
     "viewAllResults": "Alle Ergebnisse anzeigen ({{count}})",
     "placeholder": "Spiele suchen...",
-    "recentSearches": "Letzte Suchen"
+    "recentSearches": "Letzte Suchen",
+    "collection": "Sammlung"
   },
   "searchResults": {
     "title": "Suchergebnisse: \"{{query}}\"",

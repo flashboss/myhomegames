@@ -33,7 +33,8 @@
     "noResults": "未找到术语 \"{{query}}\" 的结果",
     "viewAllResults": "查看所有结果 ({{count}})",
     "placeholder": "搜索游戏...",
-    "recentSearches": "最近搜索"
+    "recentSearches": "最近搜索",
+    "collection": "收藏"
   },
   "searchResults": {
     "title": "搜索结果: \"{{query}}\"",

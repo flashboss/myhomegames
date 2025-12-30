@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
 import "./SearchResultsList.css";
 
+import { useNavigate } from "react-router-dom";
+
 type GameItem = {
   ratingKey: string;
   title: string;
@@ -14,8 +16,15 @@ type GameItem = {
   stars?: number | null;
 };
 
+type CollectionItem = {
+  ratingKey: string;
+  title: string;
+  cover?: string;
+};
+
 type SearchResultsListProps = {
   games: GameItem[];
+  collections: CollectionItem[];
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
@@ -119,8 +128,65 @@ function SearchResultItem({
   );
 }
 
+function CollectionResultItem({
+  collection,
+  apiBase,
+  buildCoverUrl,
+}: {
+  collection: CollectionItem;
+  apiBase: string;
+  buildCoverUrl: (apiBase: string, cover?: string) => string;
+}) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [imageError, setImageError] = useState(false);
+  const showPlaceholder = !collection.cover || imageError;
+  const coverHeight = FIXED_COVER_SIZE * 1.5;
+
+  return (
+    <div
+      key={collection.ratingKey}
+      className="group cursor-pointer mb-6 search-results-list-item"
+      onClick={() => navigate(`/collections/${collection.ratingKey}`)}
+    >
+      <div
+        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover cover-hover-effect"
+        style={{
+          height: `${coverHeight}px`,
+        }}
+      >
+        {showPlaceholder ? (
+          <CoverPlaceholder
+            title={collection.title}
+            width={FIXED_COVER_SIZE}
+            height={coverHeight}
+          />
+        ) : (
+          <img
+            src={buildCoverUrl(apiBase, collection.cover)}
+            alt={collection.title}
+            className="object-cover w-full h-full"
+            onError={() => {
+              setImageError(true);
+            }}
+          />
+        )}
+      </div>
+      <div className="search-results-list-content">
+        <div className="text-white mb-2 search-results-list-title">
+          {collection.title}
+        </div>
+        <div className="text-gray-400 mb-2 search-results-list-summary">
+          {t("search.collection")}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SearchResultsList({
   games,
+  collections,
   apiBase,
   onGameClick,
   onPlay,
@@ -128,12 +194,21 @@ export default function SearchResultsList({
 }: SearchResultsListProps) {
   const { t } = useTranslation();
   
-  if (games.length === 0) {
+  const totalResults = games.length + collections.length;
+  if (totalResults === 0) {
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
   return (
     <div className="search-results-list-container">
+      {collections.map((collection) => (
+        <CollectionResultItem
+          key={`collection-${collection.ratingKey}`}
+          collection={collection}
+          apiBase={apiBase}
+          buildCoverUrl={buildCoverUrl}
+        />
+      ))}
       {games.map((game) => (
         <SearchResultItem
           key={game.ratingKey}

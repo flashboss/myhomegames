@@ -8,6 +8,18 @@ type CategoryItem = {
   cover?: string;
 };
 
+type GameItem = {
+  ratingKey: string;
+  title: string;
+  summary?: string;
+  cover?: string;
+  day?: number | null;
+  month?: number | null;
+  year?: number | null;
+  stars?: number | null;
+  genre?: string | string[];
+};
+
 type CategoriesPageProps = {
   apiBase: string;
   apiToken: string;
@@ -23,7 +35,9 @@ export default function CategoriesPage({
   buildCoverUrl,
   coverSize,
 }: CategoriesPageProps) {
+  const [allCategories, setAllCategories] = useState<CategoryItem[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -34,11 +48,40 @@ export default function CategoriesPage({
 
   useEffect(() => {
     fetchCategories();
+    fetchLibraryGames();
   }, []);
+
+  // Filter categories to only those with games available
+  useEffect(() => {
+    if (games.length === 0 || allCategories.length === 0) {
+      setCategories([]);
+      return;
+    }
+
+    // Extract unique genre IDs and titles from games
+    const genresInGames = new Set<string>();
+    games.forEach((game) => {
+      if (game.genre) {
+        if (Array.isArray(game.genre)) {
+          game.genre.forEach((g) => genresInGames.add(g));
+        } else if (typeof game.genre === "string") {
+          genresInGames.add(game.genre);
+        }
+      }
+    });
+
+    // Filter categories to only those present in games
+    const filteredCategories = allCategories.filter((category) => {
+      // Check if the category ID or title matches any genre in games
+      return genresInGames.has(category.ratingKey) || genresInGames.has(category.title);
+    });
+
+    setCategories(filteredCategories);
+  }, [games, allCategories]);
 
   // Hide content until fully rendered
   useLayoutEffect(() => {
-    if (!loading && categories.length > 0) {
+    if (!loading && (categories.length > 0 || (allCategories.length > 0 && games.length > 0))) {
       // Wait for next frame to ensure DOM is ready
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -48,10 +91,9 @@ export default function CategoriesPage({
     } else if (loading) {
       setIsReady(false);
     }
-  }, [loading, categories.length]);
+  }, [loading, categories.length, allCategories.length, games.length]);
 
   async function fetchCategories() {
-    setLoading(true);
     try {
       const url = buildApiUrl(apiBase, "/categories");
       const res = await fetch(url, {
@@ -68,10 +110,43 @@ export default function CategoriesPage({
         title: v.title,
         cover: v.cover,
       }));
-      setCategories(parsed);
+      setAllCategories(parsed);
     } catch (err: any) {
       const errorMessage = String(err.message || err);
       console.error("Error fetching categories:", errorMessage);
+    }
+  }
+
+  async function fetchLibraryGames() {
+    setLoading(true);
+    try {
+      const url = buildApiUrl(apiBase, "/libraries/library/games", {
+        sort: "title",
+      });
+      const res = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "X-Auth-Token": apiToken,
+        },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const items = (json.games || []) as any[];
+      const parsed = items.map((v) => ({
+        ratingKey: v.id,
+        title: v.title,
+        summary: v.summary,
+        cover: v.cover,
+        day: v.day,
+        month: v.month,
+        year: v.year,
+        stars: v.stars,
+        genre: v.genre,
+      }));
+      setGames(parsed);
+    } catch (err: any) {
+      const errorMessage = String(err.message || err);
+      console.error("Error fetching library games:", errorMessage);
     } finally {
       setLoading(false);
     }

@@ -16,6 +16,12 @@ type GameItem = {
   stars?: number | null;
 };
 
+type CollectionItem = {
+  ratingKey: string;
+  title: string;
+  cover?: string;
+};
+
 type SearchResultsPageProps = {
   apiBase: string;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
@@ -39,8 +45,8 @@ export default function SearchResultsPage({
   useScrollRestoration(scrollContainerRef);
 
   // Retrieve data from location state
-  const { searchQuery, games } =
-    (location.state as { searchQuery?: string; games?: GameItem[] }) || {};
+  const { searchQuery, games, collections } =
+    (location.state as { searchQuery?: string; games?: GameItem[]; collections?: CollectionItem[] }) || {};
 
   // Check if we came from game detail page and should redirect
   useLayoutEffect(() => {
@@ -55,7 +61,7 @@ export default function SearchResultsPage({
 
   // Hide content until fully rendered
   useLayoutEffect(() => {
-    if (games && games.length > 0) {
+    if ((games && games.length > 0) || (collections && collections.length > 0)) {
       // Wait for next frame to ensure DOM is ready
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -65,7 +71,7 @@ export default function SearchResultsPage({
     } else {
       setIsReady(false);
     }
-  }, [games]);
+  }, [games, collections]);
 
   if (!searchQuery) {
     return (
@@ -77,7 +83,8 @@ export default function SearchResultsPage({
     );
   }
 
-  if (!games || games.length === 0) {
+  const totalResults = (games?.length || 0) + (collections?.length || 0);
+  if (totalResults === 0) {
     return (
       <div className="bg-[#1a1a1a] text-white search-results-page">
         <div className="search-results-header">
@@ -142,14 +149,15 @@ export default function SearchResultsPage({
             {t("searchResults.title", { query: searchQuery })}
           </div>
           <div className="search-results-count">
-            {t("searchResults.foundGames", { count: games.length })}
+            {t("searchResults.foundGames", { count: totalResults })}
           </div>
         </div>
       </div>
       <div ref={scrollContainerRef} className="search-results-content">
         <div className="search-results-content-inner">
           <SearchResultsList
-            games={games}
+            games={games || []}
+            collections={collections || []}
             apiBase={apiBase}
             onGameClick={onGameClick}
             onPlay={onPlay}
