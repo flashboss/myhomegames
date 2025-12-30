@@ -92,7 +92,7 @@ export default function GameDetail({
           onBackgroundVisibilityChange={setIsBackgroundVisible}
         />
       </div>
-      <div style={{ position: 'relative', zIndex: 2, minHeight: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', zIndex: 2, height: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
         <div 
           className="home-page-main-container"
           style={{
@@ -101,12 +101,13 @@ export default function GameDetail({
             flex: 1,
             overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: 0
           }}
         >
-          <main className="flex-1 home-page-content" style={{ position: 'relative', zIndex: 1 }}>
-          <div className="home-page-layout">
-            <div className="home-page-content-wrapper">
+          <main className="flex-1 home-page-content" style={{ position: 'relative', zIndex: 1, minHeight: 0 }}>
+          <div className="home-page-layout" style={{ minHeight: 0 }}>
+            <div className="home-page-content-wrapper" style={{ minHeight: 0 }}>
               <div
                 className="home-page-scroll-container"
                 style={{ paddingLeft: '64px', paddingRight: '64px', paddingTop: '5px', paddingBottom: '32px' }}

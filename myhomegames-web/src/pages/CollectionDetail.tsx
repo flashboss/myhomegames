@@ -54,7 +54,6 @@ export default function CollectionDetail({
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [sortAscending] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(true);
   const [viewMode] = useState<"grid" | "detail" | "table">("grid");
@@ -158,15 +157,31 @@ export default function CollectionDetail({
     }
   }
 
-  // Sort games
+  // Sort games by year
   const sortedGames = useMemo(() => {
     const sorted = [...games];
     sorted.sort((a, b) => {
-      const compareResult = (a.title || "").localeCompare(b.title || "");
-      return sortAscending ? compareResult : -compareResult;
+      const yearA = a.year ?? 0;
+      const yearB = b.year ?? 0;
+      
+      // If both have years, sort by year
+      if (yearA !== 0 && yearB !== 0) {
+        return yearA - yearB;
+      }
+      
+      // If only one has a year, put the one with year first
+      if (yearA !== 0 && yearB === 0) {
+        return -1;
+      }
+      if (yearA === 0 && yearB !== 0) {
+        return 1;
+      }
+      
+      // If neither has a year, sort by title
+      return (a.title || "").localeCompare(b.title || "");
     });
     return sorted;
-  }, [games, sortAscending]);
+  }, [games]);
 
   // Calculate year range from games
   const yearRange = useMemo(() => {
@@ -252,7 +267,7 @@ export default function CollectionDetail({
         onBackgroundVisibilityChange={setIsBackgroundVisible}
       />
       </div>
-      <div style={{ position: 'relative', zIndex: 2, minHeight: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', zIndex: 2, height: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
         <div 
           className="home-page-main-container"
           style={{
@@ -261,16 +276,18 @@ export default function CollectionDetail({
             flex: 1,
             overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: 0
           }}
         >
-        <main className="flex-1 home-page-content">
-      <div className="home-page-layout">
+        <main className="flex-1 home-page-content" style={{ minHeight: 0 }}>
+      <div className="home-page-layout" style={{ minHeight: 0 }}>
         <div 
           className="home-page-content-wrapper"
           style={{
             opacity: isReady ? 1 : 0,
             transition: 'opacity 0.2s ease-in-out',
+            minHeight: 0
           }}
         >
           {/* Games List */}

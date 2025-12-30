@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   margin-right: 3px;
-  transform: translateY(2px);
+  transform: translateY(3px);
 }
 
 .plex-libraries-actions-view-mode-container {

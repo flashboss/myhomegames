@@ -9,6 +9,7 @@ type GameItem = {
   summary?: string;
   cover?: string;
   stars?: number | null;
+  year?: number | null;
 };
 
 type GamesListProps = {
@@ -63,7 +64,7 @@ function GameListItem({
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
       onClick={() => onGameClick(game)}
     >
-      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 games-list-cover cover-hover-effect">
+      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden games-list-cover transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 cover-hover-effect">
         {showPlaceholder ? (
           <CoverPlaceholder
             title={game.title}
@@ -103,7 +104,12 @@ function GameListItem({
           </button>
         )}
       </div>
-      <div className="truncate games-list-title">{game.title}</div>
+      <div className="games-list-title-wrapper">
+        <div className="truncate games-list-title">{game.title}</div>
+        {game.year != null && typeof game.year === 'number' && (
+          <div className="games-list-year">{game.year}</div>
+        )}
+      </div>
     </div>
   );
 }
