@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import CollectionsList from "../components/lists/CollectionsList";
 import AlphabetNavigator from "../components/ui/AlphabetNavigator";
+import { compareTitles } from "../utils/stringUtils";
 
 type CollectionItem = {
   ratingKey: string;
@@ -92,7 +93,7 @@ export default function CollectionsPage({
   const sortedCollections = useMemo(() => {
     const sorted = [...collections];
     sorted.sort((a, b) => {
-      const compareResult = (a.title || "").localeCompare(b.title || "");
+      const compareResult = compareTitles(a.title || "", b.title || "");
       return sortAscending ? compareResult : -compareResult;
     });
     return sorted;

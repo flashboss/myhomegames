@@ -20,6 +20,8 @@ type GamesListProps = {
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
+  draggable?: boolean;
+  onDragEnd?: (sourceIndex: number, destinationIndex: number) => void;
 };
 
 type GameListItemProps = {
@@ -30,6 +32,13 @@ type GameListItemProps = {
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
+  draggable?: boolean;
+  index: number;
+  onDragStart: (index: number) => void;
+  onDragOver: (index: number) => void;
+  onDragEnd: () => void;
+  isDragging: boolean;
+  dragOverIndex: number | null;
 };
 
 function GameListItem({
@@ -40,6 +49,13 @@ function GameListItem({
   buildCoverUrl,
   coverSize,
   itemRefs,
+  draggable = false,
+  index,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  isDragging,
+  dragOverIndex,
 }: GameListItemProps) {
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !game.cover || imageError;
@@ -52,6 +68,27 @@ function GameListItem({
     }
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    if (!draggable) return;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", index.toString());
+    onDragStart(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (!draggable) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    onDragOver(index);
+  };
+
+  const handleDragEnd = () => {
+    if (!draggable) return;
+    onDragEnd();
+  };
+
+  const isDragOver = dragOverIndex === index && isDragging;
+
   return (
     <div
       key={game.ratingKey}
@@ -60,9 +97,25 @@ function GameListItem({
           itemRefs.current.set(game.ratingKey, el);
         }
       }}
-      className="group cursor-pointer games-list-item"
+      className={`group cursor-pointer games-list-item ${draggable ? 'games-list-item-draggable' : ''} ${isDragOver ? 'games-list-item-drag-over' : ''}`}
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
       onClick={() => onGameClick(game)}
+      draggable={draggable}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+      onDragLeave={(e) => {
+        if (!draggable) return;
+        // Only clear dragOver if we're actually leaving the element
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX;
+        const y = e.clientY;
+        if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+          if (dragOverIndex === index) {
+            onDragOver(-1);
+          }
+        }
+      }}
     >
       <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden games-list-cover transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 cover-hover-effect">
         {showPlaceholder ? (
@@ -122,8 +175,29 @@ export default function GamesList({
   buildCoverUrl,
   coverSize = 150,
   itemRefs,
+  draggable = false,
+  onDragEnd,
 }: GamesListProps) {
   const { t } = useTranslation();
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (index: number) => {
+    if (draggedIndex === null || draggedIndex === index) return;
+    setDragOverIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    if (draggedIndex !== null && dragOverIndex !== null && draggedIndex !== dragOverIndex && onDragEnd) {
+      onDragEnd(draggedIndex, dragOverIndex);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
   
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
@@ -134,7 +208,7 @@ export default function GamesList({
       className="games-list-container"
       style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)` }}
     >
-      {games.map((game) => (
+      {games.map((game, index) => (
         <GameListItem
           key={game.ratingKey}
           game={game}
@@ -144,6 +218,13 @@ export default function GamesList({
           buildCoverUrl={buildCoverUrl}
           coverSize={coverSize}
           itemRefs={itemRefs}
+          draggable={draggable}
+          index={index}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          isDragging={draggedIndex !== null}
+          dragOverIndex={dragOverIndex}
         />
       ))}
     </div>

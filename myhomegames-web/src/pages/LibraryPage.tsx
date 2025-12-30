@@ -7,6 +7,7 @@ import AlphabetNavigator from "../components/ui/AlphabetNavigator";
 import GamesListToolbar from "../components/games/GamesListToolbar";
 import type { ViewMode } from "../components/layout/LibrariesBar";
 import type { FilterField } from "../components/filters/types";
+import { compareTitles } from "../utils/stringUtils";
 
 type GameItem = {
   ratingKey: string;
@@ -342,7 +343,7 @@ export default function LibraryPage({
       let compareResult = 0;
       switch (sortField) {
         case "title":
-          compareResult = (a.title || "").localeCompare(b.title || "");
+          compareResult = compareTitles(a.title || "", b.title || "");
           break;
         case "year":
           const yearA = a.year ?? 0;

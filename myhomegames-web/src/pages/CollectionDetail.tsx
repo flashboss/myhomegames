@@ -8,6 +8,7 @@ import LibrariesBar from "../components/layout/LibrariesBar";
 import StarRating from "../components/common/StarRating";
 import Summary from "../components/common/Summary";
 import BackgroundManager from "../components/common/BackgroundManager";
+import { compareTitles } from "../utils/stringUtils";
 import "./CollectionDetail.css";
 
 type GameItem = {
@@ -61,6 +62,7 @@ export default function CollectionDetail({
     const saved = localStorage.getItem("coverSize");
     return saved ? parseInt(saved, 10) : 150;
   });
+  const [customOrder, setCustomOrder] = useState<string[] | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
   
@@ -157,8 +159,15 @@ export default function CollectionDetail({
     }
   }
 
-  // Sort games by year
+  // Sort games by year or custom order
   const sortedGames = useMemo(() => {
+    if (customOrder && customOrder.length === games.length) {
+      // Use custom order if available
+      const gameMap = new Map(games.map(g => [g.ratingKey, g]));
+      return customOrder.map(id => gameMap.get(id)).filter(Boolean) as GameItem[];
+    }
+    
+    // Otherwise sort by year
     const sorted = [...games];
     sorted.sort((a, b) => {
       const yearA = a.year ?? 0;
@@ -177,11 +186,49 @@ export default function CollectionDetail({
         return 1;
       }
       
-      // If neither has a year, sort by title
-      return (a.title || "").localeCompare(b.title || "");
+      // If neither has a year, sort by title (ignoring special characters)
+      return compareTitles(a.title || "", b.title || "");
     });
     return sorted;
-  }, [games]);
+  }, [games, customOrder]);
+
+  // Handle drag end to reorder games
+  const handleDragEnd = async (sourceIndex: number, destinationIndex: number) => {
+    if (sourceIndex === destinationIndex) return;
+
+    const newGames = [...sortedGames];
+    const [removed] = newGames.splice(sourceIndex, 1);
+    newGames.splice(destinationIndex, 0, removed);
+
+    // Update local state immediately
+    const newOrder = newGames.map(g => g.ratingKey);
+    setCustomOrder(newOrder);
+    setGames(newGames);
+
+    // Save to backend
+    if (collectionId) {
+      try {
+        const url = buildApiUrl(apiBase, `/collections/${collectionId}/games/order`);
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Auth-Token': apiToken,
+          },
+          body: JSON.stringify({ gameIds: newOrder }),
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+      } catch (err: any) {
+        const errorMessage = String(err.message || err);
+        console.error("Error saving collection order:", errorMessage);
+        // Revert on error
+        setCustomOrder(null);
+        fetchCollectionGames(collectionId);
+      }
+    }
+  };
 
   // Calculate year range from games
   const yearRange = useMemo(() => {
@@ -471,6 +518,8 @@ export default function CollectionDetail({
                     buildCoverUrl={buildCoverUrl}
                     coverSize={coverSize}
                     itemRefs={itemRefs}
+                    draggable={true}
+                    onDragEnd={handleDragEnd}
                   />
                 </div>
               </div>

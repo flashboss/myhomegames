@@ -81,6 +81,36 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
     res.json({ games: collectionGames });
   });
 
+  // Endpoint: update games order for a collection
+  app.put("/collections/:id/games/order", requireToken, (req, res) => {
+    const collectionId = req.params.id;
+    const { gameIds } = req.body;
+    
+    if (!Array.isArray(gameIds)) {
+      return res.status(400).json({ error: "gameIds must be an array" });
+    }
+
+    const collectionIndex = collectionsCache.findIndex((c) => c.id === collectionId);
+    
+    if (collectionIndex === -1) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+
+    // Update the games array with the new order
+    collectionsCache[collectionIndex].games = gameIds;
+
+    // Save to file
+    const fileName = "games-collections.json";
+    const filePath = path.join(metadataGamesDir, fileName);
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(collectionsCache, null, 2), "utf8");
+      res.json({ status: "success" });
+    } catch (e) {
+      console.error(`Failed to save ${fileName}:`, e.message);
+      res.status(500).json({ error: "Failed to save collection order" });
+    }
+  });
+
   // Endpoint: serve collection cover image (public, no auth required for images)
   app.get("/collection-covers/:collectionId", (req, res) => {
     const collectionId = decodeURIComponent(req.params.collectionId);

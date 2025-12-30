@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
+import { compareTitles } from "../utils/stringUtils";
 
 type GameItem = {
   ratingKey: string;
@@ -98,7 +99,7 @@ export default function RecommendedPage({
 
   // Sort games by title for alphabet navigator
   const sortedGames = [...games].sort((a, b) => 
-    (a.title || "").localeCompare(b.title || "")
+    compareTitles(a.title || "", b.title || "")
   );
 
   return (
