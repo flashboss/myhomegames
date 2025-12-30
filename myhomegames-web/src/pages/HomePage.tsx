@@ -201,62 +201,57 @@ export default function HomePage({
       />
 
       <div className="bg-[#1a1a1a] home-page-main-container">
-        <main className={`flex-1 home-page-content`}>
-          {!activeLibrary ? (
-            <div className="flex items-center justify-center h-full">
-            </div>
-          ) : (
-            <>
-              {activeLibrary.key === "libreria" && (
-                <LibraryPage
-                  apiBase={apiBase}
-                  apiToken={apiToken}
-                  onGameClick={handleGameClick}
-                  onGamesLoaded={handleGamesLoaded}
-                  onPlay={onPlay}
-                  buildApiUrl={buildApiUrl}
-                  buildCoverUrl={buildCoverUrl}
-                  coverSize={coverSize}
-                  viewMode={viewMode}
-                />
-              )}
-              {activeLibrary.key === "consigliati" && (
-                <RecommendedPage
-                  apiBase={apiBase}
-                  apiToken={apiToken}
-                  onGameClick={handleGameClick}
-                  onGamesLoaded={handleGamesLoaded}
-                  onPlay={onPlay}
-                  buildApiUrl={buildApiUrl}
-                  buildCoverUrl={buildCoverUrl}
-                  coverSize={coverSize}
-                />
-              )}
-              {activeLibrary.key === "raccolte" && (
-                <CollectionsPage
-                  apiBase={apiBase}
-                  apiToken={apiToken}
-                  onGameClick={handleGameClick}
-                  onGamesLoaded={handleGamesLoaded}
-                  onPlay={onPlay}
-                  buildApiUrl={buildApiUrl}
-                  buildCoverUrl={buildCoverUrl}
-                  coverSize={coverSize}
-                />
-              )}
-              {activeLibrary.key === "categorie" && (
-                <CategoriesPage
-                  apiBase={apiBase}
-                  apiToken={apiToken}
-                  onGameClick={handleGameClick}
-                  buildApiUrl={buildApiUrl}
-                  buildCoverUrl={buildCoverUrl}
-                  coverSize={coverSize}
-                />
-              )}
-            </>
-          )}
-        </main>
+        {!activeLibrary ? (
+          <div className="flex items-center justify-center h-full">
+          </div>
+        ) : (
+          <>
+            {activeLibrary.key === "libreria" && (
+              <LibraryPage
+                apiBase={apiBase}
+                apiToken={apiToken}
+                onGameClick={handleGameClick}
+                onGamesLoaded={handleGamesLoaded}
+                onPlay={onPlay}
+                buildApiUrl={buildApiUrl}
+                buildCoverUrl={buildCoverUrl}
+                coverSize={coverSize}
+                viewMode={viewMode}
+              />
+            )}
+            {activeLibrary.key === "consigliati" && (
+              <RecommendedPage
+                apiBase={apiBase}
+                apiToken={apiToken}
+                onGameClick={handleGameClick}
+                onGamesLoaded={handleGamesLoaded}
+                onPlay={onPlay}
+                buildApiUrl={buildApiUrl}
+                buildCoverUrl={buildCoverUrl}
+                coverSize={coverSize}
+              />
+            )}
+            {activeLibrary.key === "raccolte" && (
+              <CollectionsPage
+                apiBase={apiBase}
+                apiToken={apiToken}
+                onPlay={onPlay}
+                buildApiUrl={buildApiUrl}
+                buildCoverUrl={buildCoverUrl}
+                coverSize={coverSize}
+              />
+            )}
+            {activeLibrary.key === "categorie" && (
+              <CategoriesPage
+                apiBase={apiBase}
+                apiToken={apiToken}
+                buildApiUrl={buildApiUrl}
+                buildCoverUrl={buildCoverUrl}
+                coverSize={coverSize}
+              />
+            )}
+          </>
+        )}
       </div>
     </>
   );

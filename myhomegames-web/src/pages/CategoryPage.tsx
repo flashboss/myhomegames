@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import GamesList from "../components/GamesList";
 import GamesListDetail from "../components/GamesListDetail";
 import GamesListTable from "../components/GamesListTable";
 import AlphabetNavigator from "../components/AlphabetNavigator";
 import GamesListToolbar from "../components/GamesListToolbar";
-import type { ViewMode } from "../components/LibrariesBar";
+import LibrariesBar, { type ViewMode } from "../components/LibrariesBar";
 
 type GameItem = {
   ratingKey: string;
@@ -18,7 +19,7 @@ type GameItem = {
   genre?: string | string[];
 };
 
-type LibraryPageProps = {
+type CategoryPageProps = {
   apiBase: string;
   apiToken: string;
   onGameClick: (game: GameItem) => void;
@@ -26,11 +27,9 @@ type LibraryPageProps = {
   onPlay?: (game: GameItem) => void;
   buildApiUrl: (apiBase: string, path: string, params?: Record<string, string | number | boolean>) => string;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
-  coverSize: number;
-  viewMode: ViewMode;
 };
 
-export default function LibraryPage({
+export default function CategoryPage({
   apiBase,
   apiToken,
   onGameClick,
@@ -38,43 +37,29 @@ export default function LibraryPage({
   onPlay,
   buildApiUrl,
   buildCoverUrl,
-  coverSize,
-  viewMode,
-}: LibraryPageProps) {
+}: CategoryPageProps) {
+  const { categoryId } = useParams<{ categoryId: string }>();
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterField, setFilterField] = useState<"all" | "genre" | "year" | "decade" | "collection">(() => {
-    const saved = localStorage.getItem("libraryFilterField");
-    return (saved as "all" | "genre" | "year" | "decade" | "collection") || "all";
+  const coverSize = (() => {
+    const saved = localStorage.getItem("coverSize");
+    return saved ? parseInt(saved, 10) : 150;
+  })();
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem("viewMode_category");
+    return (saved as ViewMode) || "grid";
   });
-  const [selectedYear, setSelectedYear] = useState<number | null>(() => {
-    const saved = localStorage.getItem("librarySelectedYear");
-    return saved ? parseInt(saved, 10) : null;
-  });
-  const [selectedDecade, setSelectedDecade] = useState<number | null>(() => {
-    const saved = localStorage.getItem("librarySelectedDecade");
-    return saved ? parseInt(saved, 10) : null;
-  });
-  const [selectedCollection, setSelectedCollection] = useState<string | null>(() => {
-    const saved = localStorage.getItem("librarySelectedCollection");
-    return saved || null;
-  });
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(() => {
-    const saved = localStorage.getItem("librarySelectedGenre");
-    return saved || null;
-  });
+  const [filterField, setFilterField] = useState<"all" | "genre" | "year" | "decade" | "collection">("genre");
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedDecade, setSelectedDecade] = useState<number | null>(null);
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [allGenres, setAllGenres] = useState<Array<{ id: string; title: string }>>([]);
   const [availableGenres, setAvailableGenres] = useState<Array<{ id: string; title: string }>>([]);
   const [availableCollections, setAvailableCollections] = useState<Array<{ id: string; title: string }>>([]);
   const [collectionGameIds, setCollectionGameIds] = useState<Map<string, string[]>>(new Map());
-  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">(() => {
-    const saved = localStorage.getItem("librarySortField");
-    return (saved as "title" | "year" | "stars" | "releaseDate") || "title";
-  });
-  const [sortAscending, setSortAscending] = useState<boolean>(() => {
-    const saved = localStorage.getItem("librarySortAscending");
-    return saved ? saved === "true" : true;
-  });
+  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">("title");
+  const [sortAscending, setSortAscending] = useState<boolean>(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -85,84 +70,27 @@ export default function LibraryPage({
     fetchCollections();
   }, []);
 
-  // Save filter and sort state to localStorage
+  // Save view mode to localStorage
   useEffect(() => {
-    localStorage.setItem("libraryFilterField", filterField);
-  }, [filterField]);
+    localStorage.setItem("viewMode_category", viewMode);
+  }, [viewMode]);
 
+  // Handler to change view mode
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+  };
+
+  // Set genre filter when categoryId changes
   useEffect(() => {
-    if (selectedYear !== null) {
-      localStorage.setItem("librarySelectedYear", selectedYear.toString());
-    } else {
-      localStorage.removeItem("librarySelectedYear");
-    }
-  }, [selectedYear]);
-
-  useEffect(() => {
-    if (selectedGenre !== null) {
-      localStorage.setItem("librarySelectedGenre", selectedGenre);
-    } else {
-      localStorage.removeItem("librarySelectedGenre");
-    }
-  }, [selectedGenre]);
-
-  useEffect(() => {
-    if (selectedDecade !== null) {
-      localStorage.setItem("librarySelectedDecade", selectedDecade.toString());
-    } else {
-      localStorage.removeItem("librarySelectedDecade");
-    }
-  }, [selectedDecade]);
-
-  useEffect(() => {
-    if (selectedCollection !== null) {
-      localStorage.setItem("librarySelectedCollection", selectedCollection);
-    } else {
-      localStorage.removeItem("librarySelectedCollection");
-    }
-  }, [selectedCollection]);
-
-  useEffect(() => {
-    localStorage.setItem("librarySortField", sortField);
-  }, [sortField]);
-
-  useEffect(() => {
-    localStorage.setItem("librarySortAscending", sortAscending.toString());
-  }, [sortAscending]);
-
-  // Update available genres based on games in the library
-  useEffect(() => {
-    if (games.length === 0 || allGenres.length === 0) return;
-
-    // Extract unique genre IDs and titles from games
-    const genresInGames = new Set<string>();
-    games.forEach((game) => {
-      if (game.genre) {
-        if (Array.isArray(game.genre)) {
-          game.genre.forEach((g) => genresInGames.add(g));
-        } else if (typeof game.genre === "string") {
-          genresInGames.add(game.genre);
-        }
-      }
-    });
-
-    // Filter all genres to only those present in games
-    const filteredGenres = allGenres.filter((genre) => {
-      // Check if the genre ID or title matches any genre in games
-      return genresInGames.has(genre.id) || genresInGames.has(genre.title);
-    });
-
-    setAvailableGenres(filteredGenres);
-
-    // Validate selected genre - if it's no longer available, reset it
-    if (selectedGenre !== null && filterField === "genre") {
-      const genreExists = filteredGenres.some((g) => g.id === selectedGenre);
-      if (!genreExists) {
-        setSelectedGenre(null);
-        setFilterField("all");
+    if (categoryId && allGenres.length > 0) {
+      // Find the genre by ID or title
+      const genre = allGenres.find((g) => g.id === categoryId || g.title === categoryId);
+      if (genre) {
+        setSelectedGenre(genre.id);
+        setFilterField("genre");
       }
     }
-  }, [games, allGenres, selectedGenre, filterField]);
+  }, [categoryId, allGenres]);
 
   async function fetchCategories() {
     try {
@@ -262,12 +190,45 @@ export default function LibraryPage({
       onGamesLoaded(parsed);
     } catch (err: any) {
       const errorMessage = String(err.message || err);
-      // Error is handled by parent component
       console.error("Error fetching library games:", errorMessage);
     } finally {
       setLoading(false);
     }
   }
+
+  // Update available genres based on games in the library
+  useEffect(() => {
+    if (games.length === 0 || allGenres.length === 0) return;
+
+    // Extract unique genre IDs and titles from games
+    const genresInGames = new Set<string>();
+    games.forEach((game) => {
+      if (game.genre) {
+        if (Array.isArray(game.genre)) {
+          game.genre.forEach((g) => genresInGames.add(g));
+        } else if (typeof game.genre === "string") {
+          genresInGames.add(game.genre);
+        }
+      }
+    });
+
+    // Filter all genres to only those present in games
+    const filteredGenres = allGenres.filter((genre) => {
+      // Check if the genre ID or title matches any genre in games
+      return genresInGames.has(genre.id) || genresInGames.has(genre.title);
+    });
+
+    setAvailableGenres(filteredGenres);
+
+    // Validate selected genre - if it's no longer available, reset it
+    if (selectedGenre !== null && filterField === "genre") {
+      const genreExists = filteredGenres.some((g) => g.id === selectedGenre);
+      if (!genreExists) {
+        setSelectedGenre(null);
+        setFilterField("all");
+      }
+    }
+  }, [games, allGenres, selectedGenre, filterField]);
 
   // Filter and sort games
   const filteredAndSortedGames = useMemo(() => {
@@ -364,9 +325,20 @@ export default function LibraryPage({
   }, [games, filterField, selectedYear, selectedDecade, selectedGenre, selectedCollection, sortField, sortAscending, availableGenres, collectionGameIds]);
 
   return (
-    <main className="flex-1 home-page-content">
-      <div className="home-page-layout">
-      <div className={`home-page-content-wrapper ${!loading && games.length > 0 ? "has-toolbar" : ""}`}>
+    <>
+      <LibrariesBar
+        libraries={[]}
+        activeLibrary={null}
+        onSelectLibrary={() => {}}
+        loading={false}
+        error={null}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
+      />
+      <div className="bg-[#1a1a1a] home-page-main-container">
+        <main className="flex-1 home-page-content">
+          <div className="home-page-layout">
+            <div className={`home-page-content-wrapper ${!loading && games.length > 0 ? "has-toolbar" : ""}`}>
         {/* Toolbar with filter and sort */}
         {!loading && games.length > 0 && (
           <GamesListToolbar
@@ -437,21 +409,23 @@ export default function LibraryPage({
             </>
           )}
         </div>
-      </div>
+          </div>
 
-      {/* Alphabet navigator container */}
-      {sortField === "title" && (
-        <AlphabetNavigator
-          games={filteredAndSortedGames}
-          scrollContainerRef={
-            viewMode === "table" ? tableScrollRef : scrollContainerRef
-          }
-          itemRefs={itemRefs}
-          ascending={sortAscending}
-        />
-      )}
+            {/* Alphabet navigator container */}
+            {sortField === "title" && (
+              <AlphabetNavigator
+                games={filteredAndSortedGames}
+                scrollContainerRef={
+                  viewMode === "table" ? tableScrollRef : scrollContainerRef
+                }
+                itemRefs={itemRefs}
+                ascending={sortAscending}
+              />
+            )}
+          </div>
+        </main>
       </div>
-    </main>
+    </>
   );
 }
 

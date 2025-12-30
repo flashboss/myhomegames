@@ -87,44 +87,48 @@ export default function LibrariesBar({
   return (
     <div className="plex-libraries-bar">
       <div className="plex-libraries-bar-container" ref={containerRef}>
-        {isNarrow ? (
-          <div className="plex-libraries-combobox-container">
-            {loading && libraries.length === 0 ? (
-              <div className="plex-libraries-loading">{t("home.loadingLibraries")}</div>
+        {activeLibrary && (
+          <>
+            {isNarrow ? (
+              <div className="plex-libraries-combobox-container">
+                {loading && libraries.length === 0 ? (
+                  <div className="plex-libraries-loading">{t("home.loadingLibraries")}</div>
+                ) : (
+                  <select
+                    className="plex-libraries-combobox"
+                    value={activeLibrary?.key || ""}
+                    onChange={handleSelectChange}
+                  >
+                    {libraries.map((s) => (
+                      <option key={s.key} value={s.key}>
+                        {s.title || t(`libraries.${s.key}`)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {error && <div className="plex-libraries-error">{error}</div>}
+              </div>
             ) : (
-              <select
-                className="plex-libraries-combobox"
-                value={activeLibrary?.key || ""}
-                onChange={handleSelectChange}
-              >
-                {libraries.map((s) => (
-                  <option key={s.key} value={s.key}>
-                    {s.title || t(`libraries.${s.key}`)}
-                  </option>
-                ))}
-              </select>
+              <div className="plex-libraries-container">
+                {loading && libraries.length === 0 ? (
+                  <div className="plex-libraries-loading">{t("home.loadingLibraries")}</div>
+                ) : (
+                  libraries.map((s) => (
+                    <button
+                      key={s.key}
+                      className={`plex-library-button ${
+                        activeLibrary?.key === s.key ? "plex-library-active" : ""
+                      }`}
+                      onClick={() => onSelectLibrary(s)}
+                    >
+                      {s.title || t(`libraries.${s.key}`)}
+                    </button>
+                  ))
+                )}
+                {error && <div className="plex-libraries-error">{error}</div>}
+              </div>
             )}
-            {error && <div className="plex-libraries-error">{error}</div>}
-          </div>
-        ) : (
-          <div className="plex-libraries-container">
-            {loading && libraries.length === 0 ? (
-              <div className="plex-libraries-loading">{t("home.loadingLibraries")}</div>
-            ) : (
-              libraries.map((s) => (
-                <button
-                  key={s.key}
-                  className={`plex-library-button ${
-                    activeLibrary?.key === s.key ? "plex-library-active" : ""
-                  }`}
-                  onClick={() => onSelectLibrary(s)}
-                >
-                  {s.title || t(`libraries.${s.key}`)}
-                </button>
-              ))
-            )}
-            {error && <div className="plex-libraries-error">{error}</div>}
-          </div>
+          </>
         )}
 
         <div className="plex-libraries-actions" ref={actionsRef}>
@@ -137,12 +141,12 @@ export default function LibrariesBar({
               <CoverSizeSlider value={coverSize} onChange={onCoverSizeChange} />
             </div>
           )}
-          {onViewModeChange && activeLibrary && (
+          {onViewModeChange && (
             <div className="plex-libraries-actions-view-mode-container">
               <ViewModeSelector 
                 value={viewMode} 
                 onChange={onViewModeChange}
-                disabled={activeLibrary.key !== "libreria"}
+                disabled={activeLibrary ? activeLibrary.key !== "libreria" && activeLibrary.key !== "category" : false}
               />
             </div>
           )}

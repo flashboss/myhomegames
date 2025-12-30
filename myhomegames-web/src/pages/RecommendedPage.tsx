@@ -83,7 +83,8 @@ export default function RecommendedPage({
   );
 
   return (
-    <div className="home-page-layout">
+    <main className="flex-1 home-page-content">
+      <div className="home-page-layout">
       <div className="home-page-content-wrapper">
         <div
           ref={scrollContainerRef}
@@ -102,7 +103,8 @@ export default function RecommendedPage({
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </main>
   );
 }
 

@@ -10,7 +10,6 @@ type CategoryItem = {
 type CategoriesPageProps = {
   apiBase: string;
   apiToken: string;
-  onGameClick: (category: CategoryItem) => void;
   buildApiUrl: (apiBase: string, path: string, params?: Record<string, string | number | boolean>) => string;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
@@ -19,7 +18,6 @@ type CategoriesPageProps = {
 export default function CategoriesPage({
   apiBase,
   apiToken,
-  onGameClick,
   buildApiUrl,
   buildCoverUrl,
   coverSize,
@@ -60,14 +58,14 @@ export default function CategoriesPage({
   }
 
   return (
-    <div className="home-page-layout">
-      <div className="home-page-content-wrapper">
+    <main className="flex-1 home-page-content">
+      <div className="home-page-layout">
+        <div className="home-page-content-wrapper">
         <div className="home-page-scroll-container">
           {!loading && (
             <CategoriesList
               categories={categories}
               apiBase={apiBase}
-              onCategoryClick={onGameClick}
               buildCoverUrl={buildCoverUrl}
               coverSize={coverSize * 2}
               itemRefs={itemRefs}
@@ -75,7 +73,8 @@ export default function CategoriesPage({
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </main>
   );
 }
 

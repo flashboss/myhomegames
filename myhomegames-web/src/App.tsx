@@ -16,6 +16,7 @@ import SettingsPage from "./pages/SettingsPage";
 import AddGamePage from "./pages/AddGamePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import CollectionDetail from "./pages/CollectionDetail";
+import CategoryPage from "./pages/CategoryPage";
 import AddGame from "./components/AddGame";
 import GameDetail from "./components/GameDetail";
 
@@ -180,6 +181,32 @@ function AppContent() {
                 }
                 buildCoverUrl={buildCoverUrl}
                 coverSize={200}
+              />
+            }
+          />
+          <Route
+            path="/category/:categoryId"
+            element={
+              <CategoryPage
+                apiBase={API_BASE}
+                apiToken={API_TOKEN}
+                onGameClick={handleGameClick}
+                onGamesLoaded={(games) => {
+                  setAllGames((prev: GameItem[]) => {
+                    const existingIds = new Set(
+                      prev.map((g: GameItem) => g.ratingKey)
+                    );
+                    const newGames = games.filter(
+                      (g: GameItem) => !existingIds.has(g.ratingKey)
+                    );
+                    return [...prev, ...newGames];
+                  });
+                }}
+                onPlay={openLauncher}
+                buildApiUrl={(_apiBase: string, path: string, params?: Record<string, string | number | boolean>) => 
+                  buildApiUrl(path, params)
+                }
+                buildCoverUrl={buildCoverUrl}
               />
             }
           />

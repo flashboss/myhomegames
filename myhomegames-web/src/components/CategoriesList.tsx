@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "./CoverPlaceholder";
 import "./CategoriesList.css";
@@ -12,7 +13,6 @@ type CategoryItem = {
 type CategoriesListProps = {
   categories: CategoryItem[];
   apiBase: string;
-  onCategoryClick: (category: CategoryItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -21,7 +21,6 @@ type CategoriesListProps = {
 type CategoryListItemProps = {
   category: CategoryItem;
   apiBase: string;
-  onCategoryClick: (category: CategoryItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -30,15 +29,19 @@ type CategoryListItemProps = {
 function CategoryListItem({
   category,
   apiBase,
-  onCategoryClick,
   buildCoverUrl,
   coverSize,
   itemRefs,
 }: CategoryListItemProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !category.cover || imageError;
   const coverHeight = coverSize * (9 / 16); // 16:9 aspect ratio (1280x720px)
+
+  const handleClick = () => {
+    navigate(`/category/${category.ratingKey}`);
+  };
 
   return (
     <div
@@ -50,7 +53,7 @@ function CategoryListItem({
       }}
       className="group cursor-pointer categories-list-item"
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
-      onClick={() => onCategoryClick(category)}
+      onClick={handleClick}
     >
       <div className="relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 categories-list-cover">
         {showPlaceholder ? (
@@ -91,7 +94,6 @@ function CategoryListItem({
 export default function CategoriesList({
   categories,
   apiBase,
-  onCategoryClick,
   buildCoverUrl,
   coverSize = 150,
   itemRefs,
@@ -112,7 +114,6 @@ export default function CategoriesList({
           key={category.ratingKey}
           category={category}
           apiBase={apiBase}
-          onCategoryClick={onCategoryClick}
           buildCoverUrl={buildCoverUrl}
           coverSize={coverSize}
           itemRefs={itemRefs}

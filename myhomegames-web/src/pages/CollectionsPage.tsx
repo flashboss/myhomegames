@@ -81,7 +81,8 @@ export default function CollectionsPage({
 
 
   return (
-    <div className="home-page-layout">
+    <main className="flex-1 home-page-content">
+      <div className="home-page-layout">
       <div className="home-page-content-wrapper">
         <div
           ref={scrollContainerRef}
@@ -107,7 +108,8 @@ export default function CollectionsPage({
         itemRefs={itemRefs}
         ascending={sortAscending}
       />
-    </div>
+      </div>
+    </main>
   );
 }
 
