@@ -287,7 +287,76 @@ function GameDetailPage({
 }) {
   const { t } = useTranslation();
   const { gameId } = useParams<{ gameId: string }>();
-  const game = allGames.find((g) => g.ratingKey === gameId);
+  const [game, setGame] = useState<GameItem | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // First try to find game in allGames (fast path)
+  const gameFromCache = allGames.find((g) => g.ratingKey === gameId);
+
+  useEffect(() => {
+    if (gameFromCache) {
+      // Game found in cache, use it
+      setGame(gameFromCache);
+      setLoading(false);
+    } else if (gameId) {
+      // Game not in cache, fetch from API
+      fetchGame(gameId);
+    }
+  }, [gameId, gameFromCache]);
+
+  async function fetchGame(gameId: string) {
+    setLoading(true);
+    try {
+      // Fetch single game from dedicated endpoint
+      const url = buildApiUrl(`/games/${gameId}`);
+      const res = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "X-Auth-Token": API_TOKEN,
+        },
+      });
+      
+      if (!res.ok) {
+        if (res.status === 404) {
+          setGame(null);
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+      
+      const found = await res.json();
+      const parsed: GameItem = {
+        ratingKey: found.id,
+        title: found.title,
+        summary: found.summary,
+        cover: found.cover,
+        day: found.day,
+        month: found.month,
+        year: found.year,
+        stars: found.stars,
+      };
+      setGame(parsed);
+    } catch (err: any) {
+      const errorMessage = String(err.message || err);
+      console.error("Error fetching game:", errorMessage);
+      setGame(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div
+        className="bg-[#1a1a1a] text-white flex items-center justify-center"
+        style={{ width: "100%", height: "100%" }}
+      >
+        <div className="text-center">
+          <div className="text-gray-400">{t("home.loadingLibraries")}</div>
+        </div>
+      </div>
+    );
+  }
 
   if (!game) {
     return (

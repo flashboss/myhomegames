@@ -41,6 +41,28 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       })),
     });
   });
+
+  // Endpoint: get single game by ID
+  app.get("/games/:gameId", requireToken, (req, res) => {
+    const gameId = req.params.gameId;
+    const game = allGames[gameId];
+    
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    
+    res.json({
+      id: game.id,
+      title: game.title,
+      summary: game.summary || "",
+      cover: `/covers/${encodeURIComponent(game.id)}`,
+      day: game.day || null,
+      month: game.month || null,
+      year: game.year || null,
+      stars: game.stars || null,
+      genre: game.genre || null,
+    });
+  });
 }
 
 module.exports = {

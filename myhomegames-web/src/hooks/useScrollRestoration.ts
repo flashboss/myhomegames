@@ -7,7 +7,7 @@ const scrollPositions = new Map<string, number>();
 export function useScrollRestoration(scrollContainerRef: React.RefObject<HTMLElement | null>) {
   const location = useLocation();
   const isRestoringRef = useRef(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   // Restore scroll position when route changes
   useLayoutEffect(() => {
