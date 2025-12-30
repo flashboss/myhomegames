@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import LibrariesBar from "../components/layout/LibrariesBar";
 import type { ViewMode } from "../components/layout/LibrariesBar";
 import LibraryPage from "./LibraryPage";
@@ -64,7 +63,6 @@ export default function HomePage({
   onGamesLoaded,
   onPlay,
 }: HomePageProps) {
-  const { t } = useTranslation();
   const [libraries, setLibraries] = useState<GameLibrarySection[]>([]);
   const [activeLibrary, setActiveLibrary] = useState<GameLibrarySection | null>(
     null
@@ -88,10 +86,10 @@ export default function HomePage({
     return (saved as ViewMode) || "grid";
   };
 
-  // Handler to change view mode (only for libreria)
+  // Handler to change view mode (only for library)
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
-    if (activeLibrary && activeLibrary.key === "libreria") {
+    if (activeLibrary && activeLibrary.key === "library") {
       saveViewModeForLibrary(activeLibrary.key, mode);
     }
   };
@@ -115,7 +113,7 @@ export default function HomePage({
         : libraries[0];
 
       setActiveLibrary(libraryToSelect);
-      if (libraryToSelect.key === "libreria") {
+      if (libraryToSelect.key === "library") {
         const savedViewMode = loadViewModeForLibrary(libraryToSelect.key);
         setViewMode(savedViewMode);
       } else {
@@ -128,39 +126,17 @@ export default function HomePage({
     setLoading(true);
     setError(null);
     try {
-      const url = buildApiUrl(apiBase, "/libraries");
-      const res = await fetch(url, {
-        headers: {
-          Accept: "application/json",
-          "X-Auth-Token": apiToken,
-        },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const libs = (json.libraries || []) as any[];
-      const parsed = libs.map((d) => ({
-        key: d.key,
-        title: d.title, // Optional, will be translated using key in LibrariesBar
-        type: d.type,
-      }));
-      // Add "raccolte" (collections) as a separate section, before "categorie"
-      const categorieIndex = parsed.findIndex((lib) => lib.key === "categorie");
-      const raccolteItem = { key: "raccolte", title: undefined, type: "collections" };
-      if (categorieIndex >= 0) {
-        parsed.splice(categorieIndex, 0, raccolteItem);
-      } else {
-        parsed.push(raccolteItem);
-      }
-      setLibraries(parsed);
+      // Libraries are now hardcoded, no need to fetch from server
+      const libs: GameLibrarySection[] = [
+        { key: "recommended", type: "games" },
+        { key: "library", type: "games" },
+        { key: "collections", type: "collections" },
+        { key: "categories", type: "games" },
+      ];
+      setLibraries(libs);
     } catch (err: any) {
       const errorMessage = String(err.message || err);
-      // Translate fetch errors
-      if (errorMessage.toLowerCase().includes("failed to fetch") || 
-          errorMessage.toLowerCase().includes("fetch")) {
-        setError(t("common.fetchError"));
-      } else {
-        setError(errorMessage);
-      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -170,7 +146,7 @@ export default function HomePage({
   function onSelectLibrary(s: GameLibrarySection) {
     localStorage.setItem("lastSelectedLibrary", s.key);
     setActiveLibrary(s);
-    if (s.key === "libreria") {
+    if (s.key === "library") {
       const savedViewMode = loadViewModeForLibrary(s.key);
       setViewMode(savedViewMode);
     } else {
@@ -206,7 +182,7 @@ export default function HomePage({
           </div>
         ) : (
           <>
-            {activeLibrary.key === "libreria" && (
+            {activeLibrary.key === "library" && (
               <LibraryPage
                 apiBase={apiBase}
                 apiToken={apiToken}
@@ -219,7 +195,7 @@ export default function HomePage({
                 viewMode={viewMode}
               />
             )}
-            {activeLibrary.key === "consigliati" && (
+            {activeLibrary.key === "recommended" && (
               <RecommendedPage
                 apiBase={apiBase}
                 apiToken={apiToken}
@@ -231,7 +207,7 @@ export default function HomePage({
                 coverSize={coverSize}
               />
             )}
-            {activeLibrary.key === "raccolte" && (
+            {activeLibrary.key === "collections" && (
               <CollectionsPage
                 apiBase={apiBase}
                 apiToken={apiToken}
@@ -241,7 +217,7 @@ export default function HomePage({
                 coverSize={coverSize}
               />
             )}
-            {activeLibrary.key === "categorie" && (
+            {activeLibrary.key === "categories" && (
               <CategoriesPage
                 apiBase={apiBase}
                 apiToken={apiToken}

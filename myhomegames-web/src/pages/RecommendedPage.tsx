@@ -45,7 +45,7 @@ export default function RecommendedPage({
   async function fetchLibraryGames() {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, `/libraries/consigliati/games`, {
+      const url = buildApiUrl(apiBase, `/recommended`, {
         sort: "title",
       });
       const res = await fetch(url, {

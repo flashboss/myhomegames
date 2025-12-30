@@ -1,9 +1,9 @@
 {
   "libraries": {
-    "consigliati": "おすすめ",
-    "libreria": "ライブラリ",
-    "raccolte": "コレクション",
-    "categorie": "カテゴリ"
+    "recommended": "おすすめ",
+    "library": "ライブラリ",
+    "collections": "コレクション",
+    "categories": "カテゴリ"
   },
   "settings": {
     "title": "設定",

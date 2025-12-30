@@ -17,7 +17,7 @@ beforeAll(() => {
 describe('Authentication', () => {
   test('should reject requests without token', async () => {
     const response = await request(app)
-      .get('/libraries')
+      .get('/libraries/library/games')
       .expect(401);
     
     expect(response.body).toHaveProperty('error', 'Unauthorized');
@@ -25,68 +25,35 @@ describe('Authentication', () => {
 
   test('should accept requests with X-Auth-Token header', async () => {
     const response = await request(app)
-      .get('/libraries')
+      .get('/libraries/library/games')
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    expect(response.body).toHaveProperty('libraries');
+    expect(response.body).toHaveProperty('games');
   });
 
   test('should accept requests with token query parameter', async () => {
     const response = await request(app)
-      .get('/libraries?token=test-token')
+      .get('/libraries/library/games?token=test-token')
       .expect(200);
     
-    expect(response.body).toHaveProperty('libraries');
+    expect(response.body).toHaveProperty('games');
   });
 
   test('should accept requests with Authorization header', async () => {
     const response = await request(app)
-      .get('/libraries')
+      .get('/libraries/library/games')
       .set('Authorization', 'test-token')
       .expect(200);
     
-    expect(response.body).toHaveProperty('libraries');
+    expect(response.body).toHaveProperty('games');
   });
 });
 
-describe('GET /libraries', () => {
-  test('should return list of libraries', async () => {
+describe('GET /libraries/library/games', () => {
+  test('should return games for library', async () => {
     const response = await request(app)
-      .get('/libraries')
-      .set('X-Auth-Token', 'test-token')
-      .expect(200);
-    
-    expect(response.body).toHaveProperty('libraries');
-    expect(Array.isArray(response.body.libraries)).toBe(true);
-    expect(response.body.libraries.length).toBe(3);
-    
-    const libraryKeys = response.body.libraries.map(lib => lib.key);
-    expect(libraryKeys).toContain('consigliati');
-    expect(libraryKeys).toContain('libreria');
-    expect(libraryKeys).toContain('categorie');
-    // raccolte is now separate, not a dynamic library
-  });
-
-  test('should return libraries with correct structure', async () => {
-    const response = await request(app)
-      .get('/libraries')
-      .set('X-Auth-Token', 'test-token')
-      .expect(200);
-    
-    response.body.libraries.forEach(lib => {
-      expect(lib).toHaveProperty('key');
-      expect(lib).toHaveProperty('type');
-      expect(lib.type).toBe('games');
-      // Title is no longer returned by server - it's translated on client using react-i18next
-    });
-  });
-});
-
-describe('GET /libraries/:id/games', () => {
-  test('should return games for a valid library', async () => {
-    const response = await request(app)
-      .get('/libraries/consigliati/games')
+      .get('/libraries/library/games')
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
@@ -95,20 +62,9 @@ describe('GET /libraries/:id/games', () => {
     expect(response.body.games.length).toBeGreaterThan(0);
   });
 
-  test('should return empty array for non-existent library', async () => {
-    const response = await request(app)
-      .get('/libraries/nonexistent/games')
-      .set('X-Auth-Token', 'test-token')
-      .expect(200);
-    
-    expect(response.body).toHaveProperty('games');
-    expect(Array.isArray(response.body.games)).toBe(true);
-    expect(response.body.games.length).toBe(0);
-  });
-
   test('should return games with correct structure', async () => {
     const response = await request(app)
-      .get('/libraries/consigliati/games')
+      .get('/libraries/library/games')
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
@@ -124,7 +80,7 @@ describe('GET /libraries/:id/games', () => {
 
   test('should include optional fields when present', async () => {
     const response = await request(app)
-      .get('/libraries/consigliati/games')
+      .get('/libraries/library/games')
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
@@ -132,6 +88,63 @@ describe('GET /libraries/:id/games', () => {
     if (gameWithStars) {
       expect(typeof gameWithStars.stars).toBe('number');
     }
+  });
+
+  test('should require authentication', async () => {
+    const response = await request(app)
+      .get('/libraries/library/games')
+      .expect(401);
+    
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
+  });
+});
+
+describe('GET /recommended', () => {
+  test('should return recommended games', async () => {
+    const response = await request(app)
+      .get('/recommended')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('games');
+    expect(Array.isArray(response.body.games)).toBe(true);
+    expect(response.body.games.length).toBeGreaterThan(0);
+  });
+
+  test('should return games with correct structure', async () => {
+    const response = await request(app)
+      .get('/recommended')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (response.body.games.length > 0) {
+      const game = response.body.games[0];
+      expect(game).toHaveProperty('id');
+      expect(game).toHaveProperty('title');
+      expect(game).toHaveProperty('summary');
+      expect(game).toHaveProperty('cover');
+      expect(game.cover).toContain('/covers/');
+    }
+  });
+
+  test('should include optional fields when present', async () => {
+    const response = await request(app)
+      .get('/recommended')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const gameWithStars = response.body.games.find(g => g.stars);
+    if (gameWithStars) {
+      expect(typeof gameWithStars.stars).toBe('number');
+    }
+  });
+
+  test('should require authentication', async () => {
+    const response = await request(app)
+      .get('/recommended')
+      .expect(401);
+    
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
   });
 });
 

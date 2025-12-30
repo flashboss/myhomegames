@@ -236,7 +236,7 @@ export default function LibraryPage({
   async function fetchLibraryGames() {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, `/libraries/libreria/games`, {
+      const url = buildApiUrl(apiBase, `/libraries/library/games`, {
         sort: "title",
       });
       const res = await fetch(url, {

@@ -1,9 +1,9 @@
 {
   "libraries": {
-    "consigliati": "推荐",
-    "libreria": "游戏库",
-    "raccolte": "收藏",
-    "categorie": "分类"
+    "recommended": "推荐",
+    "library": "游戏库",
+    "collections": "收藏",
+    "categories": "分类"
   },
   "settings": {
     "title": "设置",

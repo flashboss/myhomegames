@@ -20,19 +20,19 @@ beforeAll(() => {
   
   // Copy test fixtures to test metadata directory
   const fixturesDir = path.join(__dirname, 'fixtures');
-  const libraries = ['consigliati', 'libreria', 'categorie'];
+  const libraries = ['recommended', 'library', 'categories'];
   
-  libraries.forEach(lib => {
-    const sourceFile = path.join(fixturesDir, `games-${lib}.json`);
-    const destFile = path.join(testMetadataPath, 'metadata', `games-${lib}.json`);
+  libraries.forEach((libName) => {
+    const sourceFile = path.join(fixturesDir, `games-${libName}.json`);
+    const destFile = path.join(testMetadataPath, 'metadata', `games-${libName}.json`);
     if (fs.existsSync(sourceFile)) {
       fs.copyFileSync(sourceFile, destFile);
     }
   });
   
-  // Copy collections file (games-raccolte.json) separately
-  const collectionsSource = path.join(fixturesDir, 'games-raccolte.json');
-  const collectionsDest = path.join(testMetadataPath, 'metadata', 'games-raccolte.json');
+  // Copy collections file
+  const collectionsSource = path.join(fixturesDir, 'games-collections.json');
+  const collectionsDest = path.join(testMetadataPath, 'metadata', 'games-collections.json');
   if (fs.existsSync(collectionsSource)) {
     fs.copyFileSync(collectionsSource, collectionsDest);
   }

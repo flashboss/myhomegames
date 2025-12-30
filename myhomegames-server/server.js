@@ -36,20 +36,18 @@ function requireToken(req, res, next) {
   next();
 }
 
-// Load games whitelist from JSON files (one per library)
+// Load games whitelist from JSON files
 // Games JSON files are stored in METADATA_PATH/metadata/
 const METADATA_GAMES_DIR = path.join(METADATA_PATH, "metadata");
 let allGames = {}; // Store all games by ID for launcher
-let gamesByLibrary = {}; // Store games grouped by library
 
-function loadGamesForLibrary(libraryKey) {
-  const fileName = `games-${libraryKey}.json`;
+// Load library games
+function loadLibraryGames() {
+  const fileName = "games-library.json";
   const filePath = path.join(METADATA_GAMES_DIR, fileName);
   try {
     const txt = fs.readFileSync(filePath, "utf8");
     const games = JSON.parse(txt);
-    // Store games for this library
-    gamesByLibrary[libraryKey] = games;
     // Add to allGames for launcher lookup
     games.forEach((game) => {
       allGames[game.id] = game;
@@ -61,26 +59,76 @@ function loadGamesForLibrary(libraryKey) {
   }
 }
 
-function loadAllGames() {
-  // Load games for each library (raccolte is now separate, not a library)
-  const libraries = ["consigliati", "libreria", "categorie"];
-  libraries.forEach((lib) => {
-    loadGamesForLibrary(lib);
-  });
+// Load recommended games
+function loadRecommendedGames() {
+  const fileName = "games-recommended.json";
+  const filePath = path.join(METADATA_GAMES_DIR, fileName);
+  try {
+    const txt = fs.readFileSync(filePath, "utf8");
+    const games = JSON.parse(txt);
+    // Add to allGames for launcher lookup
+    games.forEach((game) => {
+      allGames[game.id] = game;
+    });
+    return games;
+  } catch (e) {
+    console.error(`Failed to load ${fileName}:`, e.message);
+    return [];
+  }
 }
 
-loadAllGames();
+// Load categories
+function loadCategories() {
+  const fileName = "games-categories.json";
+  const filePath = path.join(METADATA_GAMES_DIR, fileName);
+  try {
+    const txt = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(txt);
+  } catch (e) {
+    console.error(`Failed to load ${fileName}:`, e.message);
+    return [];
+  }
+}
 
-// Endpoint: list libraries (simple grouped view)
-app.get("/libraries", requireToken, (req, res) => {
-  // Return only keys - titles will be translated on the client side
-  // raccolte is now separate, not a library
-  const libs = [
-    { key: "consigliati", type: "games" },
-    { key: "libreria", type: "games" },
-    { key: "categorie", type: "games" },
-  ];
-  res.json({ libraries: libs });
+// Load all games on startup
+loadLibraryGames();
+loadRecommendedGames();
+const categoriesCache = loadCategories();
+
+// Endpoint: get library games
+app.get("/libraries/library/games", requireToken, (req, res) => {
+  const libraryGames = loadLibraryGames();
+  res.json({
+    games: libraryGames.map((g) => ({
+      id: g.id,
+      title: g.title,
+      summary: g.summary || "",
+      cover: `/covers/${encodeURIComponent(g.id)}`,
+      day: g.day || null,
+      month: g.month || null,
+      year: g.year || null,
+      stars: g.stars || null,
+      genre: g.genre || null,
+    })),
+  });
+});
+
+// Endpoint: get recommended games
+app.get("/recommended", requireToken, (req, res) => {
+  const recommendedGames = loadRecommendedGames();
+  res.json({
+    games: recommendedGames.map((g) => ({
+      id: g.id,
+      title: g.title,
+      summary: g.summary || "",
+      cover: `/covers/${encodeURIComponent(g.id)}`,
+      day: g.day || null,
+      month: g.month || null,
+      year: g.year || null,
+      stars: g.stars || null,
+      genre: g.genre || null,
+    })),
+  });
 });
 
 // Endpoint: serve game cover image (public, no auth required for images)
@@ -113,28 +161,9 @@ app.get("/category-covers/:categoryId", (req, res) => {
   res.sendFile(coverPath);
 });
 
-// Endpoint: list games by library
-app.get("/libraries/:id/games", requireToken, (req, res) => {
-  const libraryId = req.params.id;
-  const libraryGames = gamesByLibrary[libraryId] || [];
-  res.json({
-    games: libraryGames.map((g) => ({
-      id: g.id,
-      title: g.title,
-      summary: g.summary || "",
-      cover: `/covers/${encodeURIComponent(g.id)}`,
-      day: g.day || null,
-      month: g.month || null,
-      year: g.year || null,
-      stars: g.stars || null,
-      genre: g.genre || null,
-    })),
-  });
-});
-
 // Endpoint: list categories
 app.get("/categories", requireToken, (req, res) => {
-  const categories = gamesByLibrary["categorie"] || [];
+  const categories = loadCategories();
   res.json({
     categories: categories.map((c) => ({
       id: c.id,
@@ -144,9 +173,9 @@ app.get("/categories", requireToken, (req, res) => {
   });
 });
 
-// Load collections from games-raccolte.json file
+// Load collections from games-collections.json file
 function loadCollections() {
-  const fileName = "games-raccolte.json";
+  const fileName = "games-collections.json";
   const filePath = path.join(METADATA_GAMES_DIR, fileName);
   try {
     const txt = fs.readFileSync(filePath, "utf8");
@@ -288,8 +317,8 @@ app.get("/launcher", requireToken, (req, res) => {
 // Reload games list (admin endpoint) — protected by token
 app.post("/reload-games", requireToken, (req, res) => {
   allGames = {};
-  gamesByLibrary = {};
-  loadAllGames();
+  loadLibraryGames();
+  loadRecommendedGames();
   collectionsCache = loadCollections();
   const totalCount = Object.keys(allGames).length;
   res.json({ status: "reloaded", count: totalCount, collections: collectionsCache.length });

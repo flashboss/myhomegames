@@ -41,10 +41,10 @@ The server expects the following directory structure under `METADATA_PATH`:
 ${METADATA_PATH}/
 ├── settings.json                    # Application settings (language, etc.)
 ├── metadata/                        # Game library data files
-│   ├── games-consigliati.json      # Recommended games library
-│   ├── games-libreria.json         # Main library
-│   ├── games-raccolte.json         # Collections library
-│   └── games-categorie.json        # Categories library
+│   ├── games-recommended.json       # Recommended games library
+│   ├── games-library.json          # Main library
+│   ├── games-collections.json      # Collections library
+│   └── games-categories.json       # Categories library
 └── content/                         # Game content (covers, etc.)
     └── ${gameId}/                   # Per-game content directories
         └── cover.webp               # Game cover image
@@ -147,10 +147,10 @@ __tests__/
 ├── server.test.js        # API endpoint tests
 ├── helpers.test.js       # Helper function tests
 └── fixtures/             # Test data files
-    ├── games-consigliati.json
-    ├── games-libreria.json
-    ├── games-raccolte.json
-    ├── games-categorie.json
+    ├── games-recommended.json
+    ├── games-library.json
+    ├── games-collections.json
+    ├── games-categories.json
     └── settings.json
 ```
 

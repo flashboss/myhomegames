@@ -15,28 +15,27 @@ describe('Helper Functions', () => {
   });
 
   describe('Game Loading', () => {
-    test('should load games from JSON files', async () => {
+    test('should load library games from JSON file', async () => {
       const response = await request(app)
-        .get('/libraries/consigliati/games')
+            .get('/libraries/library/games')
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
       expect(response.body.games.length).toBeGreaterThan(0);
     });
 
-    test('should handle missing JSON files gracefully', async () => {
-      // Create a library that doesn't exist
+    test('should load recommended games from JSON file', async () => {
       const response = await request(app)
-        .get('/libraries/nonexistent/games')
+        .get('/recommended')
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
-      expect(response.body.games).toEqual([]);
+      expect(response.body.games.length).toBeGreaterThan(0);
     });
 
     test('should reload games correctly', async () => {
       const beforeReload = await request(app)
-        .get('/libraries/consigliati/games')
+        .get('/recommended')
         .set('X-Auth-Token', 'test-token');
       
       await request(app)
@@ -45,7 +44,7 @@ describe('Helper Functions', () => {
         .expect(200);
       
       const afterReload = await request(app)
-        .get('/libraries/consigliati/games')
+        .get('/recommended')
         .set('X-Auth-Token', 'test-token');
       
       expect(afterReload.body.games.length).toBe(beforeReload.body.games.length);
@@ -123,7 +122,7 @@ describe('Helper Functions', () => {
   describe('Game Data Structure', () => {
     test('should include all required fields in game response', async () => {
       const response = await request(app)
-        .get('/libraries/consigliati/games')
+        .get('/recommended')
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
@@ -138,7 +137,7 @@ describe('Helper Functions', () => {
 
     test('should handle optional fields correctly', async () => {
       const response = await request(app)
-        .get('/libraries/consigliati/games')
+        .get('/recommended')
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
@@ -160,7 +159,7 @@ describe('Helper Functions', () => {
 
     test('should format cover URL correctly', async () => {
       const response = await request(app)
-        .get('/libraries/consigliati/games')
+        .get('/recommended')
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       

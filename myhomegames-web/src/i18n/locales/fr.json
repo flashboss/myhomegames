@@ -1,9 +1,9 @@
 {
   "libraries": {
-    "consigliati": "Recommandés",
-    "libreria": "Bibliothèque",
-    "raccolte": "Collections",
-    "categorie": "Catégories"
+    "recommended": "Recommandés",
+    "library": "Bibliothèque",
+    "collections": "Collections",
+    "categories": "Catégories"
   },
   "settings": {
     "title": "Paramètres",
