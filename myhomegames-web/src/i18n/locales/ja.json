@@ -34,7 +34,8 @@
     "viewAllResults": "すべての結果を表示 ({{count}})",
     "placeholder": "ゲームを検索...",
     "recentSearches": "最近の検索",
-    "collection": "コレクション"
+    "collection": "コレクション",
+    "game": "ゲーム"
   },
   "searchResults": {
     "title": "検索結果: \"{{query}}\"",

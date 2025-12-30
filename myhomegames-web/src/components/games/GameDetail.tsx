@@ -10,6 +10,7 @@ type GameItem = {
   title: string;
   summary?: string;
   cover?: string;
+  background?: string;
   stars?: number | null;
   day?: number | null;
   month?: number | null;
@@ -19,19 +20,23 @@ type GameItem = {
 type GameDetailProps = {
   game: GameItem;
   coverUrl: string;
+  backgroundUrl: string;
   onPlay: (game: GameItem) => void;
 };
 
 export default function GameDetail({
   game,
   coverUrl,
+  backgroundUrl,
   onPlay,
 }: GameDetailProps) {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
+  const [backgroundError, setBackgroundError] = useState(false);
   const showPlaceholder = !coverUrl || imageError;
   const coverWidth = 256;
   const coverHeight = 384; // 256 * 1.5
+  const hasBackground = backgroundUrl && backgroundUrl.trim() !== "" && !backgroundError;
 
   // Format release date
   const releaseDate = useMemo(() => {
@@ -64,24 +69,80 @@ export default function GameDetail({
 
   return (
     <>
-      <LibrariesBar
-        libraries={[]}
-        activeLibrary={{ key: "game", type: "game" }}
-        onSelectLibrary={() => {}}
-        loading={false}
-        error={null}
-        coverSize={coverSize}
-        onCoverSizeChange={handleCoverSizeChange}
-        viewMode="grid"
-        onViewModeChange={() => {}}
-      />
-      <div className="bg-[#1a1a1a] home-page-main-container">
-        <main className="flex-1 home-page-content">
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: hasBackground ? 'transparent' : '#1a1a1a',
+          backgroundImage: hasBackground ? `url(${backgroundUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          zIndex: 0
+        }}
+      >
+        {hasBackground && (
+          <>
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(26, 26, 26, 0.85)',
+                zIndex: 1
+              }}
+            />
+            <img
+              src={backgroundUrl}
+              alt=""
+              style={{ display: 'none' }}
+              onError={() => {
+                setBackgroundError(true);
+              }}
+              onLoad={() => {
+                setBackgroundError(false);
+              }}
+            />
+          </>
+        )}
+      </div>
+      <div className={hasBackground ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
+        <LibrariesBar
+          libraries={[]}
+          activeLibrary={{ key: "game", type: "game" }}
+          onSelectLibrary={() => {}}
+          loading={false}
+          error={null}
+          coverSize={coverSize}
+          onCoverSizeChange={handleCoverSizeChange}
+          viewMode="grid"
+          onViewModeChange={() => {}}
+        />
+      </div>
+      <div style={{ position: 'relative', zIndex: 2, minHeight: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
+        <div 
+          className="home-page-main-container"
+          style={{
+            backgroundColor: 'transparent',
+            position: 'relative',
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <main className="flex-1 home-page-content" style={{ position: 'relative', zIndex: 1 }}>
           <div className="home-page-layout">
             <div className="home-page-content-wrapper">
               <div
                 className="home-page-scroll-container"
-                style={{ paddingLeft: '64px', paddingRight: '64px' }}
+                style={{ paddingLeft: '64px', paddingRight: '64px', paddingTop: '5px', paddingBottom: '32px' }}
               >
         <div className="pt-8" style={{ display: 'flex', flexDirection: 'row', gap: '48px', alignItems: 'flex-start', width: '100%', boxSizing: 'border-box' }}>
           {/* Cover Image */}
@@ -229,6 +290,7 @@ export default function GameDetail({
             </div>
           </div>
         </main>
+        </div>
       </div>
     </>
   );

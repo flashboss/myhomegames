@@ -4,3 +4,7 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+.game-detail-libraries-bar-transparent .plex-libraries-bar {
+  background-color: transparent !important;
+}

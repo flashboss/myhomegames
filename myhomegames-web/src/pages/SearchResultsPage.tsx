@@ -26,7 +26,7 @@ type SearchResultsPageProps = {
   apiBase: string;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   onGameClick: (game: GameItem) => void;
-  onPlay?: (game: GameItem) => void;
+  onPlay?: (item: GameItem | CollectionItem) => void;
 };
 
 export default function SearchResultsPage({

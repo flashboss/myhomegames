@@ -23,6 +23,7 @@ type CollectionInfo = {
   id: string;
   title: string;
   cover?: string;
+  background?: string;
 };
 
 type CollectionDetailProps = {
@@ -52,6 +53,7 @@ export default function CollectionDetail({
   const [isReady, setIsReady] = useState(false);
   const [sortAscending] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [backgroundError, setBackgroundError] = useState(false);
   const [viewMode] = useState<"grid" | "detail" | "table">("grid");
   const [coverSize, setCoverSize] = useState(() => {
     const saved = localStorage.getItem("coverSize");
@@ -108,6 +110,7 @@ export default function CollectionDetail({
           id: found.id,
           title: found.title,
           cover: found.cover,
+          background: found.background,
         });
       }
     } catch (err: any) {
@@ -211,10 +214,64 @@ export default function CollectionDetail({
   const showPlaceholder = !collectionCoverUrl || imageError;
   const collectionCoverWidth = 240;
   const collectionCoverHeight = 135; // 16:9 aspect ratio
+  
+  // Build background URL
+  function buildBackgroundUrl(apiBase: string, background?: string) {
+    if (!background) return "";
+    const u = new URL(background, apiBase);
+    return u.toString();
+  }
+  
+  const backgroundUrl = buildBackgroundUrl(apiBase, collection?.background);
+  const hasBackground = backgroundUrl && backgroundUrl.trim() !== "" && !backgroundError;
 
   return (
     <>
-      <LibrariesBar
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: hasBackground ? 'transparent' : '#1a1a1a',
+          backgroundImage: hasBackground ? `url(${backgroundUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          zIndex: 0
+        }}
+      >
+        {hasBackground && (
+          <>
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(26, 26, 26, 0.85)',
+                zIndex: 1
+              }}
+            />
+            <img
+              src={backgroundUrl}
+              alt=""
+              style={{ display: 'none' }}
+              onError={() => {
+                setBackgroundError(true);
+              }}
+              onLoad={() => {
+                setBackgroundError(false);
+              }}
+            />
+          </>
+        )}
+      </div>
+      <div className={hasBackground ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
+        <LibrariesBar
         libraries={[]}
         activeLibrary={{ key: "collection", type: "collection" }}
         onSelectLibrary={() => {}}
@@ -225,7 +282,19 @@ export default function CollectionDetail({
         viewMode={viewMode}
         onViewModeChange={() => {}}
       />
-      <div className="bg-[#1a1a1a] home-page-main-container">
+      </div>
+      <div style={{ position: 'relative', zIndex: 2, minHeight: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
+        <div 
+          className="home-page-main-container"
+          style={{
+            backgroundColor: 'transparent',
+            position: 'relative',
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
         <main className="flex-1 home-page-content">
       <div className="home-page-layout">
         <div 
@@ -239,7 +308,7 @@ export default function CollectionDetail({
           <div
             ref={scrollContainerRef}
             className="home-page-scroll-container"
-            style={{ paddingLeft: '64px', paddingRight: '64px' }}
+            style={{ paddingLeft: '64px', paddingRight: '64px', paddingTop: '5px', paddingBottom: '32px' }}
           >
             {/* Collection Cover and Title */}
             {collection && (
@@ -423,6 +492,7 @@ export default function CollectionDetail({
         </div>
       </div>
       </main>
+        </div>
       </div>
     </>
   );

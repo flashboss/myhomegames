@@ -78,6 +78,36 @@ app.get("/covers/:gameId", (req, res) => {
   res.sendFile(coverPath);
 });
 
+// Endpoint: serve game background image (public, no auth required for images)
+app.get("/backgrounds/:gameId", (req, res) => {
+  const gameId = decodeURIComponent(req.params.gameId);
+  const backgroundPath = path.join(METADATA_PATH, "content", "games", gameId, "background.webp");
+
+  // Check if file exists
+  if (!fs.existsSync(backgroundPath)) {
+    return res.status(404).json({ error: "Background not found" });
+  }
+
+  // Set appropriate content type for webp
+  res.type("image/webp");
+  res.sendFile(backgroundPath);
+});
+
+// Endpoint: serve collection background image (public, no auth required for images)
+app.get("/collection-backgrounds/:collectionId", (req, res) => {
+  const collectionId = decodeURIComponent(req.params.collectionId);
+  const backgroundPath = path.join(METADATA_PATH, "content", "collections", collectionId, "background.webp");
+
+  // Check if file exists
+  if (!fs.existsSync(backgroundPath)) {
+    return res.status(404).json({ error: "Background not found" });
+  }
+
+  // Set appropriate content type for webp
+  res.type("image/webp");
+  res.sendFile(backgroundPath);
+});
+
 // Endpoint: launcher — launches a whitelisted command for a game
 app.get("/launcher", requireToken, (req, res) => {
   const gameId = req.query.gameId;

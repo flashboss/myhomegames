@@ -34,7 +34,8 @@
     "viewAllResults": "Alle Ergebnisse anzeigen ({{count}})",
     "placeholder": "Spiele suchen...",
     "recentSearches": "Letzte Suchen",
-    "collection": "Sammlung"
+    "collection": "Sammlung",
+    "game": "Spiel"
   },
   "searchResults": {
     "title": "Suchergebnisse: \"{{query}}\"",

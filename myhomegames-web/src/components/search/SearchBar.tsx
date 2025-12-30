@@ -438,6 +438,29 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
                       {t("search.collection")}
                     </div>
                   </div>
+                  {onPlay && (
+                    <button
+                      className="search-result-play-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPlay(collection);
+                      }}
+                      aria-label="Play collection"
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 5v14l11-7z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -491,11 +514,6 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
                     <div className="text-white text-base truncate search-result-title">
                       {game.title}
                     </div>
-                    {game.summary && (
-                      <div className="text-gray-400 text-sm truncate mt-1 search-result-summary">
-                        {game.summary}
-                      </div>
-                    )}
                     {game.year !== null && game.year !== undefined && (
                       <div className="text-gray-500 text-sm truncate mt-1 search-result-date">
                         {game.day !== null &&

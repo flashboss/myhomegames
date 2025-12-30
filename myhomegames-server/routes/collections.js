@@ -18,17 +18,33 @@ function loadCollections(metadataGamesDir) {
   }
 }
 
+// Helper function to check if collection background exists and return path if it does
+function getCollectionBackgroundPath(metadataPath, collectionId) {
+  const backgroundPath = path.join(metadataPath, "content", "collections", collectionId, "background.webp");
+  if (fs.existsSync(backgroundPath)) {
+    return `/collection-backgrounds/${encodeURIComponent(collectionId)}`;
+  }
+  return null;
+}
+
 function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGamesDir, allGames) {
   let collectionsCache = loadCollections(metadataGamesDir);
 
   // Endpoint: list collections
   app.get("/collections", requireToken, (req, res) => {
     res.json({
-      collections: collectionsCache.map((c) => ({
-        id: c.id,
-        title: c.title,
-        cover: `/collection-covers/${encodeURIComponent(c.id)}`,
-      })),
+      collections: collectionsCache.map((c) => {
+        const collectionData = {
+          id: c.id,
+          title: c.title,
+          cover: `/collection-covers/${encodeURIComponent(c.id)}`,
+        };
+        const background = getCollectionBackgroundPath(metadataPath, c.id);
+        if (background) {
+          collectionData.background = background;
+        }
+        return collectionData;
+      }),
     });
   });
 

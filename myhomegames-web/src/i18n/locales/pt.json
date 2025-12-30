@@ -34,7 +34,8 @@
     "viewAllResults": "Ver todos os resultados ({{count}})",
     "placeholder": "Pesquisar jogos...",
     "recentSearches": "Pesquisas Recentes",
-    "collection": "Coleção"
+    "collection": "Coleção",
+    "game": "Jogo"
   },
   "searchResults": {
     "title": "Resultados da pesquisa: \"{{query}}\"",

@@ -24,6 +24,7 @@ type GameItem = {
   title: string;
   summary?: string;
   cover?: string;
+  background?: string;
   day?: number | null;
   month?: number | null;
   year?: number | null;
@@ -47,6 +48,14 @@ function buildCoverUrl(apiBase: string, cover?: string) {
   // Cover is already a full path from server (e.g., /covers/gameId)
   // We need to prepend the API base URL
   const u = new URL(cover, apiBase);
+  return u.toString();
+}
+
+function buildBackgroundUrl(apiBase: string, background?: string) {
+  if (!background) return "";
+  // Background is already a full path from server (e.g., /backgrounds/gameId)
+  // We need to prepend the API base URL
+  const u = new URL(background, apiBase);
   return u.toString();
 }
 
@@ -156,7 +165,7 @@ function AppContent() {
     loadSettings();
   }, [i18n]);
 
-  function openLauncher(item: GameItem) {
+  function openLauncher(item: GameItem | CollectionItem) {
     const launchUrl = buildApiUrl(`/launcher`, {
       gameId: item.ratingKey,
       token: API_TOKEN,
@@ -224,7 +233,7 @@ function AppContent() {
           <Route
             path="/game/:gameId"
             element={
-              <GameDetailPage allGames={allGames} onPlay={openLauncher} />
+              <GameDetailPage onPlay={openLauncher} />
             }
           />
           <Route
@@ -350,10 +359,8 @@ function AppContent() {
 }
 
 function GameDetailPage({
-  allGames,
   onPlay,
 }: {
-  allGames: GameItem[];
   onPlay: (game: GameItem) => void;
 }) {
   const { t } = useTranslation();
@@ -361,19 +368,12 @@ function GameDetailPage({
   const [game, setGame] = useState<GameItem | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // First try to find game in allGames (fast path)
-  const gameFromCache = allGames.find((g) => g.ratingKey === gameId);
-
   useEffect(() => {
-    if (gameFromCache) {
-      // Game found in cache, use it
-      setGame(gameFromCache);
-      setLoading(false);
-    } else if (gameId) {
-      // Game not in cache, fetch from API
+    if (gameId) {
+      // Always fetch from API to get background field
       fetchGame(gameId);
     }
-  }, [gameId, gameFromCache]);
+  }, [gameId]);
 
   async function fetchGame(gameId: string) {
     setLoading(true);
@@ -401,6 +401,7 @@ function GameDetailPage({
         title: found.title,
         summary: found.summary,
         cover: found.cover,
+        background: found.background,
         day: found.day,
         month: found.month,
         year: found.year,
@@ -446,6 +447,7 @@ function GameDetailPage({
     <GameDetail
       game={game}
       coverUrl={buildCoverUrl(API_BASE, game.cover)}
+      backgroundUrl={buildBackgroundUrl(API_BASE, game.background)}
       onPlay={onPlay}
     />
   );

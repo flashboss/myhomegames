@@ -6,6 +6,15 @@ const path = require("path");
  * Handles the main library games endpoint
  */
 
+// Helper function to check if background exists and return path if it does
+function getBackgroundPath(metadataPath, gameId) {
+  const backgroundPath = path.join(metadataPath, "content", "games", gameId, "background.webp");
+  if (fs.existsSync(backgroundPath)) {
+    return `/backgrounds/${encodeURIComponent(gameId)}`;
+  }
+  return null;
+}
+
 function loadLibraryGames(metadataGamesDir, allGames) {
   const fileName = "games-library.json";
   const filePath = path.join(metadataGamesDir, fileName);
@@ -24,6 +33,9 @@ function loadLibraryGames(metadataGamesDir, allGames) {
 }
 
 function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
+  // Get metadata path (parent of metadataGamesDir)
+  const metadataPath = path.dirname(metadataGamesDir);
+  
   // Endpoint: get library games
   app.get("/libraries/library/games", requireToken, (req, res) => {
     const libraryGames = loadLibraryGames(metadataGamesDir, allGames);
@@ -51,7 +63,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       return res.status(404).json({ error: "Game not found" });
     }
     
-    res.json({
+    const gameData = {
       id: game.id,
       title: game.title,
       summary: game.summary || "",
@@ -61,7 +73,12 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       year: game.year || null,
       stars: game.stars || null,
       genre: game.genre || null,
-    });
+    };
+    const background = getBackgroundPath(metadataPath, game.id);
+    if (background) {
+      gameData.background = background;
+    }
+    res.json(gameData);
   });
 }
 

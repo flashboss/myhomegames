@@ -27,7 +27,7 @@ type SearchResultsListProps = {
   collections: CollectionItem[];
   apiBase: string;
   onGameClick: (game: GameItem) => void;
-  onPlay?: (game: GameItem) => void;
+  onPlay?: (item: GameItem | CollectionItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
 };
 
@@ -85,11 +85,6 @@ function SearchResultItem({
         <div className="text-white mb-2 search-results-list-title">
           {game.title}
         </div>
-        {game.summary && (
-          <div className="text-gray-400 mb-2 search-results-list-summary">
-            {game.summary}
-          </div>
-        )}
         {game.year !== null && game.year !== undefined && (
           <div className="text-gray-500 search-results-list-date">
             {game.day !== null &&
@@ -132,10 +127,12 @@ function CollectionResultItem({
   collection,
   apiBase,
   buildCoverUrl,
+  onPlay,
 }: {
   collection: CollectionItem;
   apiBase: string;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
+  onPlay?: (item: GameItem | CollectionItem) => void;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -180,6 +177,29 @@ function CollectionResultItem({
           {t("search.collection")}
         </div>
       </div>
+      {onPlay && (
+        <button
+          className="search-results-list-play-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPlay(collection);
+          }}
+          aria-label="Play collection"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8 5v14l11-7z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
@@ -207,6 +227,7 @@ export default function SearchResultsList({
           collection={collection}
           apiBase={apiBase}
           buildCoverUrl={buildCoverUrl}
+          onPlay={onPlay}
         />
       ))}
       {games.map((game) => (
