@@ -61,17 +61,23 @@ export default function FilterPopup({
         wentBackRef.current = false;
       } else {
         // Subsequent opens during the same session
-        if (currentFilter === "year") {
+        // If user went back to main menu, always show main menu
+        if (wentBackRef.current) {
+          setOpenSubmenu(null);
+          // Keep track of filter but don't show submenu
+          if (currentFilter === "year") {
+            lastOpenSubmenuRef.current = "year";
+          } else if (currentFilter === "genre") {
+            lastOpenSubmenuRef.current = "genre";
+          }
+        } else if (currentFilter === "year") {
           setOpenSubmenu("year");
           lastOpenSubmenuRef.current = "year";
-          wentBackRef.current = false;
         } else if (currentFilter === "genre") {
           setOpenSubmenu("genre");
           lastOpenSubmenuRef.current = "genre";
-          wentBackRef.current = false;
-        } else if (lastOpenSubmenuRef.current && !wentBackRef.current) {
+        } else if (lastOpenSubmenuRef.current) {
           // Restore the last open submenu even if no filter is active
-          // but only if user didn't go back to main menu
           setOpenSubmenu(lastOpenSubmenuRef.current);
         } else {
           setOpenSubmenu(null);
@@ -98,11 +104,8 @@ export default function FilterPopup({
       
       // If clicked outside the main menu, close everything
       if (clickedOutside && !openSubmenu) {
-        // If user went back to main menu, reset the last open submenu
-        if (wentBackRef.current) {
-          lastOpenSubmenuRef.current = null;
-          wentBackRef.current = false;
-        }
+        // Don't reset wentBackRef here - it should persist when closing after going back
+        // This way when reopening, we'll still show main menu
         onClose();
       }
     }
@@ -123,11 +126,8 @@ export default function FilterPopup({
           setOpenSubmenu(null);
           wentBackRef.current = true; // Mark that user went back to main menu
         } else {
-          // If user went back to main menu, reset the last open submenu
-          if (wentBackRef.current) {
-            lastOpenSubmenuRef.current = null;
-            wentBackRef.current = false;
-          }
+          // Don't reset wentBackRef here - it should persist when closing after going back
+          // This way when reopening, we'll still show main menu
           onClose();
         }
       }
@@ -143,9 +143,11 @@ export default function FilterPopup({
     if (field === "year") {
       setOpenSubmenu("year");
       lastOpenSubmenuRef.current = "year";
+      wentBackRef.current = false; // Reset went back flag when selecting a filter
     } else if (field === "genre") {
       setOpenSubmenu("genre");
       lastOpenSubmenuRef.current = "genre";
+      wentBackRef.current = false; // Reset went back flag when selecting a filter
     } else {
       onFilterChange?.(field);
       if (onYearFilterChange) {
@@ -196,17 +198,15 @@ export default function FilterPopup({
 
   const handleSubmenuClose = () => {
     setOpenSubmenu(null);
+    lastOpenSubmenuRef.current = null; // Reset state when going back to main menu
     wentBackRef.current = true; // Mark that user went back to main menu
     // Don't close the main popup, just go back to main menu
   };
 
   const handleSubmenuCloseCompletely = () => {
     setOpenSubmenu(null);
-    // If user went back to main menu, reset the last open submenu
-    if (wentBackRef.current) {
-      lastOpenSubmenuRef.current = null;
-      wentBackRef.current = false;
-    }
+    // Don't reset wentBackRef here - it should persist when closing after going back
+    // This way when reopening, we'll still show main menu
     onClose();
     // Close the popup completely
   };
