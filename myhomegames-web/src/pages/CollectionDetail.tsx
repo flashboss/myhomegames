@@ -98,13 +98,7 @@ export default function CollectionDetail({
     return (
       <div className="bg-[#1a1a1a] text-white flex items-center justify-center" style={{ width: "100%", height: "100%" }}>
         <div className="text-center">
-          <div className="text-gray-400 mb-4">Collection not found</div>
-          <button
-            onClick={() => navigate("/")}
-            className="text-[#E5A00D] hover:text-[#F5B041] transition-colors"
-          >
-            Go back
-          </button>
+          <div className="text-gray-400">Collection not found</div>
         </div>
       </div>
     );

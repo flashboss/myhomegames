@@ -51,13 +51,7 @@ export default function SearchResultsPage({
     return (
       <div className="bg-[#1a1a1a] text-white flex items-center justify-center search-results-page-empty">
         <div className="text-center">
-          <div className="text-gray-400 mb-4">{t("searchResults.noResults")}</div>
-          <button
-            onClick={() => navigate("/")}
-            className="text-[#E5A00D] hover:text-[#F5B041] transition-colors"
-          >
-            {t("searchResults.goBack")}
-          </button>
+          <div className="text-gray-400">{t("searchResults.noResults")}</div>
         </div>
       </div>
     );

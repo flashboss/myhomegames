@@ -8,6 +8,12 @@ const path = require("path");
 const { spawn } = require("child_process");
 const https = require("https");
 
+// Import route modules
+const libraryRoutes = require("./routes/library");
+const recommendedRoutes = require("./routes/recommended");
+const categoriesRoutes = require("./routes/categories");
+const collectionsRoutes = require("./routes/collections");
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -41,200 +47,26 @@ function requireToken(req, res, next) {
 const METADATA_GAMES_DIR = path.join(METADATA_PATH, "metadata");
 let allGames = {}; // Store all games by ID for launcher
 
-// Load library games
-function loadLibraryGames() {
-  const fileName = "games-library.json";
-  const filePath = path.join(METADATA_GAMES_DIR, fileName);
-  try {
-    const txt = fs.readFileSync(filePath, "utf8");
-    const games = JSON.parse(txt);
-    // Add to allGames for launcher lookup
-    games.forEach((game) => {
-      allGames[game.id] = game;
-    });
-    return games;
-  } catch (e) {
-    console.error(`Failed to load ${fileName}:`, e.message);
-    return [];
-  }
-}
-
-// Load recommended games
-function loadRecommendedGames() {
-  const fileName = "games-recommended.json";
-  const filePath = path.join(METADATA_GAMES_DIR, fileName);
-  try {
-    const txt = fs.readFileSync(filePath, "utf8");
-    const games = JSON.parse(txt);
-    // Add to allGames for launcher lookup
-    games.forEach((game) => {
-      allGames[game.id] = game;
-    });
-    return games;
-  } catch (e) {
-    console.error(`Failed to load ${fileName}:`, e.message);
-    return [];
-  }
-}
-
-// Load categories
-function loadCategories() {
-  const fileName = "games-categories.json";
-  const filePath = path.join(METADATA_GAMES_DIR, fileName);
-  try {
-    const txt = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(txt);
-  } catch (e) {
-    console.error(`Failed to load ${fileName}:`, e.message);
-    return [];
-  }
-}
-
 // Load all games on startup
-loadLibraryGames();
-loadRecommendedGames();
-const categoriesCache = loadCategories();
+libraryRoutes.loadLibraryGames(METADATA_GAMES_DIR, allGames);
+recommendedRoutes.loadRecommendedGames(METADATA_GAMES_DIR, allGames);
 
-// Endpoint: get library games
-app.get("/libraries/library/games", requireToken, (req, res) => {
-  const libraryGames = loadLibraryGames();
-  res.json({
-    games: libraryGames.map((g) => ({
-      id: g.id,
-      title: g.title,
-      summary: g.summary || "",
-      cover: `/covers/${encodeURIComponent(g.id)}`,
-      day: g.day || null,
-      month: g.month || null,
-      year: g.year || null,
-      stars: g.stars || null,
-      genre: g.genre || null,
-    })),
-  });
-});
-
-// Endpoint: get recommended games
-app.get("/recommended", requireToken, (req, res) => {
-  const recommendedGames = loadRecommendedGames();
-  res.json({
-    games: recommendedGames.map((g) => ({
-      id: g.id,
-      title: g.title,
-      summary: g.summary || "",
-      cover: `/covers/${encodeURIComponent(g.id)}`,
-      day: g.day || null,
-      month: g.month || null,
-      year: g.year || null,
-      stars: g.stars || null,
-      genre: g.genre || null,
-    })),
-  });
-});
+// Register routes
+libraryRoutes.registerLibraryRoutes(app, requireToken, METADATA_GAMES_DIR, allGames);
+recommendedRoutes.registerRecommendedRoutes(app, requireToken, METADATA_GAMES_DIR, allGames);
+categoriesRoutes.registerCategoriesRoutes(app, requireToken, METADATA_PATH, METADATA_GAMES_DIR);
+const collectionsHandler = collectionsRoutes.registerCollectionsRoutes(
+  app,
+  requireToken,
+  METADATA_PATH,
+  METADATA_GAMES_DIR,
+  allGames
+);
 
 // Endpoint: serve game cover image (public, no auth required for images)
 app.get("/covers/:gameId", (req, res) => {
   const gameId = decodeURIComponent(req.params.gameId);
   const coverPath = path.join(METADATA_PATH, "content", "games", gameId, "cover.webp");
-
-  // Check if file exists
-  if (!fs.existsSync(coverPath)) {
-    return res.status(404).json({ error: "Cover not found" });
-  }
-
-  // Set appropriate content type for webp
-  res.type("image/webp");
-  res.sendFile(coverPath);
-});
-
-// Endpoint: serve category cover image (public, no auth required for images)
-app.get("/category-covers/:categoryId", (req, res) => {
-  const categoryId = decodeURIComponent(req.params.categoryId);
-  const coverPath = path.join(METADATA_PATH, "content", "categories", categoryId, "cover.webp");
-
-  // Check if file exists
-  if (!fs.existsSync(coverPath)) {
-    return res.status(404).json({ error: "Cover not found" });
-  }
-
-  // Set appropriate content type for webp
-  res.type("image/webp");
-  res.sendFile(coverPath);
-});
-
-// Endpoint: list categories
-app.get("/categories", requireToken, (req, res) => {
-  const categories = loadCategories();
-  res.json({
-    categories: categories.map((c) => ({
-      id: c.id,
-      title: c.title,
-      cover: `/category-covers/${encodeURIComponent(c.id)}`,
-    })),
-  });
-});
-
-// Load collections from games-collections.json file
-function loadCollections() {
-  const fileName = "games-collections.json";
-  const filePath = path.join(METADATA_GAMES_DIR, fileName);
-  try {
-    const txt = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(txt);
-  } catch (e) {
-    console.error(`Failed to load ${fileName}:`, e.message);
-    return [];
-  }
-}
-
-let collectionsCache = loadCollections();
-
-// Endpoint: list collections
-app.get("/collections", requireToken, (req, res) => {
-  res.json({
-    collections: collectionsCache.map((c) => ({
-      id: c.id,
-      title: c.title,
-      cover: `/collection-covers/${encodeURIComponent(c.id)}`,
-    })),
-  });
-});
-
-// Endpoint: get games for a collection (returns games by their IDs)
-app.get("/collections/:id/games", requireToken, (req, res) => {
-  const collectionId = req.params.id;
-  const collection = collectionsCache.find((c) => c.id === collectionId);
-  
-  if (!collection) {
-    return res.status(404).json({ error: "Collection not found" });
-  }
-
-  // Get games by their IDs from the collection
-  const gameIds = collection.games || [];
-  const collectionGames = [];
-
-  gameIds.forEach((gameId) => {
-    const game = allGames[gameId];
-    if (game) {
-      collectionGames.push({
-        id: game.id,
-        title: game.title,
-        summary: game.summary || "",
-        cover: `/covers/${encodeURIComponent(game.id)}`,
-        day: game.day || null,
-        month: game.month || null,
-        year: game.year || null,
-        stars: game.stars || null,
-      });
-    }
-  });
-
-  res.json({ games: collectionGames });
-});
-
-// Endpoint: serve collection cover image (public, no auth required for images)
-app.get("/collection-covers/:collectionId", (req, res) => {
-  const collectionId = decodeURIComponent(req.params.collectionId);
-  const coverPath = path.join(METADATA_PATH, "content", "collections", collectionId, "cover.webp");
 
   // Check if file exists
   if (!fs.existsSync(coverPath)) {
@@ -317,9 +149,9 @@ app.get("/launcher", requireToken, (req, res) => {
 // Reload games list (admin endpoint) — protected by token
 app.post("/reload-games", requireToken, (req, res) => {
   allGames = {};
-  loadLibraryGames();
-  loadRecommendedGames();
-  collectionsCache = loadCollections();
+  libraryRoutes.loadLibraryGames(METADATA_GAMES_DIR, allGames);
+  recommendedRoutes.loadRecommendedGames(METADATA_GAMES_DIR, allGames);
+  const collectionsCache = collectionsHandler.reload();
   const totalCount = Object.keys(allGames).length;
   res.json({ status: "reloaded", count: totalCount, collections: collectionsCache.length });
 });

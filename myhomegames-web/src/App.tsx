@@ -288,31 +288,8 @@ function GameDetailPage({
   onPlay: (game: GameItem) => void;
 }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { gameId } = useParams<{ gameId: string }>();
   const game = allGames.find((g) => g.ratingKey === gameId);
-  const from = (location.state as { from?: string })?.from || "/";
-
-  // Store the "from" path in sessionStorage as backup
-  useEffect(() => {
-    if (from && from !== "/search-results") {
-      sessionStorage.setItem("gameDetailFrom", from);
-    }
-  }, [from]);
-
-  const handleBack = () => {
-    // Always navigate to the saved "from" location, or "/" if not available
-    // Also check sessionStorage as backup
-    const savedFrom = sessionStorage.getItem("gameDetailFrom");
-    const targetPath = (from && from !== "/search-results") 
-      ? from 
-      : (savedFrom && savedFrom !== "/search-results")
-      ? savedFrom
-      : "/";
-    sessionStorage.removeItem("gameDetailFrom");
-    navigate(targetPath, { replace: true });
-  };
 
   if (!game) {
     return (
@@ -321,13 +298,7 @@ function GameDetailPage({
         style={{ width: "100%", height: "100%" }}
       >
         <div className="text-center">
-          <div className="text-gray-400 mb-4">{t("gameDetail.notFound")}</div>
-          <button
-            onClick={handleBack}
-            className="text-[#E5A00D] hover:text-[#F5B041] transition-colors"
-          >
-            {t("gameDetail.goBack")}
-          </button>
+          <div className="text-gray-400">{t("gameDetail.notFound")}</div>
         </div>
       </div>
     );
