@@ -41,25 +41,41 @@ export default function FilterPopup({
   const filterRef = useRef<HTMLDivElement>(null);
   const lastOpenSubmenuRef = useRef<"year" | "genre" | null>(null);
   const wentBackRef = useRef(false); // Track if user went back to main menu
+  const isFirstOpenRef = useRef(true); // Track if this is the first time opening after page load
 
-  // When popup opens, show the appropriate submenu if a filter is active
-  // or restore the last open submenu if no filter is active
+  // When popup opens, always show main menu on first open (after page refresh)
+  // After that, preserve submenu state during the session
   useEffect(() => {
     if (isOpen) {
-      if (currentFilter === "year") {
-        setOpenSubmenu("year");
-        lastOpenSubmenuRef.current = "year";
-        wentBackRef.current = false; // Reset went back flag when filter is active
-      } else if (currentFilter === "genre") {
-        setOpenSubmenu("genre");
-        lastOpenSubmenuRef.current = "genre";
-        wentBackRef.current = false; // Reset went back flag when filter is active
-      } else if (lastOpenSubmenuRef.current && !wentBackRef.current) {
-        // Restore the last open submenu even if no filter is active
-        // but only if user didn't go back to main menu
-        setOpenSubmenu(lastOpenSubmenuRef.current);
-      } else {
+      if (isFirstOpenRef.current) {
+        // First time opening after page load - always show main menu
         setOpenSubmenu(null);
+        isFirstOpenRef.current = false;
+        if (currentFilter === "year") {
+          lastOpenSubmenuRef.current = "year";
+        } else if (currentFilter === "genre") {
+          lastOpenSubmenuRef.current = "genre";
+        } else {
+          lastOpenSubmenuRef.current = null;
+        }
+        wentBackRef.current = false;
+      } else {
+        // Subsequent opens during the same session
+        if (currentFilter === "year") {
+          setOpenSubmenu("year");
+          lastOpenSubmenuRef.current = "year";
+          wentBackRef.current = false;
+        } else if (currentFilter === "genre") {
+          setOpenSubmenu("genre");
+          lastOpenSubmenuRef.current = "genre";
+          wentBackRef.current = false;
+        } else if (lastOpenSubmenuRef.current && !wentBackRef.current) {
+          // Restore the last open submenu even if no filter is active
+          // but only if user didn't go back to main menu
+          setOpenSubmenu(lastOpenSubmenuRef.current);
+        } else {
+          setOpenSubmenu(null);
+        }
       }
     }
     // Don't reset openSubmenu when popup closes - it will persist
