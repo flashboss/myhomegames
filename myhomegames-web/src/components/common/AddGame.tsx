@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import "./AddGame.css";
 
 type IGDBGame = {
   id: number;
@@ -111,56 +112,51 @@ export default function AddGame({
 
   return createPortal(
     <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 99999,
-        margin: 0,
-        padding: 0,
-      }}
+      className="add-game-overlay"
+      onClick={onClose}
     >
       <div
-        className="bg-[#1a1a1a] w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden border border-[#2a2a2a] max-h-[80vh] flex flex-col"
+        className="add-game-container"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-[#2a2a2a] bg-[#0d0d0d]">
-          <h2 className="text-xl font-semibold text-white">{t("addGame.title")}</h2>
+        <div className="add-game-header">
+          <h2 className="add-game-title">{t("addGame.title")}</h2>
         </div>
 
-        <div className="p-6 flex-1 overflow-hidden flex flex-col">
-          <div className="mb-4">
+        <div className="add-game-content">
+          <div className="add-game-search-container">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("addGame.searchPlaceholder")}
-              className="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#E5A00D] transition-colors"
+              className="add-game-search-input"
               autoFocus
             />
           </div>
 
-          {error && <div className="mb-4 text-red-400 text-sm">{t("addGame.error")}: {error}</div>}
+          {error && (
+            <div className="add-game-error">
+              {t("addGame.error")}: {error}
+            </div>
+          )}
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="add-game-results">
             {loading ? (
-              <div className="text-center text-gray-400 py-8">{t("addGame.loading")}</div>
+              <div className="add-game-loading">
+                <div className="add-game-spinner"></div>
+                <div>{t("addGame.loading")}</div>
+              </div>
             ) : results.length === 0 && searchQuery.trim().length >= 2 ? (
-              <div className="text-center text-gray-400 py-8">
+              <div className="add-game-empty-state">
                 {t("addGame.noResults")}
               </div>
             ) : results.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">
+              <div className="add-game-empty-state">
                 {t("addGame.typeToSearch")}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3">
+              <div className="add-game-results-list">
                 {results.map((game) => (
                   <button
                     key={game.id}
@@ -168,33 +164,33 @@ export default function AddGame({
                       onGameSelected(game);
                       onClose();
                     }}
-                    className="flex items-center gap-4 p-4 bg-[#2a2a2a] rounded hover:bg-[#3a3a3a] transition-colors text-left"
+                    className="add-game-result-item"
                   >
                     {game.cover ? (
                       <img
                         src={game.cover}
                         alt={game.name}
-                        className="w-20 h-28 object-cover rounded flex-shrink-0"
+                        className="add-game-result-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />
                     ) : (
-                      <div className="w-20 h-28 bg-[#1a1a1a] rounded flex items-center justify-center flex-shrink-0">
-                        <div className="text-gray-500 text-2xl">🎮</div>
+                      <div className="add-game-result-placeholder">
+                        🎮
                       </div>
                     )}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-white font-medium text-lg mb-1">
+                    <div className="add-game-result-content">
+                      <div className="add-game-result-title">
                         {game.name}
                       </div>
                       {game.releaseDate && (
-                        <div className="text-gray-400 text-sm mb-2">
+                        <div className="add-game-result-date">
                           {game.releaseDate}
                         </div>
                       )}
                       {game.summary && (
-                        <div className="text-gray-300 text-sm line-clamp-2">
+                        <div className="add-game-result-summary">
                           {game.summary}
                         </div>
                       )}
