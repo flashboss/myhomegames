@@ -112,6 +112,62 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
     }
   });
 
+  // Endpoint: update collection fields
+  app.put("/collections/:id", requireToken, (req, res) => {
+    const collectionId = req.params.id;
+    const updates = req.body;
+    
+    // Validate collection exists
+    const collectionIndex = collectionsCache.findIndex((c) => c.id === collectionId);
+    if (collectionIndex === -1) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+    
+    // Define allowed fields that can be updated
+    const allowedFields = ['title', 'summary'];
+    
+    // Filter updates to only include allowed fields
+    const filteredUpdates = Object.keys(updates)
+      .filter(key => allowedFields.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = updates[key];
+        return obj;
+      }, {});
+    
+    if (Object.keys(filteredUpdates).length === 0) {
+      return res.status(400).json({ error: "No valid fields to update" });
+    }
+    
+    // Update collection in cache
+    Object.assign(collectionsCache[collectionIndex], filteredUpdates);
+    
+    // Save to file
+    const fileName = "games-collections.json";
+    const filePath = path.join(metadataGamesDir, fileName);
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(collectionsCache, null, 2), "utf8");
+      
+      // Return updated collection data
+      const collection = collectionsCache[collectionIndex];
+      const collectionData = {
+        id: collection.id,
+        title: collection.title,
+        summary: collection.summary || "",
+        cover: `/collection-covers/${encodeURIComponent(collection.id)}`,
+        gameCount: (collection.games || []).length,
+      };
+      const background = getCollectionBackgroundPath(metadataPath, collection.id);
+      if (background) {
+        collectionData.background = background;
+      }
+      
+      res.json({ status: "success", collection: collectionData });
+    } catch (e) {
+      console.error(`Failed to save ${fileName}:`, e.message);
+      res.status(500).json({ error: "Failed to save collection updates" });
+    }
+  });
+
   // Endpoint: serve collection cover image (public, no auth required for images)
   app.get("/collection-covers/:collectionId", (req, res) => {
     const collectionId = decodeURIComponent(req.params.collectionId);

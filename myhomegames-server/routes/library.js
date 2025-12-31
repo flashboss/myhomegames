@@ -80,6 +80,79 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
     }
     res.json(gameData);
   });
+
+  // Endpoint: update game fields
+  app.put("/games/:gameId", requireToken, (req, res) => {
+    const gameId = req.params.gameId;
+    const updates = req.body;
+    
+    // Validate game exists
+    const game = allGames[gameId];
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    
+    // Define allowed fields that can be updated
+    const allowedFields = ['title', 'summary', 'year', 'month', 'day', 'stars', 'genre'];
+    
+    // Filter updates to only include allowed fields
+    const filteredUpdates = Object.keys(updates)
+      .filter(key => allowedFields.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = updates[key];
+        return obj;
+      }, {});
+    
+    if (Object.keys(filteredUpdates).length === 0) {
+      return res.status(400).json({ error: "No valid fields to update" });
+    }
+    
+    // Update game in memory
+    Object.assign(game, filteredUpdates);
+    
+    // Save to file
+    const fileName = "games-library.json";
+    const filePath = path.join(metadataGamesDir, fileName);
+    try {
+      // Read current library games
+      const txt = fs.readFileSync(filePath, "utf8");
+      const allLibraryGames = JSON.parse(txt);
+      const gameIndex = allLibraryGames.findIndex((g) => g.id === gameId);
+      
+      if (gameIndex !== -1) {
+        // Update existing game
+        Object.assign(allLibraryGames[gameIndex], filteredUpdates);
+      } else {
+        // Game not in library file, skip (it might be in recommended/categories)
+        return res.status(404).json({ error: "Game not found in library" });
+      }
+      
+      fs.writeFileSync(filePath, JSON.stringify(allLibraryGames, null, 2), "utf8");
+      
+      // Return updated game data
+      const updatedGame = allLibraryGames[gameIndex];
+      const gameData = {
+        id: updatedGame.id,
+        title: updatedGame.title,
+        summary: updatedGame.summary || "",
+        cover: `/covers/${encodeURIComponent(updatedGame.id)}`,
+        day: updatedGame.day || null,
+        month: updatedGame.month || null,
+        year: updatedGame.year || null,
+        stars: updatedGame.stars || null,
+        genre: updatedGame.genre || null,
+      };
+      const background = getBackgroundPath(metadataPath, updatedGame.id);
+      if (background) {
+        gameData.background = background;
+      }
+      
+      res.json({ status: "success", game: gameData });
+    } catch (e) {
+      console.error(`Failed to save ${fileName}:`, e.message);
+      res.status(500).json({ error: "Failed to save game updates" });
+    }
+  });
 }
 
 module.exports = {

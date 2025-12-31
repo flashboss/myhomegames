@@ -163,3 +163,171 @@ describe('GET /games/:gameId', () => {
   });
 });
 
+describe('PUT /games/:gameId', () => {
+  test('should update a single field', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const updateResponse = await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ title: 'Updated Title' })
+        .expect(200);
+      
+      expect(updateResponse.body).toHaveProperty('status', 'success');
+      expect(updateResponse.body).toHaveProperty('game');
+      expect(updateResponse.body.game).toHaveProperty('title', 'Updated Title');
+      
+      // Verify the update persisted by fetching again
+      const verifyResponse = await request(app)
+        .get(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(verifyResponse.body).toHaveProperty('title', 'Updated Title');
+    }
+  });
+
+  test('should update multiple fields', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const updateResponse = await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ 
+          title: 'New Title',
+          stars: 9 
+        })
+        .expect(200);
+      
+      expect(updateResponse.body).toHaveProperty('status', 'success');
+      expect(updateResponse.body.game).toHaveProperty('title', 'New Title');
+      expect(updateResponse.body.game).toHaveProperty('stars', 9);
+    }
+  });
+
+  test('should ignore non-allowed fields', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const originalTitle = libraryResponse.body.games[0].title;
+      
+      const updateResponse = await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ 
+          title: 'Updated Title',
+          invalidField: 'should be ignored',
+          anotherInvalidField: 123
+        })
+        .expect(200);
+      
+      expect(updateResponse.body.game).toHaveProperty('title', 'Updated Title');
+      expect(updateResponse.body.game).not.toHaveProperty('invalidField');
+    }
+  });
+
+  test('should return 400 when no valid fields provided', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ 
+          invalidField: 'should be ignored',
+          anotherInvalidField: 123
+        })
+        .expect(400);
+      
+      expect(response.body).toHaveProperty('error', 'No valid fields to update');
+    }
+  });
+
+  test('should return 404 for non-existent game', async () => {
+    const response = await request(app)
+      .put('/games/non-existent-game-id')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'Updated Title' })
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Game not found');
+  });
+
+  test('should return 404 for game not in library file', async () => {
+    // Try to update a game that doesn't exist at all
+    const response = await request(app)
+      .put('/games/completely-nonexistent-game-id-12345')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'Updated Title' })
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Game not found');
+  });
+
+  test('should require authentication', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .put(`/games/${gameId}`)
+        .send({ title: 'Updated Title' })
+        .expect(401);
+      
+      expect(response.body).toHaveProperty('error', 'Unauthorized');
+    }
+  });
+
+  test('should return updated game data', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const updateResponse = await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ title: 'Updated Title' })
+        .expect(200);
+      
+      const game = updateResponse.body.game;
+      expect(game).toHaveProperty('id');
+      expect(game).toHaveProperty('title', 'Updated Title');
+    }
+  });
+});
+

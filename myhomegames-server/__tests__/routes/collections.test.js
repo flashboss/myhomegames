@@ -92,3 +92,91 @@ describe('GET /collections/:id/games', () => {
   });
 });
 
+describe('PUT /collections/:id', () => {
+  test('should update a single field', async () => {
+    const collectionId = 'collection_test_1';
+    const response = await request(app)
+      .put(`/collections/${collectionId}`)
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'Updated Title' })
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body.collection).toHaveProperty('id', collectionId);
+    expect(response.body.collection).toHaveProperty('title', 'Updated Title');
+  });
+
+  test('should update multiple fields', async () => {
+    const collectionId = 'collection_test_2';
+    const updates = { title: 'Updated Title', summary: 'Updated Summary' };
+    const response = await request(app)
+      .put(`/collections/${collectionId}`)
+      .set('X-Auth-Token', 'test-token')
+      .send(updates)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body.collection).toHaveProperty('id', collectionId);
+    expect(response.body.collection).toHaveProperty('title', 'Updated Title');
+    expect(response.body.collection).toHaveProperty('summary', 'Updated Summary');
+  });
+
+  test('should ignore non-allowed fields', async () => {
+    const collectionId = 'collection_test_1';
+    const updates = { title: 'New Title', unknownField: 'value' };
+    const response = await request(app)
+      .put(`/collections/${collectionId}`)
+      .set('X-Auth-Token', 'test-token')
+      .send(updates)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body.collection).toHaveProperty('title', 'New Title');
+    expect(response.body.collection).not.toHaveProperty('unknownField');
+  });
+
+  test('should return 400 when no valid fields provided', async () => {
+    const collectionId = 'collection_test_1';
+    const response = await request(app)
+      .put(`/collections/${collectionId}`)
+      .set('X-Auth-Token', 'test-token')
+      .send({ unknownField: 'value' })
+      .expect(400);
+
+    expect(response.body).toHaveProperty('error', 'No valid fields to update');
+  });
+
+  test('should return 404 for non-existent collection', async () => {
+    const response = await request(app)
+      .put('/collections/non-existent-collection-id')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'New Title' })
+      .expect(404);
+
+    expect(response.body).toHaveProperty('error', 'Collection not found');
+  });
+
+  test('should require authentication', async () => {
+    const collectionId = 'collection_test_1';
+    const response = await request(app)
+      .put(`/collections/${collectionId}`)
+      .send({ title: 'New Title' })
+      .expect(401);
+
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
+  });
+
+  test('should return updated collection data', async () => {
+    const collectionId = 'collection_test_1';
+    const response = await request(app)
+      .put(`/collections/${collectionId}`)
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'Updated Title' })
+      .expect(200);
+
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body.collection).toHaveProperty('title', 'Updated Title');
+    expect(response.body.collection).toHaveProperty('gameCount');
+  });
+});
+
