@@ -45,7 +45,6 @@ function CollectionListItem({
       }}
       className="group cursor-pointer collections-list-item"
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
-      onClick={() => onCollectionClick(collection)}
     >
       <Cover
         title={collection.title}

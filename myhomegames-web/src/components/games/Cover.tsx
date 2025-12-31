@@ -50,6 +50,7 @@ export default function Cover({
       onPlay();
     } else if (detail && onClick) {
       // If detail enabled, clicking the cover goes to detail
+      e.stopPropagation(); // Prevent event from bubbling to parent
       onClick();
     }
     // If neither play nor detail, do nothing
