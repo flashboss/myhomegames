@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
+import Cover from "./Cover";
 import type { GameItem } from "../../types";
 import "./GamesList.css";
 
@@ -50,16 +50,7 @@ function GameListItem({
   isDragging,
   dragOverIndex,
 }: GameListItemProps) {
-  const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !game.cover || imageError;
   const coverHeight = coverSize * 1.5;
-
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onPlay) {
-      onPlay(game);
-    }
-  };
 
   const handleDragStart = (e: React.DragEvent) => {
     if (!draggable) return;
@@ -110,52 +101,16 @@ function GameListItem({
         }
       }}
     >
-      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden games-list-cover transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 cover-hover-effect">
-        {showPlaceholder ? (
-          <CoverPlaceholder
-            title={game.title}
-            width={coverSize}
-            height={coverHeight}
-          />
-        ) : (
-          <>
-            <img
-              src={buildCoverUrl(apiBase, game.cover)}
-              alt={game.title}
-              className="object-cover w-full h-full"
-              onError={() => {
-                setImageError(true);
-              }}
-            />
-          </>
-        )}
-        {onPlay && (
-          <button
-            onClick={handlePlayClick}
-            className="games-list-play-button"
-            aria-label="Play game"
-          >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 5v14l11-7z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
-      <div className="games-list-title-wrapper">
-        <div className="truncate games-list-title">{game.title}</div>
-        {game.year != null && typeof game.year === 'number' && (
-          <div className="games-list-year">{game.year}</div>
-        )}
-      </div>
+      <Cover
+        title={game.title}
+        coverUrl={buildCoverUrl(apiBase, game.cover)}
+        width={coverSize}
+        height={coverHeight}
+        onPlay={onPlay ? () => onPlay(game) : undefined}
+        showTitle={true}
+        showYear={true}
+        year={game.year}
+      />
     </div>
   );
 }
