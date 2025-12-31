@@ -81,7 +81,8 @@
   },
   "gameDetail": {
     "notFound": "未找到游戏",
-    "goBack": "返回首页"
+    "goBack": "返回首页",
+    "andMore": "等等"
   },
   "common": {
     "loading": "加载中...",

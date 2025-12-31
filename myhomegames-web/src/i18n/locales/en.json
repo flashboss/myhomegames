@@ -81,7 +81,8 @@
   },
   "gameDetail": {
     "notFound": "Game not found",
-    "goBack": "Go back to home"
+    "goBack": "Go back to home",
+    "andMore": "and more"
   },
   "common": {
     "loading": "Loading...",

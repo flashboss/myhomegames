@@ -81,7 +81,8 @@
   },
   "gameDetail": {
     "notFound": "Spiel nicht gefunden",
-    "goBack": "Zurück zur Startseite"
+    "goBack": "Zurück zur Startseite",
+    "andMore": "und mehr"
   },
   "common": {
     "loading": "Lädt...",

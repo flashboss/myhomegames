@@ -81,7 +81,8 @@
   },
   "gameDetail": {
     "notFound": "Jeu non trouvé",
-    "goBack": "Retour à l'accueil"
+    "goBack": "Retour à l'accueil",
+    "andMore": "et plus"
   },
   "common": {
     "loading": "Chargement...",

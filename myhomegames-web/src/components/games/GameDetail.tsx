@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import Cover from "./Cover";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
+import GameCategories from "./GameCategories";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
 import type { GameItem } from "../../types";
@@ -216,6 +217,7 @@ function GameDetailContent({
                   {releaseDate}
                 </div>
               )}
+              <GameCategories game={game} />
               <StarRating 
                 rating={rating || 0} 
                 readOnly={false}

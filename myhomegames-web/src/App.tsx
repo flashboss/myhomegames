@@ -424,6 +424,7 @@ function GameDetailPage({
         month: found.month,
         year: found.year,
         stars: found.stars,
+        genre: found.genre,
       };
       setGame(parsed);
     } catch (err: any) {
