@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import StarRating from "../common/StarRating";
 import type { GameItem } from "../../types";
+import { buildApiUrl } from "../../utils/api";
 import "./GamesListTable.css";
 
 type GamesListTableProps = {
@@ -14,6 +15,8 @@ type GamesListTableProps = {
   sortAscending?: boolean;
   onSortChange?: (field: "title" | "year" | "stars" | "releaseDate") => void;
   onSortDirectionChange?: (ascending: boolean) => void;
+  apiBase?: string;
+  apiToken?: string;
 };
 
 type ColumnVisibility = {
@@ -33,7 +36,44 @@ export default function GamesListTable({
   sortAscending = true,
   onSortChange,
   onSortDirectionChange,
+  apiBase,
+  apiToken,
 }: GamesListTableProps) {
+  const [localGames, setLocalGames] = useState<GameItem[]>(games);
+  
+  // Sync localGames when games prop changes
+  useEffect(() => {
+    setLocalGames(games);
+  }, [games]);
+
+  const handleRatingChange = async (gameId: string, newStars: number) => {
+    if (!apiBase || !apiToken) return;
+    
+    try {
+      const url = buildApiUrl(apiBase, `/games/${gameId}`);
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': apiToken,
+        },
+        body: JSON.stringify({ stars: newStars }),
+      });
+
+      if (response.ok) {
+        const updatedGames = localGames.map(game => 
+          game.ratingKey === gameId 
+            ? { ...game, stars: newStars }
+            : game
+        );
+        setLocalGames(updatedGames);
+      } else {
+        console.error('Failed to update rating');
+      }
+    } catch (error) {
+      console.error('Error updating rating:', error);
+    }
+  };
   const { t, i18n } = useTranslation();
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(
     () => {
@@ -273,7 +313,7 @@ export default function GamesListTable({
             </tr>
           </thead>
                   <tbody>
-                    {games.map((it, index) => {
+                    {localGames.map((it, index) => {
               const isEven = index % 2 === 0;
               const rowClass = isEven ? "even-row" : "odd-row";
               
@@ -364,11 +404,15 @@ export default function GamesListTable({
                     <td className={`stars-cell ${rowClass} ${firstVisibleColumn === "stars" ? "first-visible-cell" : ""}`}>
                       {firstVisibleColumn === "stars" && onPlay && <PlayIcon />}
                       <div className={firstVisibleColumn === "stars" ? "first-cell-text" : ""} style={{ display: 'flex', alignItems: 'center' }}>
-                        {it.stars !== null && it.stars !== undefined ? (
-                          <StarRating rating={(it.stars / 10) * 5} starSize={14} gap={3} color="rgba(255, 255, 255, 0.4)" noStroke={true} />
-                        ) : (
-                          <span>-</span>
-                        )}
+                        <StarRating 
+                          rating={it.stars ? (it.stars / 10) * 5 : 0} 
+                          starSize={14} 
+                          gap={3} 
+                          color="rgba(255, 255, 255, 0.4)" 
+                          noStroke={true}
+                          readOnly={!apiBase || !apiToken}
+                          onRatingChange={apiBase && apiToken ? (newStars) => handleRatingChange(it.ratingKey, newStars) : undefined}
+                        />
                       </div>
                     </td>
                   )}

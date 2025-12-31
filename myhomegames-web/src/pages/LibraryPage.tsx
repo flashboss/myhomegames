@@ -450,6 +450,8 @@ export default function LibraryPage({
                   sortAscending={sortAscending}
                   onSortChange={setSortField}
                   onSortDirectionChange={setSortAscending}
+                  apiBase={apiBase}
+                  apiToken={apiToken}
                 />
               )}
             </>

@@ -422,6 +422,8 @@ export default function CategoryPage({
                   sortAscending={sortAscending}
                   onSortChange={setSortField}
                   onSortDirectionChange={setSortAscending}
+                  apiBase={apiBase}
+                  apiToken={apiToken}
                 />
               )}
             </>
