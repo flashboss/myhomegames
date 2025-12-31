@@ -9,18 +9,7 @@ import GamesListToolbar from "../components/games/GamesListToolbar";
 import LibrariesBar, { type ViewMode } from "../components/layout/LibrariesBar";
 import type { FilterField } from "../components/filters/types";
 import { compareTitles } from "../utils/stringUtils";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-  genre?: string | string[];
-};
+import type { GameItem } from "../types";
 
 type CategoryPageProps = {
   apiBase: string;

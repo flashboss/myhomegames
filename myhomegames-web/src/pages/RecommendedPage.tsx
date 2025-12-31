@@ -1,17 +1,7 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import RecommendedSection from "../components/recommended/RecommendedSection";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
+import type { GameItem } from "../types";
 
 type RecommendedSection = {
   id: string;

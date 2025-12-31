@@ -2,18 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
 import StarRating from "../common/StarRating";
+import type { GameItem } from "../../types";
 import "./GamesListDetail.css";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
 
 type GamesListDetailProps = {
   games: GameItem[];

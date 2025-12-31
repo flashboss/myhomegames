@@ -3,24 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import SearchResultsList from "../components/search/SearchResultsList";
+import type { GameItem, CollectionItem } from "../types";
 import "./SearchResultsPage.css";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
-
-type CollectionItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-};
 
 type SearchResultsPageProps = {
   apiBase: string;

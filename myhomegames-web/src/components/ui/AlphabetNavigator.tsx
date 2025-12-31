@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
+import type { GameItem } from "../../types";
 import "./AlphabetNavigator.css";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
 
 type AlphabetNavigatorProps = {
   games: GameItem[];

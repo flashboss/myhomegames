@@ -2,6 +2,7 @@ import { useRef, useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import GamesList from "../games/GamesList";
+import type { GameItem } from "../../types";
 import "./RecommendedSection.css";
 
 // Helper functions to get/set scroll positions from sessionStorage
@@ -23,17 +24,6 @@ function setScrollPosition(key: string, position: number): void {
     // Ignore storage errors
   }
 }
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
 
 type RecommendedSectionProps = {
   sectionId: string;

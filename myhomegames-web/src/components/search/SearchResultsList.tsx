@@ -1,26 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
-import "./SearchResultsList.css";
-
 import { useNavigate } from "react-router-dom";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
-
-type CollectionItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-};
+import type { GameItem, CollectionItem } from "../../types";
+import "./SearchResultsList.css";
 
 type SearchResultsListProps = {
   games: GameItem[];

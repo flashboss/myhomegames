@@ -20,17 +20,7 @@ import AddGame from "./components/common/AddGame";
 import GameDetail from "./components/games/GameDetail";
 import LaunchModal from "./components/common/LaunchModal";
 
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  background?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
+import type { GameItem, CollectionItem } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
 const API_TOKEN = import.meta.env.VITE_API_TOKEN || "";
@@ -59,12 +49,6 @@ function buildBackgroundUrl(apiBase: string, background?: string) {
   const u = new URL(background, apiBase);
   return u.toString();
 }
-
-type CollectionItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-};
 
 function AppContent() {
   const [allGames, setAllGames] = useState<GameItem[]>([]);

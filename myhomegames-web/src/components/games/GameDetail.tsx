@@ -5,19 +5,8 @@ import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
+import type { GameItem } from "../../types";
 import "./GameDetail.css";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  background?: string;
-  stars?: number | null;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-};
 
 type GameDetailProps = {
   game: GameItem;

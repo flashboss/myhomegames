@@ -4,13 +4,7 @@ import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import CollectionsList from "../components/lists/CollectionsList";
 import AlphabetNavigator from "../components/ui/AlphabetNavigator";
 import { compareTitles } from "../utils/stringUtils";
-
-type CollectionItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-  gameCount?: number;
-};
+import type { CollectionItem } from "../types";
 
 type CollectionsPageProps = {
   apiBase: string;

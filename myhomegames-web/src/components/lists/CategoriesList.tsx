@@ -2,13 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
+import type { CategoryItem } from "../../types";
 import "./CategoriesList.css";
-
-type CategoryItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-};
 
 type CategoriesListProps = {
   categories: CategoryItem[];

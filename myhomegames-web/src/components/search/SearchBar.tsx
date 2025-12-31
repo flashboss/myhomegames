@@ -2,24 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
+import type { GameItem, CollectionItem } from "../../types";
 import "./SearchBar.css";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
-
-type CollectionItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-};
 
 type SearchBarProps = {
   games: GameItem[];

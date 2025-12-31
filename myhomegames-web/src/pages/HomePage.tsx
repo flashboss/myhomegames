@@ -5,29 +5,13 @@ import LibraryPage from "./LibraryPage";
 import RecommendedPage from "./RecommendedPage";
 import CollectionsPage from "./CollectionsPage";
 import CategoriesPage from "./CategoriesPage";
+import type { GameItem, CategoryItem } from "../types";
 import "./HomePage.css";
 
 type GameLibrarySection = {
   key: string;
   title?: string; // Optional, will be translated using key
   type: string;
-};
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
-
-type CategoryItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
 };
 
 export type { GameItem, CategoryItem };

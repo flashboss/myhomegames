@@ -9,26 +9,8 @@ import StarRating from "../components/common/StarRating";
 import Summary from "../components/common/Summary";
 import BackgroundManager, { useBackground } from "../components/common/BackgroundManager";
 import { compareTitles } from "../utils/stringUtils";
+import type { GameItem, CollectionInfo } from "../types";
 import "./CollectionDetail.css";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
-
-type CollectionInfo = {
-  id: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  background?: string;
-};
 
 type CollectionDetailProps = {
   apiBase: string;

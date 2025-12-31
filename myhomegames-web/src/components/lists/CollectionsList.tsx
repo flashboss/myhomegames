@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
+import type { CollectionItem } from "../../types";
 import "./CollectionsList.css";
-
-type CollectionItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-  gameCount?: number;
-};
 
 type CollectionsListProps = {
   collections: CollectionItem[];

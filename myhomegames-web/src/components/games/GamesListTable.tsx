@@ -1,18 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import StarRating from "../common/StarRating";
+import type { GameItem } from "../../types";
 import "./GamesListTable.css";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
 
 type GamesListTableProps = {
   games: GameItem[];

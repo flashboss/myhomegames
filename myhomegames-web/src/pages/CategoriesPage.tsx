@@ -1,24 +1,7 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import CategoriesList from "../components/lists/CategoriesList";
-
-type CategoryItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-};
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-  genre?: string | string[];
-};
+import type { CategoryItem, GameItem } from "../types";
 
 type CategoriesPageProps = {
   apiBase: string;

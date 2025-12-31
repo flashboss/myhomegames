@@ -1,23 +1,7 @@
 import { useTranslation } from "react-i18next";
 import Logo from "../common/Logo";
 import SearchBar from "../search/SearchBar";
-
-type GameItem = {
-  ratingKey: string;
-  title: string;
-  summary?: string;
-  cover?: string;
-  day?: number | null;
-  month?: number | null;
-  year?: number | null;
-  stars?: number | null;
-};
-
-type CollectionItem = {
-  ratingKey: string;
-  title: string;
-  cover?: string;
-};
+import type { GameItem, CollectionItem } from "../../types";
 
 type HeaderProps = {
   allGames: GameItem[];
