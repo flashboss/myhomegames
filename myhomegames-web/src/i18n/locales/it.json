@@ -7,9 +7,10 @@
   },
   "recommended": {
     "most_played": "I più giocati",
-    "recently_installed": "Quelli installati recente",
+    "recently_installed": "Installati di recente",
     "best_western": "I migliori giochi western",
-    "recommended": "Consigliati"
+    "recommended": "Consigliati",
+    "oldest": "I più antichi"
   },
   "settings": {
     "title": "Impostazioni",

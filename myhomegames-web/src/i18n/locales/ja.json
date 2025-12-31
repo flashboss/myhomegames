@@ -9,7 +9,8 @@
     "most_played": "最もプレイされた",
     "recently_installed": "最近インストールされた",
     "best_western": "最高のウェスタンゲーム",
-    "recommended": "おすすめ"
+    "recommended": "おすすめ",
+    "oldest": "最も古い"
   },
   "settings": {
     "title": "設定",

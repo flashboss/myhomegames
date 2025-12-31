@@ -12,7 +12,7 @@
     "games": ["test_game_1"]
   },
   {
-    "id": "recommended",
+    "id": "oldest",
     "games": ["test_game_1", "test_game_2", "test_game_3"]
   }
 ]

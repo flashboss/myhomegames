@@ -9,7 +9,8 @@
     "most_played": "Most Played",
     "recently_installed": "Recently Installed",
     "best_western": "Best Western Games",
-    "recommended": "Recommended"
+    "recommended": "Recommended",
+    "oldest": "Oldest"
   },
   "settings": {
     "title": "Settings",
