@@ -3,24 +3,27 @@ import { useTranslation } from "react-i18next";
 
 type SummaryProps = {
   summary: string;
+  truncateOnly?: boolean;
+  maxLines?: number;
+  fontSize?: string;
 };
 
-export default function Summary({ summary }: SummaryProps) {
+export default function Summary({ summary, truncateOnly = false, maxLines = 5, fontSize }: SummaryProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (textRef.current) {
-      // Check if text exceeds 5 lines
+    if (textRef.current && !truncateOnly) {
+      // Check if text exceeds maxLines
       const lineHeight = parseFloat(getComputedStyle(textRef.current).lineHeight);
-      const maxHeight = lineHeight * 5;
+      const maxHeight = lineHeight * maxLines;
       if (textRef.current.scrollHeight > maxHeight) {
         setShowExpandButton(true);
       }
     }
-  }, [summary]);
+  }, [summary, truncateOnly, maxLines]);
 
   if (!summary) {
     return null;
@@ -34,10 +37,10 @@ export default function Summary({ summary }: SummaryProps) {
         style={{ 
           opacity: 0.8,
           fontFamily: 'var(--font-body-1-font-family)',
-          fontSize: 'var(--font-body-1-font-size)',
+          fontSize: fontSize || 'var(--font-body-1-font-size)',
           lineHeight: 'var(--font-body-1-line-height)',
           display: '-webkit-box',
-          WebkitLineClamp: isExpanded ? 'none' : 5,
+          WebkitLineClamp: isExpanded ? 'none' : maxLines,
           WebkitBoxOrient: 'vertical',
           overflow: isExpanded ? 'visible' : 'hidden',
           textOverflow: isExpanded ? 'clip' : 'ellipsis'
@@ -45,7 +48,7 @@ export default function Summary({ summary }: SummaryProps) {
       >
         {summary}
       </div>
-      {showExpandButton && (
+      {showExpandButton && !truncateOnly && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           style={{

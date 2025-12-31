@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
 import StarRating from "../common/StarRating";
+import Summary from "../common/Summary";
 import type { GameItem } from "../../types";
 import "./GamesListDetail.css";
 
@@ -108,17 +109,6 @@ function GameDetailItem({
         <div className="text-white mb-2 games-list-detail-title">
           {game.title}
         </div>
-        {game.summary && (
-          <div
-            className="text-gray-400 mb-2"
-            style={{
-              fontSize: "0.95rem",
-              lineHeight: "1.5",
-            }}
-          >
-            {game.summary}
-          </div>
-        )}
         {(game.year !== null && game.year !== undefined) || (game.stars !== null && game.stars !== undefined) ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             {game.year !== null && game.year !== undefined && (
@@ -136,6 +126,9 @@ function GameDetailItem({
             )}
           </div>
         ) : null}
+        {game.summary && (
+          <Summary summary={game.summary} truncateOnly={true} maxLines={2} fontSize="0.85rem" />
+        )}
       </div>
     </div>
   );
