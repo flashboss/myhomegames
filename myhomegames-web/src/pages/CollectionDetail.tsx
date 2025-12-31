@@ -127,9 +127,32 @@ export default function CollectionDetail({
         year: v.year,
         stars: v.stars,
       }));
-      // Initialize customOrder with the order from backend (saved order)
+      // Check if the order from backend differs from year-sorted order
+      // If it differs, it means there's a custom order saved
+      const yearSorted = [...parsed].sort((a, b) => {
+        const yearA = a.year ?? 0;
+        const yearB = b.year ?? 0;
+        if (yearA !== 0 && yearB !== 0) return yearA - yearB;
+        if (yearA !== 0 && yearB === 0) return -1;
+        if (yearA === 0 && yearB !== 0) return 1;
+        return 0;
+      });
+      
       const orderFromBackend = parsed.map(g => g.ratingKey);
-      setCustomOrder(orderFromBackend);
+      const yearSortedOrder = yearSorted.map(g => g.ratingKey);
+      
+      // Only use customOrder if backend order differs from year-sorted order
+      const orderMatches = orderFromBackend.length === yearSortedOrder.length &&
+        orderFromBackend.every((id, idx) => id === yearSortedOrder[idx]);
+      
+      if (!orderMatches) {
+        // Backend has a custom order saved
+        setCustomOrder(orderFromBackend);
+      } else {
+        // Backend order matches year-sorted, so use default year sorting
+        setCustomOrder(null);
+      }
+      
       setGames(parsed);
       onGamesLoaded(parsed);
     } catch (err: any) {
