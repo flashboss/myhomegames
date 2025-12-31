@@ -10,25 +10,4 @@
   flex-shrink: 0;
 }
 
-.categories-list-title-overlay {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  z-index: 5;
-  pointer-events: none;
-}
-
-.categories-list-title-inside {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  text-align: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  line-height: 1.2;
-  padding: 8px;
-}
-
 

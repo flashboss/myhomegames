@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
+import SearchResultsList from "./SearchResultsList";
 import type { GameItem, CollectionItem } from "../../types";
 import "./SearchBar.css";
+import "./SearchResultsList.css";
 
 type SearchBarProps = {
   games: GameItem[];
@@ -27,7 +28,6 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
   const [filteredCollections, setFilteredCollections] = useState<CollectionItem[]>([]);
   const [allFilteredGames, setAllFilteredGames] = useState<GameItem[]>([]);
   const [allFilteredCollections, setAllFilteredCollections] = useState<CollectionItem[]>([]);
-  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -368,173 +368,26 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
       {isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && (filteredGames.length > 0 || filteredCollections.length > 0) && (
         <div className="plex-dropdown search-dropdown">
           <div className="search-dropdown-scroll">
-            {filteredCollections.map((collection, index) => {
-              const showPlaceholder =
-                !collection.cover || imageErrors.has(collection.ratingKey);
-
-              return (
-                <div
-                  key={`collection-${collection.ratingKey}`}
-                  onClick={() => {
-                    navigate(`/collections/${collection.ratingKey}`);
-                    setIsOpen(false);
-                    setIsFocused(false);
-                    setSearchQuery("");
-                  }}
-                  className={`w-full plex-dropdown-item search-dropdown-item ${
-                    index < filteredCollections.length - 1 || filteredGames.length > 0 ? "has-border" : ""
-                  }`}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      navigate(`/collections/${collection.ratingKey}`);
-                      setIsOpen(false);
-                      setIsFocused(false);
-                      setSearchQuery("");
-                    }
-                  }}
-                >
-                  {showPlaceholder ? (
-                    <div className="search-result-thumbnail">
-                      <CoverPlaceholder title={collection.title} width={40} height={60} />
-                    </div>
-                  ) : (
-                    <img
-                      src={
-                        collection.cover && collection.cover.startsWith("http")
-                          ? collection.cover
-                          : `http://127.0.0.1:4000${collection.cover || ""}`
-                      }
-                      alt={collection.title}
-                      className="object-cover rounded flex-shrink-0 search-result-thumbnail"
-                      onError={() => {
-                        setImageErrors((prev) => new Set(prev).add(collection.ratingKey));
-                      }}
-                    />
-                  )}
-                  <div className="search-result-content">
-                    <div className="text-white text-base truncate search-result-title">
-                      {collection.title}
-                    </div>
-                    <div className="text-gray-400 text-sm truncate mt-1 search-result-type">
-                      {t("search.collection")}
-                    </div>
-                  </div>
-                  {onPlay && (
-                    <button
-                      className="search-result-play-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPlay(collection);
-                      }}
-                      aria-label="Play collection"
-                    >
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8 5v14l11-7z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-            {filteredGames.map((game, index) => {
-              const showPlaceholder =
-                !game.cover || imageErrors.has(game.ratingKey);
-
-              return (
-                <div
-                  key={game.ratingKey}
-                  onClick={() => {
-                    handleGameSelect(game);
-                  }}
-                  className={`w-full plex-dropdown-item search-dropdown-item ${
-                    index < filteredGames.length - 1 ? "has-border" : ""
-                  }`}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleGameSelect(game);
-                    }
-                  }}
-                >
-                  {showPlaceholder ? (
-                    <div className="search-result-thumbnail">
-                      <CoverPlaceholder
-                        title={game.title}
-                        width={60}
-                        height={90}
-                      />
-                    </div>
-                  ) : (
-                    <img
-                      src={
-                        game.cover && game.cover.startsWith("http")
-                          ? game.cover
-                          : `http://127.0.0.1:4000${game.cover || ""}`
-                      }
-                      alt={game.title}
-                      className="object-cover rounded flex-shrink-0 search-result-thumbnail"
-                      onError={() => {
-                        setImageErrors((prev) =>
-                          new Set(prev).add(game.ratingKey)
-                        );
-                      }}
-                    />
-                  )}
-                  <div className="search-result-content">
-                    <div className="text-white text-base truncate search-result-title">
-                      {game.title}
-                    </div>
-                    {game.year !== null && game.year !== undefined && (
-                      <div className="text-gray-500 text-sm truncate mt-1 search-result-date">
-                        {game.day !== null &&
-                        game.day !== undefined &&
-                        game.month !== null &&
-                        game.month !== undefined
-                          ? `${game.day}/${game.month}/${game.year}`
-                          : game.year.toString()}
-                      </div>
-                    )}
-                  </div>
-                  {onPlay && (
-                    <button
-                      className="search-result-play-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPlay(game);
-                      }}
-                      aria-label="Play game"
-                    >
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8 5v14l11-7z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+            <SearchResultsList
+              games={filteredGames}
+              collections={filteredCollections}
+              apiBase="http://127.0.0.1:4000"
+              onGameClick={handleGameSelect}
+              buildCoverUrl={(apiBase, cover) => {
+                if (cover && cover.startsWith("http")) {
+                  return cover;
+                }
+                return `${apiBase}${cover || ""}`;
+              }}
+              variant="popup"
+              onPlay={onPlay}
+              onCollectionClick={(collection) => {
+                navigate(`/collections/${collection.ratingKey}`);
+                setIsOpen(false);
+                setIsFocused(false);
+                setSearchQuery("");
+              }}
+            />
           </div>
           {(allFilteredGames.length > 0 || allFilteredCollections.length > 0) && (
             <div className="search-dropdown-footer">

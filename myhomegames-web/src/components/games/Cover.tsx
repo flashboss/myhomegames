@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
 import type React from "react";
 import "./Cover.css";
 
@@ -20,6 +19,7 @@ type CoverProps = {
   overlayContent?: React.ReactNode; // Content to overlay on the cover
   brightness?: number; // Brightness filter (0-100 or higher, default: 100)
   blur?: number; // Blur filter in pixels (default: 0)
+  titlePosition?: "bottom" | "overlay"; // Position of title: below cover or inside image (default: "bottom")
 };
 
 export default function Cover({
@@ -38,10 +38,20 @@ export default function Cover({
   overlayContent,
   brightness,
   blur,
+  titlePosition = "bottom",
 }: CoverProps) {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !coverUrl || imageError;
+  
+  // Calculate font size and padding for placeholder overlay
+  let calculatedFontSize = Math.max(10, Math.min(16, Math.floor(width / 8)));
+  // Increase font size for 16/9 aspect ratio with overlay title
+  if (aspectRatio === "16/9" && titlePosition === "overlay") {
+    calculatedFontSize = Math.max(14, Math.min(24, Math.floor(width / 5)));
+  }
+  const padding = Math.max(4, Math.floor(width / 20));
+  const lineClamp = Math.max(2, Math.floor(height / (calculatedFontSize * 1.5)));
 
   const handleCoverClick = (e: React.MouseEvent) => {
     if (play && !detail && onPlay) {
@@ -79,7 +89,7 @@ export default function Cover({
   return (
     <>
       <div
-        className={`games-list-cover relative bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} ${play ? 'games-list-cover-play' : ''} ${detail ? 'games-list-cover-detail' : ''}`}
+        className={`games-list-cover relative bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} ${play ? 'games-list-cover-play' : ''} ${detail ? 'games-list-cover-detail' : ''} ${blur !== undefined && blur > 0 ? 'cover-with-blur' : ''}`}
         style={{ 
           width: `${width}px`, 
           aspectRatio: aspectRatio,
@@ -88,11 +98,40 @@ export default function Cover({
         onClick={handleCoverClick}
       >
         {showPlaceholder ? (
-          <CoverPlaceholder
-            title={title}
-            width={width}
-            height={height}
-          />
+          <div
+            className="cover-placeholder"
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#2a2a2a",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              className="cover-placeholder-text"
+              style={{
+                padding: `${padding}px`,
+                fontSize: `${calculatedFontSize}px`,
+                textAlign: "center",
+                color: "rgba(255, 255, 255, 0.85)",
+                fontWeight: 600,
+                lineHeight: 1.3,
+                wordBreak: "break-word",
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: lineClamp,
+                WebkitBoxOrient: "vertical",
+                width: "100%",
+                maxHeight: "100%",
+              }}
+            >
+              {title}
+            </div>
+          </div>
         ) : (
           <img
             src={coverUrl}
@@ -129,8 +168,34 @@ export default function Cover({
             {overlayContent}
           </div>
         )}
+        {titlePosition === "overlay" && showTitle && !showPlaceholder && (
+          <div className="cover-overlay-content" style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: `${padding}px`,
+          }}>
+            <div
+              style={{
+                textAlign: "center",
+                color: "rgba(255, 255, 255, 0.95)",
+                fontWeight: 600,
+                fontSize: `${calculatedFontSize}px`,
+                lineHeight: 1.3,
+                wordBreak: "break-word",
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: lineClamp,
+                WebkitBoxOrient: "vertical",
+                textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
+              }}
+            >
+              {title}
+            </div>
+          </div>
+        )}
       </div>
-      {(showTitle || subtitle != null) && (
+      {(showTitle || subtitle != null) && titlePosition === "bottom" && (
         <div className="games-list-title-wrapper">
           {showTitle && (
             <div 

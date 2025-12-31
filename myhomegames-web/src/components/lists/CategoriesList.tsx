@@ -53,20 +53,14 @@ function CategoryListItem({
         width={coverSize}
         height={coverHeight}
         onClick={handleClick}
-        showTitle={false}
+        showTitle={true}
+        titlePosition="overlay"
         detail={true}
         play={false}
         showBorder={true}
         aspectRatio="16/9"
         brightness={40}
         blur={1}
-        overlayContent={
-          <div className="categories-list-title-overlay">
-            <div className="categories-list-title-inside">
-              {t(`genre.${category.title}`, category.title)}
-            </div>
-          </div>
-        }
       />
     </div>
   );

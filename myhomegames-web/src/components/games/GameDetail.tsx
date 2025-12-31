@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
+import Cover from "./Cover";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
@@ -22,8 +22,6 @@ export default function GameDetail({
   onPlay,
 }: GameDetailProps) {
   const { t } = useTranslation();
-  const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !coverUrl || imageError;
   const coverWidth = 256;
   const coverHeight = 384; // 256 * 1.5
   const hasBackground = Boolean(backgroundUrl && backgroundUrl.trim() !== "");
@@ -66,7 +64,6 @@ export default function GameDetail({
       <GameDetailContent
         game={game}
         coverUrl={coverUrl}
-        showPlaceholder={showPlaceholder}
         coverWidth={coverWidth}
         coverHeight={coverHeight}
         releaseDate={releaseDate}
@@ -74,7 +71,6 @@ export default function GameDetail({
         onPlay={onPlay}
         coverSize={coverSize}
         handleCoverSizeChange={handleCoverSizeChange}
-        setImageError={setImageError}
         t={t}
       />
     </BackgroundManager>
@@ -84,7 +80,6 @@ export default function GameDetail({
 function GameDetailContent({
   game,
   coverUrl,
-  showPlaceholder,
   coverWidth,
   coverHeight,
   releaseDate,
@@ -92,12 +87,10 @@ function GameDetailContent({
   onPlay,
   coverSize,
   handleCoverSizeChange,
-  setImageError,
   t,
 }: {
   game: GameItem;
   coverUrl: string;
-  showPlaceholder: boolean;
   coverWidth: number;
   coverHeight: number;
   releaseDate: string | null;
@@ -105,7 +98,6 @@ function GameDetailContent({
   onPlay: (game: GameItem) => void;
   coverSize: number;
   handleCoverSizeChange: (size: number) => void;
-  setImageError: (error: boolean) => void;
   t: (key: string) => string;
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
@@ -148,54 +140,18 @@ function GameDetailContent({
         <div className="pt-8" style={{ display: 'flex', flexDirection: 'row', gap: '48px', alignItems: 'flex-start', width: '100%', boxSizing: 'border-box' }}>
           {/* Cover Image */}
           <div style={{ flexShrink: 0 }}>
-            <div 
-              className="collection-detail-cover-container cover-hover-effect relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden" 
-              style={{ width: `${coverWidth}px` }}
-              onClick={() => {
-                // Click on cover plays the game
-                onPlay(game);
-              }}
-            >
-              {showPlaceholder ? (
-                <CoverPlaceholder
-                  title={game.title}
-                  width={coverWidth}
-                  height={coverHeight}
-                />
-              ) : (
-                <img
-                  src={coverUrl}
-                  alt={game.title}
-                  className="object-cover w-full h-full"
-                  onError={() => {
-                    setImageError(true);
-                  }}
-                />
-              )}
-              {onPlay && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onPlay(game);
-                  }}
-                  className="collection-detail-play-button"
-                  aria-label={t("common.play")}
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8 5v14l11-7z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
+            <Cover
+              title={game.title}
+              coverUrl={coverUrl}
+              width={coverWidth}
+              height={coverHeight}
+              onPlay={() => onPlay(game)}
+              showTitle={true}
+              titlePosition="overlay"
+              detail={false}
+              play={true}
+              showBorder={false}
+            />
           </div>
 
           {/* Game Info Panel */}

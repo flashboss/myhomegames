@@ -10,15 +10,26 @@ type SearchResultsListProps = {
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
+  variant?: "popup" | "page"; // "popup" for dropdown, "page" for full page
+  coverSize?: number; // Cover width (default: 100 for page, 60 for popup games, 40 for popup collections)
+  onPlay?: (item: GameItem | CollectionItem) => void; // Play handler
+  onCollectionClick?: (collection: CollectionItem) => void; // Collection click handler (for popup)
+  onItemClick?: (item: GameItem | CollectionItem) => void; // Generic item click handler
 };
 
 const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
+const POPUP_COVER_SIZE = 60;
 
 type SearchResultItemProps = {
   game: GameItem;
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
+  variant?: "popup" | "page";
+  coverSize?: number;
+  showPlayButton?: boolean;
+  onPlay?: (game: GameItem) => void;
+  hasBorder?: boolean;
 };
 
 function SearchResultItem({
@@ -26,83 +37,179 @@ function SearchResultItem({
   apiBase,
   onGameClick,
   buildCoverUrl,
+  variant = "page",
+  coverSize,
+  onPlay,
+  hasBorder = false,
 }: SearchResultItemProps) {
-  const coverHeight = FIXED_COVER_SIZE * 1.5;
+  const actualCoverSize = coverSize || (variant === "popup" ? POPUP_COVER_SIZE : FIXED_COVER_SIZE);
+  const coverHeight = actualCoverSize * 1.5;
+  const isPopup = variant === "popup";
+
+  const handleClick = () => {
+    onGameClick(game);
+  };
+
+  const handlePlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onPlay) {
+      onPlay(game);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (isPopup && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
     <div
       key={game.ratingKey}
-      className="group cursor-pointer mb-6 search-results-list-item"
-      onClick={() => onGameClick(game)}
+      className={`group cursor-pointer ${isPopup ? `plex-dropdown-item search-dropdown-item ${hasBorder ? "has-border" : ""}` : "mb-6 search-results-list-item"}`}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role={isPopup ? "button" : undefined}
+      tabIndex={isPopup ? 0 : undefined}
+      style={isPopup ? { display: "flex", alignItems: "center", gap: "16px" } : undefined}
     >
       <Cover
         title={game.title}
         coverUrl={buildCoverUrl(apiBase, game.cover)}
-        width={FIXED_COVER_SIZE}
+        width={actualCoverSize}
         height={coverHeight}
-        onClick={() => onGameClick(game)}
-        showTitle={false}
-        detail={true}
-        play={false}
-        showBorder={false}
-      />
-      <div className="search-results-list-content">
-        <div className="text-white mb-2 search-results-list-title">
-          {game.title}
-        </div>
-        {game.year !== null && game.year !== undefined && (
-          <div className="text-gray-500 search-results-list-date">
-            {game.day !== null &&
+        onClick={handleClick}
+        showTitle={true}
+        subtitle={game.year !== null && game.year !== undefined
+          ? (game.day !== null &&
             game.day !== undefined &&
             game.month !== null &&
             game.month !== undefined
               ? `${game.day}/${game.month}/${game.year}`
-              : game.year.toString()}
-          </div>
-        )}
-      </div>
+              : game.year.toString())
+          : null}
+        titlePosition="bottom"
+        detail={true}
+        play={false}
+        showBorder={false}
+      />
+      {onPlay && (
+        <button
+          className="search-result-play-button"
+          onClick={handlePlayClick}
+          aria-label="Play game"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8 5v14l11-7z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
+
+type CollectionResultItemProps = {
+  collection: CollectionItem;
+  apiBase: string;
+  buildCoverUrl: (apiBase: string, cover?: string) => string;
+  variant?: "popup" | "page";
+  coverSize?: number;
+  onPlay?: (collection: CollectionItem) => void;
+  onCollectionClick?: (collection: CollectionItem) => void;
+  hasBorder?: boolean;
+};
 
 function CollectionResultItem({
   collection,
   apiBase,
   buildCoverUrl,
-}: {
-  collection: CollectionItem;
-  apiBase: string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
-}) {
+  variant = "page",
+  coverSize,
+  onPlay,
+  onCollectionClick,
+  hasBorder = false,
+}: CollectionResultItemProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const coverHeight = FIXED_COVER_SIZE * 1.5;
+  const actualCoverSize = coverSize || (variant === "popup" ? POPUP_COVER_SIZE : FIXED_COVER_SIZE);
+  const coverHeight = actualCoverSize * 1.5;
+  const isPopup = variant === "popup";
+
+  const handleClick = () => {
+    if (onCollectionClick) {
+      onCollectionClick(collection);
+    } else {
+      navigate(`/collections/${collection.ratingKey}`);
+    }
+  };
+
+  const handlePlayClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onPlay) {
+      onPlay(collection);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (isPopup && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
     <div
       key={collection.ratingKey}
-      className="group cursor-pointer mb-6 search-results-list-item"
-      onClick={() => navigate(`/collections/${collection.ratingKey}`)}
+      className={`group cursor-pointer ${isPopup ? `plex-dropdown-item search-dropdown-item ${hasBorder ? "has-border" : ""}` : "mb-6 search-results-list-item"}`}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role={isPopup ? "button" : undefined}
+      tabIndex={isPopup ? 0 : undefined}
+      style={isPopup ? { display: "flex", alignItems: "center", gap: "16px" } : undefined}
     >
       <Cover
         title={collection.title}
         coverUrl={buildCoverUrl(apiBase, collection.cover)}
-        width={FIXED_COVER_SIZE}
+        width={actualCoverSize}
         height={coverHeight}
-        onClick={() => navigate(`/collections/${collection.ratingKey}`)}
-        showTitle={false}
+        onClick={handleClick}
+        showTitle={true}
+        subtitle={t("search.collection")}
+        titlePosition="bottom"
         detail={true}
         play={false}
         showBorder={false}
       />
-      <div className="search-results-list-content">
-        <div className="text-white mb-2 search-results-list-title">
-          {collection.title}
-        </div>
-        <div className="text-gray-400 mb-2 search-results-list-summary">
-          {t("search.collection")}
-        </div>
-      </div>
+      {onPlay && (
+        <button
+          className="search-result-play-button"
+          onClick={handlePlayClick}
+          aria-label="Play collection"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8 5v14l11-7z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
@@ -113,6 +220,10 @@ export default function SearchResultsList({
   apiBase,
   onGameClick,
   buildCoverUrl,
+  variant = "page",
+  coverSize,
+  onPlay,
+  onCollectionClick,
 }: SearchResultsListProps) {
   const { t } = useTranslation();
   
@@ -121,23 +232,35 @@ export default function SearchResultsList({
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
+  const isPopup = variant === "popup";
+  const containerClass = isPopup ? "" : "search-results-list-container";
+
   return (
-    <div className="search-results-list-container">
-      {collections.map((collection) => (
+    <div className={containerClass}>
+      {collections.map((collection, index) => (
         <CollectionResultItem
           key={`collection-${collection.ratingKey}`}
           collection={collection}
           apiBase={apiBase}
           buildCoverUrl={buildCoverUrl}
+          variant={variant}
+          coverSize={coverSize}
+          onPlay={onPlay}
+          onCollectionClick={onCollectionClick}
+          hasBorder={isPopup && (index < collections.length - 1 || games.length > 0)}
         />
       ))}
-      {games.map((game) => (
+      {games.map((game, index) => (
         <SearchResultItem
           key={game.ratingKey}
           game={game}
           apiBase={apiBase}
           onGameClick={onGameClick}
           buildCoverUrl={buildCoverUrl}
+          variant={variant}
+          coverSize={coverSize}
+          onPlay={onPlay}
+          hasBorder={isPopup && index < games.length - 1}
         />
       ))}
     </div>

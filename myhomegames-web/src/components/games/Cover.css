@@ -26,7 +26,7 @@
   margin-bottom: 12px;
 }
 
-/* Placeholder styles moved to CoverPlaceholder.css */
+/* Placeholder styles are inline in Cover component */
 
 /* Play button styles */
 .games-list-play-button {
@@ -91,6 +91,11 @@
   outline-color: #E5A00D !important;
   border-radius: 4px;
   box-shadow: 0 10px 20px rgba(229, 160, 13, 0.2) !important;
+}
+
+/* When cover has blur, keep border sharp by reducing box-shadow blur but maintaining same luminosity */
+.games-list-cover.cover-with-blur.cover-hover-effect:hover {
+  box-shadow: 0 0 10px rgba(229, 160, 13, 1), 0 0 5px rgba(229, 160, 13, 0.8) !important;
 }
 
 .games-list-cover.cover-hover-effect:hover::before {

@@ -53,19 +53,12 @@ function CollectionListItem({
         height={coverHeight}
         onPlay={onPlay ? () => onPlay(collection) : undefined}
         onClick={() => onCollectionClick(collection)}
-        showTitle={false}
+        showTitle={true}
+        subtitle={collection.gameCount !== undefined ? `${collection.gameCount} ${t("common.elements")}` : undefined}
         detail={true}
         play={true}
         showBorder={true}
       />
-      <div className="collections-list-title-container">
-        <div className="truncate collections-list-title">{collection.title}</div>
-        {collection.gameCount !== undefined && (
-          <div className="collections-list-game-count">
-            {collection.gameCount} {t("common.elements")}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

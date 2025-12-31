@@ -145,6 +145,7 @@ export default function SearchResultsPage({
             apiBase={apiBase}
             onGameClick={onGameClick}
             buildCoverUrl={buildCoverUrl}
+            onPlay={onPlay}
           />
         </div>
       </div>
