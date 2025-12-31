@@ -1,39 +1,86 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
+
+type BackgroundContextType = {
+  hasBackground: boolean;
+  isBackgroundVisible: boolean;
+  setBackgroundVisible: (visible: boolean) => void;
+};
+
+const BackgroundContext = createContext<BackgroundContextType | null>(null);
+
+export function useBackground() {
+  const context = useContext(BackgroundContext);
+  if (!context) {
+    return {
+      hasBackground: false,
+      isBackgroundVisible: false,
+      setBackgroundVisible: () => {},
+    };
+  }
+  return context;
+}
 
 type BackgroundManagerProps = {
   backgroundUrl: string;
   hasBackground: boolean;
+  elementId: string;
   children: React.ReactNode;
-  isBackgroundVisible?: boolean;
-  onBackgroundVisibilityChange?: (visible: boolean) => void;
+};
+
+const STORAGE_KEY = "backgroundStates";
+
+const getBackgroundStates = (): Record<string, boolean> => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+};
+
+const saveBackgroundState = (elementId: string, visible: boolean) => {
+  const states = getBackgroundStates();
+  states[elementId] = visible;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+};
+
+const getBackgroundState = (elementId: string, defaultVisible: boolean): boolean => {
+  const states = getBackgroundStates();
+  return states[elementId] ?? defaultVisible;
 };
 
 export default function BackgroundManager({
   backgroundUrl,
   hasBackground,
+  elementId,
   children,
-  isBackgroundVisible: controlledIsVisible,
-  onBackgroundVisibilityChange,
 }: BackgroundManagerProps) {
-  const [internalIsVisible, setInternalIsVisible] = useState(hasBackground);
-  const isBackgroundVisible = controlledIsVisible !== undefined ? controlledIsVisible : internalIsVisible;
+  const [isBackgroundVisible, setIsBackgroundVisible] = useState(() => 
+    getBackgroundState(elementId, hasBackground)
+  );
 
   useEffect(() => {
-    if (hasBackground && controlledIsVisible === undefined) {
-      setInternalIsVisible(hasBackground);
+    if (hasBackground) {
+      const savedState = getBackgroundState(elementId, hasBackground);
+      setIsBackgroundVisible(savedState);
+    } else {
+      setIsBackgroundVisible(false);
     }
-  }, [hasBackground, controlledIsVisible]);
+  }, [hasBackground, elementId]);
 
   const handleVisibilityChange = (visible: boolean) => {
-    if (onBackgroundVisibilityChange) {
-      onBackgroundVisibilityChange(visible);
-    } else {
-      setInternalIsVisible(visible);
-    }
+    setIsBackgroundVisible(visible);
+    saveBackgroundState(elementId, visible);
+  };
+
+  const contextValue: BackgroundContextType = {
+    hasBackground,
+    isBackgroundVisible,
+    setBackgroundVisible: handleVisibilityChange,
   };
 
   return (
-    <>
+    <BackgroundContext.Provider value={contextValue}>
       <div
         style={{
           position: 'fixed',
@@ -80,7 +127,7 @@ export default function BackgroundManager({
       <div style={{ position: 'relative', zIndex: 2 }}>
         {children}
       </div>
-    </>
+    </BackgroundContext.Provider>
   );
 }
 

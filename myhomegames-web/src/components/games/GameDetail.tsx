@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
-import BackgroundManager from "../common/BackgroundManager";
+import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
 import "./GameDetail.css";
 
@@ -34,7 +34,6 @@ export default function GameDetail({
 }: GameDetailProps) {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
-  const [isBackgroundVisible, setIsBackgroundVisible] = useState(true);
   const showPlaceholder = !coverUrl || imageError;
   const coverWidth = 256;
   const coverHeight = 384; // 256 * 1.5
@@ -73,9 +72,57 @@ export default function GameDetail({
     <BackgroundManager 
       backgroundUrl={backgroundUrl} 
       hasBackground={hasBackground}
-      isBackgroundVisible={isBackgroundVisible}
-      onBackgroundVisibilityChange={setIsBackgroundVisible}
+      elementId={game.ratingKey}
     >
+      <GameDetailContent
+        game={game}
+        coverUrl={coverUrl}
+        showPlaceholder={showPlaceholder}
+        coverWidth={coverWidth}
+        coverHeight={coverHeight}
+        releaseDate={releaseDate}
+        rating={rating}
+        onPlay={onPlay}
+        coverSize={coverSize}
+        handleCoverSizeChange={handleCoverSizeChange}
+        setImageError={setImageError}
+        t={t}
+      />
+    </BackgroundManager>
+  );
+}
+
+function GameDetailContent({
+  game,
+  coverUrl,
+  showPlaceholder,
+  coverWidth,
+  coverHeight,
+  releaseDate,
+  rating,
+  onPlay,
+  coverSize,
+  handleCoverSizeChange,
+  setImageError,
+  t,
+}: {
+  game: GameItem;
+  coverUrl: string;
+  showPlaceholder: boolean;
+  coverWidth: number;
+  coverHeight: number;
+  releaseDate: string | null;
+  rating: number | null;
+  onPlay: (game: GameItem) => void;
+  coverSize: number;
+  handleCoverSizeChange: (size: number) => void;
+  setImageError: (error: boolean) => void;
+  t: (key: string) => string;
+}) {
+  const { hasBackground, isBackgroundVisible } = useBackground();
+  
+  return (
+    <>
       <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
         <LibrariesBar
           libraries={[]}
@@ -87,9 +134,6 @@ export default function GameDetail({
           onCoverSizeChange={handleCoverSizeChange}
           viewMode="grid"
           onViewModeChange={() => {}}
-          hasBackground={hasBackground}
-          isBackgroundVisible={isBackgroundVisible}
-          onBackgroundVisibilityChange={setIsBackgroundVisible}
         />
       </div>
       <div style={{ position: 'relative', zIndex: 2, height: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
@@ -247,6 +291,6 @@ export default function GameDetail({
         </main>
         </div>
       </div>
-    </BackgroundManager>
+    </>
   );
 }

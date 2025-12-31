@@ -7,7 +7,7 @@ import CoverPlaceholder from "../components/common/CoverPlaceholder";
 import LibrariesBar from "../components/layout/LibrariesBar";
 import StarRating from "../components/common/StarRating";
 import Summary from "../components/common/Summary";
-import BackgroundManager from "../components/common/BackgroundManager";
+import BackgroundManager, { useBackground } from "../components/common/BackgroundManager";
 import { compareTitles } from "../utils/stringUtils";
 import "./CollectionDetail.css";
 
@@ -56,7 +56,6 @@ export default function CollectionDetail({
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [isBackgroundVisible, setIsBackgroundVisible] = useState(true);
   const [viewMode] = useState<"grid" | "detail" | "table">("grid");
   const [coverSize, setCoverSize] = useState(() => {
     const saved = localStorage.getItem("coverSize");
@@ -295,9 +294,87 @@ export default function CollectionDetail({
     <BackgroundManager 
       backgroundUrl={backgroundUrl} 
       hasBackground={hasBackground}
-      isBackgroundVisible={isBackgroundVisible}
-      onBackgroundVisibilityChange={setIsBackgroundVisible}
+      elementId={collectionId || ""}
     >
+      <CollectionDetailContent
+        collection={collection}
+        collectionCoverUrl={collectionCoverUrl}
+        showPlaceholder={showPlaceholder}
+        setImageError={setImageError}
+        collectionCoverWidth={collectionCoverWidth}
+        collectionCoverHeight={collectionCoverHeight}
+        yearRange={yearRange}
+        averageRating={averageRating}
+        onPlay={onPlay}
+        sortedGames={sortedGames}
+        loading={loading}
+        apiBase={apiBase}
+        onGameClick={onGameClick}
+        buildCoverUrl={buildCoverUrl}
+        coverSize={coverSize}
+        handleCoverSizeChange={handleCoverSizeChange}
+        viewMode={viewMode}
+        itemRefs={itemRefs}
+        handleDragEnd={handleDragEnd}
+        scrollContainerRef={scrollContainerRef}
+        isReady={isReady}
+        t={t}
+      />
+    </BackgroundManager>
+  );
+}
+
+function CollectionDetailContent({
+  collection,
+  collectionCoverUrl,
+  showPlaceholder,
+  setImageError,
+  collectionCoverWidth,
+  collectionCoverHeight,
+  yearRange,
+  averageRating,
+  onPlay,
+  sortedGames,
+  loading,
+  apiBase,
+  onGameClick,
+  buildCoverUrl,
+  coverSize,
+  handleCoverSizeChange,
+  viewMode,
+  itemRefs,
+  handleDragEnd,
+  scrollContainerRef,
+  isReady,
+  t,
+}: {
+  collection: CollectionInfo | null;
+  collectionCoverUrl: string;
+  showPlaceholder: boolean;
+  setImageError: (error: boolean) => void;
+  collectionCoverWidth: number;
+  collectionCoverHeight: number;
+  yearRange: string | null;
+  averageRating: number | null;
+  onPlay?: (game: GameItem) => void;
+  sortedGames: GameItem[];
+  loading: boolean;
+  apiBase: string;
+  onGameClick: (game: GameItem) => void;
+  buildCoverUrl: (apiBase: string, cover?: string) => string;
+  coverSize: number;
+  handleCoverSizeChange: (size: number) => void;
+  viewMode: "grid" | "detail" | "table";
+  itemRefs: React.MutableRefObject<Map<string, HTMLElement>>;
+  handleDragEnd: (sourceIndex: number, destinationIndex: number) => void;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  isReady: boolean;
+  t: (key: string) => string;
+}) {
+  const { hasBackground, isBackgroundVisible } = useBackground();
+  
+  return (
+    <>
       <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
         <LibrariesBar
         libraries={[]}
@@ -309,9 +386,6 @@ export default function CollectionDetail({
         onCoverSizeChange={handleCoverSizeChange}
         viewMode={viewMode}
         onViewModeChange={() => {}}
-        hasBackground={hasBackground}
-        isBackgroundVisible={isBackgroundVisible}
-        onBackgroundVisibilityChange={setIsBackgroundVisible}
       />
       </div>
       <div style={{ position: 'relative', zIndex: 2, height: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
@@ -530,7 +604,7 @@ export default function CollectionDetail({
       </main>
         </div>
       </div>
-    </BackgroundManager>
+    </>
   );
 }
 
