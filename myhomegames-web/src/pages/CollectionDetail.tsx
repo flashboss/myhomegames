@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import GamesList from "../components/games/GamesList";
-import CoverPlaceholder from "../components/common/CoverPlaceholder";
+import Cover from "../components/games/Cover";
 import LibrariesBar from "../components/layout/LibrariesBar";
 import StarRating from "../components/common/StarRating";
 import Summary from "../components/common/Summary";
@@ -37,7 +37,6 @@ export default function CollectionDetail({
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [viewMode] = useState<"grid" | "detail" | "table">("grid");
   const [coverSize, setCoverSize] = useState(() => {
     const saved = localStorage.getItem("coverSize");
@@ -258,7 +257,6 @@ export default function CollectionDetail({
   }
 
   const collectionCoverUrl = collection?.cover ? buildCoverUrl(apiBase, collection.cover) : "";
-  const showPlaceholder = !collectionCoverUrl || imageError;
   const collectionCoverWidth = 240;
   const collectionCoverHeight = 360; // 2:3 aspect ratio (vertical like games)
   
@@ -281,8 +279,6 @@ export default function CollectionDetail({
       <CollectionDetailContent
         collection={collection}
         collectionCoverUrl={collectionCoverUrl}
-        showPlaceholder={showPlaceholder}
-        setImageError={setImageError}
         collectionCoverWidth={collectionCoverWidth}
         collectionCoverHeight={collectionCoverHeight}
         yearRange={yearRange}
@@ -309,8 +305,6 @@ export default function CollectionDetail({
 function CollectionDetailContent({
   collection,
   collectionCoverUrl,
-  showPlaceholder,
-  setImageError,
   collectionCoverWidth,
   collectionCoverHeight,
   yearRange,
@@ -332,8 +326,6 @@ function CollectionDetailContent({
 }: {
   collection: CollectionInfo | null;
   collectionCoverUrl: string;
-  showPlaceholder: boolean;
-  setImageError: (error: boolean) => void;
   collectionCoverWidth: number;
   collectionCoverHeight: number;
   yearRange: string | null;
@@ -404,59 +396,21 @@ function CollectionDetailContent({
               <div className="pt-8" style={{ display: 'flex', flexDirection: 'row', gap: '48px', alignItems: 'flex-start', width: '100%', boxSizing: 'border-box', marginBottom: '32px' }}>
                 {/* Cover */}
                 <div style={{ flexShrink: 0 }}>
-                  <div 
-                    className="collection-detail-cover-container cover-hover-effect relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden" 
-                    style={{ width: `${collectionCoverWidth}px` }}
-                    onClick={() => {
-                      // Click on cover plays first game
-                      if (onPlay && sortedGames[0]) {
+                  <Cover
+                    title={collection.title}
+                    coverUrl={collectionCoverUrl}
+                    width={collectionCoverWidth}
+                    height={collectionCoverHeight}
+                    onPlay={onPlay && sortedGames.length > 0 ? () => {
+                      if (sortedGames[0]) {
                         onPlay(sortedGames[0]);
                       }
-                    }}
-                  >
-                    {showPlaceholder ? (
-                      <CoverPlaceholder
-                        title={collection.title}
-                        width={collectionCoverWidth}
-                        height={collectionCoverHeight}
-                      />
-                    ) : (
-                      <img
-                        src={collectionCoverUrl}
-                        alt={collection.title}
-                        className="object-cover w-full h-full"
-                        onError={() => {
-                          setImageError(true);
-                        }}
-                      />
-                    )}
-                    {onPlay && sortedGames.length > 0 && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Play first game in collection
-                          if (sortedGames[0]) {
-                            onPlay(sortedGames[0]);
-                          }
-                        }}
-                        className="collection-detail-play-button"
-                        aria-label={t("common.play")}
-                      >
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M8 5v14l11-7z"
-                            fill="currentColor"
-                          />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
+                    } : undefined}
+                    showTitle={false}
+                    detail={false}
+                    play={true}
+                    showBorder={true}
+                  />
                 </div>
                 {/* Collection Info Panel */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '16px', minHeight: `${collectionCoverHeight}px`, minWidth: 0, visibility: 'visible' }}>

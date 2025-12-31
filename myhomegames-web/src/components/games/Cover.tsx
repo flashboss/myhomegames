@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CoverPlaceholder from "../common/CoverPlaceholder";
+import type React from "react";
 import "./Cover.css";
 
 type CoverProps = {
@@ -15,6 +16,10 @@ type CoverProps = {
   detail?: boolean;
   play?: boolean;
   showBorder?: boolean;
+  aspectRatio?: string; // e.g., "2/3" or "16/9"
+  overlayContent?: React.ReactNode; // Content to overlay on the cover
+  brightness?: number; // Brightness filter (0-100 or higher, default: 100)
+  blur?: number; // Blur filter in pixels (default: 0)
 };
 
 export default function Cover({
@@ -29,6 +34,10 @@ export default function Cover({
   detail = true,
   play = true,
   showBorder = true,
+  aspectRatio = "2/3",
+  overlayContent,
+  brightness,
+  blur,
 }: CoverProps) {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
@@ -56,11 +65,25 @@ export default function Cover({
   const shouldShowPlayButton = play && onPlay;
   const isClickable = detail || play;
 
+  // Build filter style string
+  const filterParts: string[] = [];
+  if (brightness !== undefined) {
+    filterParts.push(`brightness(${brightness}%)`);
+  }
+  if (blur !== undefined) {
+    filterParts.push(`blur(${blur}px)`);
+  }
+  const filterStyle = filterParts.length > 0 ? filterParts.join(' ') : undefined;
+
   return (
     <>
       <div
-        className={`games-list-cover relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} ${play ? 'games-list-cover-play' : ''} ${detail ? 'games-list-cover-detail' : ''}`}
-        style={{ width: `${width}px`, cursor: isClickable ? 'pointer' : 'default' }}
+        className={`games-list-cover relative bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} ${play ? 'games-list-cover-play' : ''} ${detail ? 'games-list-cover-detail' : ''}`}
+        style={{ 
+          width: `${width}px`, 
+          aspectRatio: aspectRatio,
+          cursor: isClickable ? 'pointer' : 'default' 
+        }}
         onClick={handleCoverClick}
       >
         {showPlaceholder ? (
@@ -74,6 +97,7 @@ export default function Cover({
             src={coverUrl}
             alt={title}
             className="object-cover w-full h-full"
+            style={filterStyle ? { filter: filterStyle } : undefined}
             onError={() => {
               setImageError(true);
             }}
@@ -98,6 +122,11 @@ export default function Cover({
               />
             </svg>
           </button>
+        )}
+        {overlayContent && (
+          <div className="cover-overlay-content">
+            {overlayContent}
+          </div>
         )}
       </div>
       {(showTitle || subtitle != null) && (

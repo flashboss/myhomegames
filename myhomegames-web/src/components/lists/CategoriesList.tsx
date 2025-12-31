@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
+import Cover from "../games/Cover";
 import type { CategoryItem } from "../../types";
 import "./CategoriesList.css";
 
@@ -30,8 +29,6 @@ function CategoryListItem({
 }: CategoryListItemProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !category.cover || imageError;
   const coverHeight = coverSize * (9 / 16); // 16:9 aspect ratio (1280x720px)
 
   const handleClick = () => {
@@ -50,38 +47,27 @@ function CategoryListItem({
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
       onClick={handleClick}
     >
-      <div className="relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 categories-list-cover cover-hover-effect">
-        {showPlaceholder ? (
-          <>
-            <CoverPlaceholder
-              title=""
-              width={coverSize}
-              height={coverHeight}
-            />
-            <div className="categories-list-title-overlay">
-              <div className="categories-list-title-inside">
-                {t(`genre.${category.title}`, category.title)}
-              </div>
+      <Cover
+        title={t(`genre.${category.title}`, category.title)}
+        coverUrl={buildCoverUrl(apiBase, category.cover)}
+        width={coverSize}
+        height={coverHeight}
+        onClick={handleClick}
+        showTitle={false}
+        detail={true}
+        play={false}
+        showBorder={true}
+        aspectRatio="16/9"
+        brightness={40}
+        blur={1}
+        overlayContent={
+          <div className="categories-list-title-overlay">
+            <div className="categories-list-title-inside">
+              {t(`genre.${category.title}`, category.title)}
             </div>
-          </>
-        ) : (
-          <>
-            <img
-              src={buildCoverUrl(apiBase, category.cover)}
-              alt={t(`genre.${category.title}`, category.title)}
-              className="object-cover w-full h-full"
-              onError={() => {
-                setImageError(true);
-              }}
-            />
-            <div className="categories-list-title-overlay">
-              <div className="categories-list-title-inside">
-                {t(`genre.${category.title}`, category.title)}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+        }
+      />
     </div>
   );
 }
