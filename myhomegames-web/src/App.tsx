@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   BrowserRouter,
   Routes,
@@ -72,6 +73,34 @@ function AppContent() {
   const [addGameOpen, setAddGameOpen] = useState(false);
   const navigate = useNavigate();
   const { i18n } = useTranslation();
+
+  // Block body scroll when player modal is open
+  useEffect(() => {
+    if (playerUrl) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [playerUrl]);
+
+  // Handle ESC key to close player modal
+  useEffect(() => {
+    if (!playerUrl) return;
+    
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setPlayerUrl(null);
+      }
+    }
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [playerUrl]);
 
   // Load games on app startup for search
   useEffect(() => {
@@ -328,30 +357,102 @@ function AppContent() {
         />
 
         {/* Modal Plex-style for launcher */}
-        {playerUrl && (
+        {playerUrl && createPortal(
           <div
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+            style={{ 
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 99999,
+              pointerEvents: 'auto',
+              overflow: 'hidden'
+            }}
             onClick={() => setPlayerUrl(null)}
           >
             <div
-              className="bg-[#1a1a1a] w-11/12 h-4/5 rounded-lg shadow-2xl overflow-hidden border border-[#2a2a2a]"
+              style={{
+                backgroundColor: '#1a1a1a',
+                borderRadius: '8px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                overflow: 'hidden',
+                border: '1px solid #2a2a2a',
+                width: '90%',
+                maxWidth: '1400px',
+                height: '85%',
+                maxHeight: '900px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-4 border-b border-[#2a2a2a] flex items-center justify-between bg-[#0d0d0d]">
+              <div style={{ 
+                padding: '16px', 
+                borderBottom: '1px solid #2a2a2a', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between', 
+                backgroundColor: '#0d0d0d',
+                flexShrink: 0
+              }}>
+                <h2 style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 600, 
+                  color: '#ffffff',
+                  margin: 0
+                }}>
+                  Game Launcher
+                </h2>
                 <button
-                  className="text-gray-400 hover:text-white transition-colors text-sm px-3 py-1 rounded hover:bg-[#2a2a2a]"
+                  style={{
+                    color: '#9ca3af',
+                    fontSize: '18px',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#ffffff';
+                    e.currentTarget.style.backgroundColor = '#2a2a2a';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#9ca3af';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                   onClick={() => setPlayerUrl(null)}
+                  aria-label="Close"
                 >
                   ✕ Close
                 </button>
               </div>
-              <iframe
-                src={playerUrl}
-                title="Game Launcher"
-                className="w-full h-full border-0"
-              />
+              <div style={{ 
+                flex: 1, 
+                overflow: 'hidden', 
+                minHeight: 0 
+              }}>
+                <iframe
+                  src={playerUrl}
+                  title="Game Launcher"
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    border: 'none',
+                    display: 'block'
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </>

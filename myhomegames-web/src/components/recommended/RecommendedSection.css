@@ -55,3 +55,9 @@
   grid-template-columns: none !important;
 }
 
+.recommended-section-scroll .games-list-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

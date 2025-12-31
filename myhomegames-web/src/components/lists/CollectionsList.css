@@ -23,6 +23,9 @@
   padding: 0;
   cursor: pointer;
   transition: text-decoration 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .collections-list-item:hover .collections-list-title {

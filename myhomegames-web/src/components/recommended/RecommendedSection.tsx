@@ -63,11 +63,32 @@ export default function RecommendedSection({
   const isRestoringRef = useRef(false);
   const timeoutRef = useRef<number | null>(null);
   const lastScrollPositionRef = useRef<number>(0);
-  const [paddingLeft, setPaddingLeft] = useState(64); // Start with 64px, will be adjusted based on title position
+  const [paddingLeft, setPaddingLeft] = useState(64); // Initial value, will be calculated immediately
   const storageKey = `${location.pathname}:${sectionId}`;
+  const isInitializedRef = useRef(false);
 
   const titleKey = `recommended.${sectionId}`;
   const title = t(titleKey, { defaultValue: sectionId });
+
+  // Calculate initial padding before first paint to avoid visual jumps
+  useLayoutEffect(() => {
+    if (isInitializedRef.current) return;
+    
+    const scrollContainer = scrollRef.current;
+    const titleElement = titleRef.current;
+    const gamesListElement = gamesListRef.current;
+    
+    if (!scrollContainer || !titleElement || !gamesListElement) return;
+    
+    // Calculate padding based on title position
+    const scrollRect = scrollContainer.getBoundingClientRect();
+    const titleRect = titleElement.getBoundingClientRect();
+    const titleLeft = titleRect.left - scrollRect.left;
+    
+    // Set initial padding to title position (will be fine-tuned later)
+    setPaddingLeft(titleLeft);
+    isInitializedRef.current = true;
+  }, []);
 
   // Save scroll before route changes
   useEffect(() => {
@@ -221,107 +242,116 @@ export default function RecommendedSection({
 
   // Adjust padding dynamically based on available space
   useEffect(() => {
+    let isCalculating = false;
+    let calculationTimeout: number | null = null;
+    
     const adjustPadding = () => {
       const scrollContainer = scrollRef.current;
       const titleElement = titleRef.current;
       const gamesListElement = gamesListRef.current;
       
-      if (!scrollContainer || !titleElement || !gamesListElement) return;
-
-      // Save current scroll position
-      const savedScrollLeft = scrollContainer.scrollLeft;
+      if (!scrollContainer || !titleElement || !gamesListElement || isCalculating) return;
       
-      // Check first element position when scrolled to start (scrollLeft = 0)
-      scrollContainer.scrollLeft = 0;
+      // Clear any pending calculation
+      if (calculationTimeout) {
+        clearTimeout(calculationTimeout);
+        calculationTimeout = null;
+      }
       
-      // Wait for layout to update and images to load (especially for large images)
-      // Use multiple frames to ensure layout is stable
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            const firstGame = gamesListElement.querySelector('.games-list-item');
-            if (!firstGame) {
-              scrollContainer.scrollLeft = savedScrollLeft;
-              return;
-            }
-            
-            // Check if images are loaded (for large images)
-            const firstImage = firstGame.querySelector('img');
-            if (firstImage && !firstImage.complete) {
-              // Image not loaded yet, wait a bit more
-              firstImage.addEventListener('load', () => {
-                adjustPadding();
-              }, { once: true });
-              scrollContainer.scrollLeft = savedScrollLeft;
-              return;
-            }
-            
-            // Get current container rect (after scrolling to 0)
-            const currentScrollRect = scrollContainer.getBoundingClientRect();
-            const firstGameRect = firstGame.getBoundingClientRect();
-            const firstGameWidth = firstGameRect.width;
-            
-            // Recalculate title position relative to container (after scrolling to 0)
-            const titleRect = titleElement.getBoundingClientRect();
-            const titleLeft = titleRect.left - currentScrollRect.left;
-            
-            // Calculate first game position relative to the container (when scrollLeft = 0)
-            const firstGameLeft = firstGameRect.left - currentScrollRect.left;
-            
-            // Target: align first game with title when scrollLeft = 0
-            const targetPadding = titleLeft;
-            
-            // Calculate the difference between where the first game is and where it should be
-            const difference = firstGameLeft - targetPadding;
-            
-            // Determine if image is large (needs extra padding)
-            // Calculate extra padding proportionally to image size
-            // For very large images, add more padding
-            const extraPadding = firstGameWidth > 200 
-              ? Math.min(500, 100 + (firstGameWidth - 200) * 2) 
-              : 0;
-            
-            // Restore scroll position
-            scrollContainer.scrollLeft = savedScrollLeft;
-            
-            // Calculate excess space on the right
-            const contentWidth = gamesListElement.scrollWidth;
-            const containerWidth = scrollContainer.clientWidth;
-            const visibleRight = scrollContainer.scrollLeft + containerWidth;
-            const contentRight = paddingLeft + contentWidth;
-            const excessSpace = visibleRight - contentRight;
-            
-            // Adjust padding to align first game with title
-            // When scrollLeft = 0, firstGameLeft should equal targetPadding
-            // If firstGameLeft > targetPadding, first game is too far right, need to REDUCE padding
-            // If firstGameLeft < targetPadding, first game is too far left, need to INCREASE padding
-            if (Math.abs(difference) > 10) {
-              // Calculate the offset: when scrollLeft = 0, firstGameLeft = paddingLeft + offset
-              // where offset accounts for any margins/padding of the wrapper
-              const offset = firstGameLeft - paddingLeft;
-              // To align with targetPadding, we need: targetPadding = newPadding + offset
-              // So: newPadding = targetPadding - offset
-              // Add extra padding for large images
-              const newPadding = targetPadding - offset + extraPadding;
-              // Increase max limit for very large images
-              const maxPadding = Math.max(3000, targetPadding + extraPadding + 500);
-              const finalPadding = Math.max(0, Math.min(maxPadding, newPadding));
-              
-              if (Math.abs(finalPadding - paddingLeft) > 5) {
-                setPaddingLeft(finalPadding);
-                return;
-              }
-            }
-            
-            // If there's too much space on the right, reduce padding slightly
-            if (excessSpace > 100 && paddingLeft > targetPadding) {
-              const reducedPadding = Math.max(targetPadding, paddingLeft - 50);
-              if (Math.abs(reducedPadding - paddingLeft) > 5) {
-                setPaddingLeft(reducedPadding);
-              }
-            }
-          }, 50); // Small delay to ensure layout is stable
-        });
+      isCalculating = true;
+      
+      // Calculate padding in background without modifying visible scroll
+      // Use requestIdleCallback if available, otherwise use setTimeout
+      const scheduleCalculation = (callback: () => void) => {
+        if ('requestIdleCallback' in window) {
+          (window as any).requestIdleCallback(callback, { timeout: 500 });
+        } else {
+          setTimeout(callback, 0);
+        }
+      };
+      
+      scheduleCalculation(() => {
+        const firstGame = gamesListElement.querySelector('.games-list-item');
+        if (!firstGame) {
+          isCalculating = false;
+          return;
+        }
+        
+        // Check if images are loaded (for large images)
+        const firstImage = firstGame.querySelector('img');
+        if (firstImage && !firstImage.complete) {
+          // Image not loaded yet, wait for it
+          firstImage.addEventListener('load', () => {
+            isCalculating = false;
+            adjustPadding();
+          }, { once: true });
+          isCalculating = false;
+          return;
+        }
+        
+        // Get current positions without modifying scroll
+        const scrollRect = scrollContainer.getBoundingClientRect();
+        const titleRect = titleElement.getBoundingClientRect();
+        const firstGameRect = firstGame.getBoundingClientRect();
+        const firstGameWidth = firstGameRect.width;
+        
+        // Calculate positions relative to container
+        const titleLeft = titleRect.left - scrollRect.left;
+        const currentScrollLeft = scrollContainer.scrollLeft;
+        
+        // Calculate where firstGameLeft would be when scrollLeft = 0
+        // When scrollLeft = 0, firstGameLeft = paddingLeft + offset (where offset is margin/padding)
+        // Current firstGameLeft = paddingLeft + offset - currentScrollLeft
+        // So: firstGameLeft at scrollLeft=0 = current firstGameLeft + currentScrollLeft
+        const firstGameLeftAtZero = (firstGameRect.left - scrollRect.left) + currentScrollLeft;
+        
+        // Target: align first game with title when scrollLeft = 0
+        const targetPadding = titleLeft;
+        
+        // Calculate the offset (margin/padding of wrapper)
+        const offset = firstGameLeftAtZero - paddingLeft;
+        
+        // Determine if image is large (needs extra padding)
+        const extraPadding = firstGameWidth > 200 
+          ? Math.min(500, 100 + (firstGameWidth - 200) * 2) 
+          : 0;
+        
+        // Calculate new padding: targetPadding = newPadding + offset
+        // So: newPadding = targetPadding - offset
+        const newPadding = targetPadding - offset + extraPadding;
+        const maxPadding = Math.max(3000, targetPadding + extraPadding + 500);
+        const finalPadding = Math.max(0, Math.min(maxPadding, newPadding));
+        
+        // Calculate excess space on the right
+        const contentWidth = gamesListElement.scrollWidth;
+        const containerWidth = scrollContainer.clientWidth;
+        const visibleRight = currentScrollLeft + containerWidth;
+        const contentRight = paddingLeft + contentWidth;
+        const excessSpace = visibleRight - contentRight;
+        
+        // Apply padding adjustment only if significant change
+        if (Math.abs(finalPadding - paddingLeft) > 5) {
+          // Apply padding update in next frame to avoid visual jumps
+          requestAnimationFrame(() => {
+            setPaddingLeft(finalPadding);
+            isCalculating = false;
+          });
+          return;
+        }
+        
+        // If there's too much space on the right, reduce padding slightly
+        if (excessSpace > 100 && paddingLeft > targetPadding) {
+          const reducedPadding = Math.max(targetPadding, paddingLeft - 50);
+          if (Math.abs(reducedPadding - paddingLeft) > 5) {
+            requestAnimationFrame(() => {
+              setPaddingLeft(reducedPadding);
+              isCalculating = false;
+            });
+            return;
+          }
+        }
+        
+        isCalculating = false;
       });
     };
 

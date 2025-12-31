@@ -32,6 +32,12 @@
   margin-bottom: 12px;
 }
 
+.collection-detail-games-list .games-list-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .games-list-title-wrapper {
   display: flex;
   flex-direction: column;
@@ -47,6 +53,9 @@
   padding: 0;
   cursor: pointer;
   transition: text-decoration 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .games-list-item:hover .games-list-title {
