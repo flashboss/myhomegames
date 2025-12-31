@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import Cover from "./Cover";
 import StarRating from "../common/StarRating";
@@ -6,6 +7,7 @@ import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
 import type { GameItem } from "../../types";
 import { formatGameDate } from "../../utils/date";
+import { buildApiUrl } from "../../utils/api";
 import "./GameDetail.css";
 
 type GameDetailProps = {
@@ -13,6 +15,9 @@ type GameDetailProps = {
   coverUrl: string;
   backgroundUrl: string;
   onPlay: (game: GameItem) => void;
+  apiBase: string;
+  apiToken: string;
+  onGameUpdate?: (updatedGame: GameItem) => void;
 };
 
 export default function GameDetail({
@@ -20,17 +25,56 @@ export default function GameDetail({
   coverUrl,
   backgroundUrl,
   onPlay,
+  apiBase,
+  apiToken,
+  onGameUpdate,
 }: GameDetailProps) {
   const { t } = useTranslation();
+  const [localGame, setLocalGame] = useState<GameItem>(game);
+  
+  // Sync localGame when game prop changes
+  useEffect(() => {
+    setLocalGame(game);
+  }, [game]);
+  
   const coverWidth = 256;
   const coverHeight = 384; // 256 * 1.5
   const hasBackground = Boolean(backgroundUrl && backgroundUrl.trim() !== "");
 
   // Format release date
-  const releaseDate = formatGameDate(game);
+  const releaseDate = formatGameDate(localGame);
 
   // Convert stars from 1-10 to 0-5 scale
-  const rating = game.stars ? game.stars / 2 : null;
+  const rating = localGame.stars ? localGame.stars / 2 : null;
+
+  const handleRatingChange = async (newStars: number) => {
+    try {
+      const url = buildApiUrl(apiBase, `/games/${localGame.ratingKey}`);
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': apiToken,
+        },
+        body: JSON.stringify({ stars: newStars }),
+      });
+
+      if (response.ok) {
+        const updatedGame: GameItem = {
+          ...localGame,
+          stars: newStars,
+        };
+        setLocalGame(updatedGame);
+        if (onGameUpdate) {
+          onGameUpdate(updatedGame);
+        }
+      } else {
+        console.error('Failed to update rating');
+      }
+    } catch (error) {
+      console.error('Error updating rating:', error);
+    }
+  };
 
   // Get coverSize from localStorage
   const coverSize = (() => {
@@ -49,7 +93,7 @@ export default function GameDetail({
       elementId={game.ratingKey}
     >
       <GameDetailContent
-        game={game}
+        game={localGame}
         coverUrl={coverUrl}
         coverWidth={coverWidth}
         coverHeight={coverHeight}
@@ -58,6 +102,7 @@ export default function GameDetail({
         onPlay={onPlay}
         coverSize={coverSize}
         handleCoverSizeChange={handleCoverSizeChange}
+        onRatingChange={handleRatingChange}
         t={t}
       />
     </BackgroundManager>
@@ -74,6 +119,7 @@ function GameDetailContent({
   onPlay,
   coverSize,
   handleCoverSizeChange,
+  onRatingChange,
   t,
 }: {
   game: GameItem;
@@ -85,6 +131,7 @@ function GameDetailContent({
   onPlay: (game: GameItem) => void;
   coverSize: number;
   handleCoverSizeChange: (size: number) => void;
+  onRatingChange?: (newStars: number) => void;
   t: (key: string) => string;
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
@@ -169,9 +216,11 @@ function GameDetailContent({
                   {releaseDate}
                 </div>
               )}
-              {rating !== null && (
-                <StarRating rating={rating} />
-              )}
+              <StarRating 
+                rating={rating || 0} 
+                readOnly={false}
+                onRatingChange={onRatingChange}
+              />
               <button
                 onClick={() => onPlay(game)}
                 style={{

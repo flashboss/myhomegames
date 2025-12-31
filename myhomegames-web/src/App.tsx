@@ -467,6 +467,11 @@ function GameDetailPage({
       coverUrl={buildCoverUrl(API_BASE, game.cover)}
       backgroundUrl={buildBackgroundUrl(API_BASE, game.background)}
       onPlay={onPlay}
+      apiBase={API_BASE}
+      apiToken={API_TOKEN}
+      onGameUpdate={(updatedGame) => {
+        setGame(updatedGame);
+      }}
     />
   );
 }
