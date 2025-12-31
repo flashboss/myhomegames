@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
+import Cover from "./Cover";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import type { GameItem } from "../../types";
@@ -36,17 +35,8 @@ function GameDetailItem({
   itemRefs,
   index,
 }: GameDetailItemProps) {
-  const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !game.cover || imageError;
   const isEven = index % 2 === 0;
   const coverHeight = FIXED_COVER_SIZE * 1.5;
-
-  const handleCoverClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onPlay) {
-      onPlay(game);
-    }
-  };
 
   return (
     <div
@@ -61,50 +51,17 @@ function GameDetailItem({
       }`}
       onClick={() => onGameClick(game)}
     >
-      <div
-        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 games-list-detail-cover cover-hover-effect"
-        style={{
-          height: `${coverHeight}px`,
-        }}
-        onClick={handleCoverClick}
-      >
-        {showPlaceholder ? (
-          <CoverPlaceholder
-            title={game.title}
-            width={FIXED_COVER_SIZE}
-            height={coverHeight}
-          />
-        ) : (
-          <img
-            src={buildCoverUrl(apiBase, game.cover)}
-            alt={game.title}
-            className="object-cover w-full h-full"
-            onError={() => {
-              setImageError(true);
-            }}
-          />
-        )}
-        {onPlay && (
-          <button
-            onClick={handleCoverClick}
-            className="games-list-detail-play-button"
-            aria-label="Play game"
-          >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 5v14l11-7z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
+      <Cover
+        title={game.title}
+        coverUrl={buildCoverUrl(apiBase, game.cover)}
+        width={FIXED_COVER_SIZE}
+        height={coverHeight}
+        onPlay={onPlay ? () => onPlay(game) : undefined}
+        showTitle={false}
+        showYear={false}
+        mode="play-only"
+        showBorder={false}
+      />
       <div className="games-list-detail-content">
         <div className="text-white mb-2 games-list-detail-title">
           {game.title}

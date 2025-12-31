@@ -15,7 +15,9 @@ type GamesListProps = {
   draggable?: boolean;
   onDragEnd?: (sourceIndex: number, destinationIndex: number) => void;
   style?: React.CSSProperties;
+  viewMode?: "grid" | "detail" | "table";
 };
+
 
 type GameListItemProps = {
   game: GameItem;
@@ -32,6 +34,7 @@ type GameListItemProps = {
   onDragEnd: () => void;
   isDragging: boolean;
   dragOverIndex: number | null;
+  viewMode?: "grid" | "detail" | "table";
 };
 
 function GameListItem({
@@ -49,6 +52,7 @@ function GameListItem({
   onDragEnd,
   isDragging,
   dragOverIndex,
+  viewMode,
 }: GameListItemProps) {
   const coverHeight = coverSize * 1.5;
 
@@ -83,7 +87,6 @@ function GameListItem({
       }}
       className={`group cursor-pointer games-list-item ${draggable ? 'games-list-item-draggable' : ''} ${isDragOver ? 'games-list-item-drag-over' : ''}`}
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
-      onClick={() => onGameClick(game)}
       draggable={draggable}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
@@ -107,9 +110,12 @@ function GameListItem({
         width={coverSize}
         height={coverHeight}
         onPlay={onPlay ? () => onPlay(game) : undefined}
+        onClick={() => onGameClick(game)}
         showTitle={true}
         showYear={true}
         year={game.year}
+        mode="play-or-detail"
+        showBorder={viewMode !== "detail"}
       />
     </div>
   );
@@ -126,6 +132,7 @@ export default function GamesList({
   draggable = false,
   onDragEnd,
   style,
+  viewMode,
 }: GamesListProps) {
   const { t } = useTranslation();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -174,6 +181,7 @@ export default function GamesList({
           onDragEnd={handleDragEnd}
           isDragging={draggedIndex !== null}
           dragOverIndex={dragOverIndex}
+          viewMode={viewMode}
         />
       ))}
     </div>

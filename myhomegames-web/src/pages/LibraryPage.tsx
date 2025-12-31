@@ -426,6 +426,7 @@ export default function LibraryPage({
                   buildCoverUrl={buildCoverUrl}
                   coverSize={coverSize}
                   itemRefs={itemRefs}
+                  viewMode={viewMode}
                 />
               )}
               {viewMode === "detail" && (

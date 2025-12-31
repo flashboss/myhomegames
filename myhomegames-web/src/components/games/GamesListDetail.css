@@ -26,12 +26,8 @@
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-.games-list-detail-cover {
-  width: 100px;
-  height: 150px;
-  min-width: 100px;
-  min-height: 150px;
-  /* Common hover effects handled by .cover-hover-effect class */
+.games-list-detail-item .games-list-cover {
+  flex-shrink: 0;
 }
 
 .games-list-detail-content {
@@ -48,34 +44,4 @@
   font-weight: 600;
   color: #f8f8f8;
   cursor: pointer;
-}
-
-.games-list-detail-play-button {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(229, 160, 13, 0.9);
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 3;
-}
-
-.games-list-detail-cover:hover .games-list-detail-play-button {
-  opacity: 1;
-}
-
-.games-list-detail-play-button svg {
-  width: 24px;
-  height: 24px;
-  color: #ffffff;
-  margin-left: 3px;
 }

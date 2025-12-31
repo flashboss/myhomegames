@@ -1,5 +1,25 @@
 .games-list-cover {
   margin-bottom: 8px;
+  position: relative;
+}
+
+/* Ensure play button stays within bounds when border is disabled */
+.games-list-cover:not(.cover-hover-effect) {
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.games-list-cover:not(.cover-hover-effect) > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.games-list-cover:not(.cover-hover-effect) > div:first-child {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
 }
 
 .collection-detail-games-list .games-list-cover {
@@ -14,7 +34,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.7);
   border: none;
   border-radius: 50%;
   width: 48px;
@@ -23,17 +42,38 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0;
   transition: opacity 0.2s ease, background-color 0.2s ease;
   z-index: 3;
 }
 
-.games-list-play-button:hover {
+/* play-or-detail mode: transparent button that becomes visible on cover hover, yellow on button hover */
+.games-list-play-button-play-or-detail {
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+}
+
+.games-list-cover:hover .games-list-play-button-play-or-detail {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.games-list-play-button-play-or-detail:hover {
+  background-color: rgba(229, 160, 13, 0.9) !important;
+}
+
+/* play-only mode: invisible button that becomes yellow on hover */
+.games-list-play-button-play-only {
+  background-color: rgba(229, 160, 13, 0.9);
+  opacity: 0;
+}
+
+.games-list-cover-play-only:hover .games-list-play-button-play-only {
+  opacity: 1;
   background-color: rgba(229, 160, 13, 0.9);
 }
 
-.games-list-cover:hover .games-list-play-button {
-  opacity: 1;
+.games-list-play-button-play-only:hover {
+  background-color: rgba(229, 160, 13, 0.9);
 }
 
 /* Override global cover-hover-effect rule - disable parent hover effect */
@@ -55,6 +95,16 @@
 
 .games-list-cover.cover-hover-effect:hover::before {
   background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* no-click mode: disable hover effects */
+.games-list-cover-no-click.cover-hover-effect:hover {
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.games-list-cover-no-click.cover-hover-effect:hover::before {
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 
 .games-list-play-button svg {
@@ -79,14 +129,17 @@
   color: #f8f8f8;
   background-color: transparent;
   padding: 0;
-  cursor: pointer;
   transition: text-decoration 0.2s ease;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.games-list-title:hover {
+.games-list-title-clickable {
+  cursor: pointer;
+}
+
+.games-list-title-clickable:hover {
   text-decoration: underline;
 }
 

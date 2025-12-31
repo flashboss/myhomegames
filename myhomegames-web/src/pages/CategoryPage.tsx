@@ -398,6 +398,7 @@ export default function CategoryPage({
                   buildCoverUrl={buildCoverUrl}
                   coverSize={coverSize}
                   itemRefs={itemRefs}
+                  viewMode={viewMode}
                 />
               )}
               {viewMode === "detail" && (
