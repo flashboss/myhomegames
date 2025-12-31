@@ -4,6 +4,7 @@ import Cover from "./Cover";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import GameCategories from "./GameCategories";
+import EditGameModal from "./EditGameModal";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
 import type { GameItem } from "../../types";
@@ -32,6 +33,7 @@ export default function GameDetail({
 }: GameDetailProps) {
   const { t } = useTranslation();
   const [localGame, setLocalGame] = useState<GameItem>(game);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   // Sync localGame when game prop changes
   useEffect(() => {
@@ -104,6 +106,17 @@ export default function GameDetail({
         coverSize={coverSize}
         handleCoverSizeChange={handleCoverSizeChange}
         onRatingChange={handleRatingChange}
+        isEditModalOpen={isEditModalOpen}
+        onEditModalOpen={() => setIsEditModalOpen(true)}
+        onEditModalClose={() => setIsEditModalOpen(false)}
+        apiBase={apiBase}
+        apiToken={apiToken}
+        onGameUpdate={(updatedGame) => {
+          setLocalGame(updatedGame);
+          if (onGameUpdate) {
+            onGameUpdate(updatedGame);
+          }
+        }}
         t={t}
       />
     </BackgroundManager>
@@ -121,6 +134,12 @@ function GameDetailContent({
   coverSize,
   handleCoverSizeChange,
   onRatingChange,
+  isEditModalOpen,
+  onEditModalOpen,
+  onEditModalClose,
+  apiBase,
+  apiToken,
+  onGameUpdate,
   t,
 }: {
   game: GameItem;
@@ -133,6 +152,12 @@ function GameDetailContent({
   coverSize: number;
   handleCoverSizeChange: (size: number) => void;
   onRatingChange?: (newStars: number) => void;
+  isEditModalOpen: boolean;
+  onEditModalOpen: () => void;
+  onEditModalClose: () => void;
+  apiBase: string;
+  apiToken: string;
+  onGameUpdate: (updatedGame: GameItem) => void;
   t: (key: string) => string;
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
@@ -223,47 +248,90 @@ function GameDetailContent({
                 readOnly={false}
                 onRatingChange={onRatingChange}
               />
-              <button
-                onClick={() => onPlay(game)}
-                style={{
-                  backgroundColor: '#E5A00D',
-                  color: '#000000',
-                  border: 'none',
-                  borderRadius: '4px',
-                  paddingTop: '6px',
-                  paddingBottom: '6px',
-                  paddingLeft: '8px',
-                  paddingRight: '12px',
-                  fontSize: '1.25rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s ease',
-                  marginTop: '16px',
-                  width: 'fit-content',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  lineHeight: '1.2'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F5B041';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#E5A00D';
-                }}
-              >
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style={{ display: 'block' }}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '16px' }}>
+                <button
+                  onClick={() => onPlay(game)}
+                  style={{
+                    backgroundColor: '#E5A00D',
+                    color: '#000000',
+                    border: 'none',
+                    borderRadius: '4px',
+                    paddingTop: '6px',
+                    paddingBottom: '6px',
+                    paddingLeft: '8px',
+                    paddingRight: '12px',
+                    fontSize: '1.25rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s ease',
+                    width: 'fit-content',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    lineHeight: '1.2'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F5B041';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E5A00D';
+                  }}
                 >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                {t("common.play")}
-              </button>
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    style={{ display: 'block' }}
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {t("common.play")}
+                </button>
+                <button
+                  onClick={onEditModalOpen}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
+                  }}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </button>
+              </div>
+              <EditGameModal
+                isOpen={isEditModalOpen}
+                onClose={onEditModalClose}
+                game={game}
+                apiBase={apiBase}
+                apiToken={apiToken}
+                onGameUpdate={onGameUpdate}
+              />
               {game.summary && <Summary summary={game.summary} />}
             </div>
           </div>

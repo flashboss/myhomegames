@@ -82,7 +82,15 @@
   "gameDetail": {
     "notFound": "未找到游戏",
     "goBack": "返回首页",
-    "andMore": "等等"
+    "andMore": "等等",
+    "editGame": "编辑游戏",
+    "title": "标题",
+    "summary": "摘要",
+    "year": "年",
+    "month": "月",
+    "day": "日",
+    "genre": "类型",
+    "addGenre": "添加类型..."
   },
   "common": {
     "loading": "加载中...",
@@ -95,7 +103,10 @@
     "more": "更多",
     "less": "更少",
     "showBackground": "显示背景",
-    "hideBackground": "隐藏背景"
+    "hideBackground": "隐藏背景",
+    "cancel": "取消",
+    "save": "保存",
+    "saving": "保存中..."
   },
   "launch": {
     "launching": "正在启动游戏...",
@@ -169,6 +180,11 @@
     "turnbased": "回合制",
     "visualnovel": "视觉小说",
     "western": "西部"
+  },
+  "collectionDetail": {
+    "editCollection": "编辑收藏",
+    "title": "标题",
+    "summary": "摘要"
   }
 }
 

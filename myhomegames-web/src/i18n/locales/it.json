@@ -82,7 +82,15 @@
   "gameDetail": {
     "notFound": "Gioco non trovato",
     "goBack": "Torna alla home",
-    "andMore": "e molto altro"
+    "andMore": "e molto altro",
+    "editGame": "Modifica Gioco",
+    "title": "Titolo",
+    "summary": "Riassunto",
+    "year": "Anno",
+    "month": "Mese",
+    "day": "Giorno",
+    "genre": "Genere",
+    "addGenre": "Aggiungi genere..."
   },
   "common": {
     "loading": "Caricamento...",
@@ -95,7 +103,10 @@
     "more": "Altro",
     "less": "Meno",
     "showBackground": "Mostra sfondo",
-    "hideBackground": "Nascondi sfondo"
+    "hideBackground": "Nascondi sfondo",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "saving": "Salvataggio..."
   },
   "launch": {
     "launching": "Avvio gioco...",
@@ -169,6 +180,11 @@
     "turnbased": "A Turni",
     "visualnovel": "Visual Novel",
     "western": "Western"
+  },
+  "collectionDetail": {
+    "editCollection": "Modifica Raccolta",
+    "title": "Titolo",
+    "summary": "Riassunto"
   }
 }
 

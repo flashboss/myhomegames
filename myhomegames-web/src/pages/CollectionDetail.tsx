@@ -7,6 +7,7 @@ import Cover from "../components/games/Cover";
 import LibrariesBar from "../components/layout/LibrariesBar";
 import StarRating from "../components/common/StarRating";
 import Summary from "../components/common/Summary";
+import EditCollectionModal from "../components/collections/EditCollectionModal";
 import BackgroundManager, { useBackground } from "../components/common/BackgroundManager";
 import { compareTitles } from "../utils/stringUtils";
 import { buildBackgroundUrl } from "../utils/api";
@@ -44,6 +45,7 @@ export default function CollectionDetail({
     return saved ? parseInt(saved, 10) : 150;
   });
   const [customOrder, setCustomOrder] = useState<string[] | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
   
@@ -305,6 +307,7 @@ export default function CollectionDetail({
         sortedGames={sortedGames}
         loading={loading}
         apiBase={apiBase}
+        apiToken={apiToken}
         onGameClick={onGameClick}
         buildCoverUrl={buildCoverUrl}
         coverSize={coverSize}
@@ -314,6 +317,12 @@ export default function CollectionDetail({
         handleDragEnd={handleDragEnd}
         scrollContainerRef={scrollContainerRef}
         isReady={isReady}
+        isEditModalOpen={isEditModalOpen}
+        onEditModalOpen={() => setIsEditModalOpen(true)}
+        onEditModalClose={() => setIsEditModalOpen(false)}
+        onCollectionUpdate={(updatedCollection) => {
+          setCollection(updatedCollection);
+        }}
         t={t}
       />
     </BackgroundManager>
@@ -331,6 +340,7 @@ function CollectionDetailContent({
   sortedGames,
   loading,
   apiBase,
+  apiToken,
   onGameClick,
   buildCoverUrl,
   coverSize,
@@ -340,6 +350,10 @@ function CollectionDetailContent({
   handleDragEnd,
   scrollContainerRef,
   isReady,
+  isEditModalOpen,
+  onEditModalOpen,
+  onEditModalClose,
+  onCollectionUpdate,
   t,
 }: {
   collection: CollectionInfo | null;
@@ -352,6 +366,7 @@ function CollectionDetailContent({
   sortedGames: GameItem[];
   loading: boolean;
   apiBase: string;
+  apiToken: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
@@ -361,6 +376,10 @@ function CollectionDetailContent({
   handleDragEnd: (sourceIndex: number, destinationIndex: number) => void;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   isReady: boolean;
+  isEditModalOpen: boolean;
+  onEditModalOpen: () => void;
+  onEditModalClose: () => void;
+  onCollectionUpdate: (updatedCollection: CollectionInfo) => void;
   t: (key: string) => string;
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
@@ -461,53 +480,102 @@ function CollectionDetailContent({
                     {averageRating !== null && (
                       <StarRating rating={averageRating} />
                     )}
-                    {onPlay && sortedGames.length > 0 && (
-                      <button
-                        onClick={() => {
-                          // Play first game in collection
-                          if (sortedGames[0]) {
-                            onPlay(sortedGames[0]);
-                          }
-                        }}
-                        style={{
-                          backgroundColor: '#E5A00D',
-                          color: '#000000',
-                          border: 'none',
-                          borderRadius: '4px',
-                          paddingTop: '6px',
-                          paddingBottom: '6px',
-                          paddingLeft: '8px',
-                          paddingRight: '12px',
-                          fontSize: '1.25rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          transition: 'background-color 0.2s ease',
-                          marginTop: '16px',
-                          width: 'fit-content',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '6px',
-                          lineHeight: '1.2'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#F5B041';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#E5A00D';
-                        }}
-                      >
-                        <svg
-                          width="28"
-                          height="28"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          style={{ display: 'block' }}
-                        >
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                        {t("common.play")}
-                      </button>
+                    {(onPlay && sortedGames.length > 0) || collection ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '16px' }}>
+                        {onPlay && sortedGames.length > 0 && (
+                          <button
+                            onClick={() => {
+                              // Play first game in collection
+                              if (sortedGames[0]) {
+                                onPlay(sortedGames[0]);
+                              }
+                            }}
+                            style={{
+                              backgroundColor: '#E5A00D',
+                              color: '#000000',
+                              border: 'none',
+                              borderRadius: '4px',
+                              paddingTop: '6px',
+                              paddingBottom: '6px',
+                              paddingLeft: '8px',
+                              paddingRight: '12px',
+                              fontSize: '1.25rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s ease',
+                              width: 'fit-content',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              lineHeight: '1.2'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#F5B041';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#E5A00D';
+                            }}
+                          >
+                            <svg
+                              width="28"
+                              height="28"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              style={{ display: 'block' }}
+                            >
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                            {t("common.play")}
+                          </button>
+                        )}
+                        {collection && (
+                          <button
+                            onClick={onEditModalOpen}
+                            style={{
+                              backgroundColor: 'transparent',
+                              color: 'rgba(255, 255, 255, 0.8)',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              transition: 'color 0.2s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
+                            }}
+                          >
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    ) : null}
+                    {collection && (
+                      <EditCollectionModal
+                        isOpen={isEditModalOpen}
+                        onClose={onEditModalClose}
+                        collection={collection}
+                        apiBase={apiBase}
+                        apiToken={apiToken}
+                        onCollectionUpdate={onCollectionUpdate}
+                      />
                     )}
                     {collection.summary && <Summary summary={collection.summary} />}
                     {/* Additional information can be added here */}

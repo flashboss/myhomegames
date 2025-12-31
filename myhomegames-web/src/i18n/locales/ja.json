@@ -82,7 +82,15 @@
   "gameDetail": {
     "notFound": "ゲームが見つかりません",
     "goBack": "ホームに戻る",
-    "andMore": "など"
+    "andMore": "など",
+    "editGame": "ゲームを編集",
+    "title": "タイトル",
+    "summary": "概要",
+    "year": "年",
+    "month": "月",
+    "day": "日",
+    "genre": "ジャンル",
+    "addGenre": "ジャンルを追加..."
   },
   "common": {
     "loading": "読み込み中...",
@@ -95,7 +103,10 @@
     "more": "もっと",
     "less": "少なく",
     "showBackground": "背景を表示",
-    "hideBackground": "背景を非表示"
+    "hideBackground": "背景を非表示",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "saving": "保存中..."
   },
   "launch": {
     "launching": "ゲームを起動中...",
@@ -169,6 +180,11 @@
     "turnbased": "ターンベース",
     "visualnovel": "ビジュアルノベル",
     "western": "西部劇"
+  },
+  "collectionDetail": {
+    "editCollection": "コレクションを編集",
+    "title": "タイトル",
+    "summary": "概要"
   }
 }
 

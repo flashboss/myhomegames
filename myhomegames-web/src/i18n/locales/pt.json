@@ -82,7 +82,15 @@
   "gameDetail": {
     "notFound": "Jogo não encontrado",
     "goBack": "Voltar ao início",
-    "andMore": "e mais"
+    "andMore": "e mais",
+    "editGame": "Editar Jogo",
+    "title": "Título",
+    "summary": "Resumo",
+    "year": "Ano",
+    "month": "Mês",
+    "day": "Dia",
+    "genre": "Gênero",
+    "addGenre": "Adicionar gênero..."
   },
   "common": {
     "loading": "Carregando...",
@@ -95,7 +103,10 @@
     "more": "Mais",
     "less": "Menos",
     "showBackground": "Mostrar fundo",
-    "hideBackground": "Ocultar fundo"
+    "hideBackground": "Ocultar fundo",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "saving": "Salvando..."
   },
   "launch": {
     "launching": "Iniciando jogo...",
@@ -169,6 +180,11 @@
     "turnbased": "Por Turnos",
     "visualnovel": "Visual Novel",
     "western": "Faroeste"
+  },
+  "collectionDetail": {
+    "editCollection": "Editar Coleção",
+    "title": "Título",
+    "summary": "Resumo"
   }
 }
 

@@ -82,7 +82,15 @@
   "gameDetail": {
     "notFound": "Game not found",
     "goBack": "Go back to home",
-    "andMore": "and more"
+    "andMore": "and more",
+    "editGame": "Edit Game",
+    "title": "Title",
+    "summary": "Summary",
+    "year": "Year",
+    "month": "Month",
+    "day": "Day",
+    "genre": "Genre",
+    "addGenre": "Add genre..."
   },
   "common": {
     "loading": "Loading...",
@@ -95,7 +103,10 @@
     "more": "More",
     "less": "Less",
     "showBackground": "Show background",
-    "hideBackground": "Hide background"
+    "hideBackground": "Hide background",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving..."
   },
   "launch": {
     "launching": "Launching game...",
@@ -169,6 +180,11 @@
     "turnbased": "Turn-Based",
     "visualnovel": "Visual Novel",
     "western": "Western"
+  },
+  "collectionDetail": {
+    "editCollection": "Edit Collection",
+    "title": "Title",
+    "summary": "Summary"
   }
 }
 

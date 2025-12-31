@@ -82,7 +82,15 @@
   "gameDetail": {
     "notFound": "Jeu non trouvé",
     "goBack": "Retour à l'accueil",
-    "andMore": "et plus"
+    "andMore": "et plus",
+    "editGame": "Modifier le jeu",
+    "title": "Titre",
+    "summary": "Résumé",
+    "year": "Année",
+    "month": "Mois",
+    "day": "Jour",
+    "genre": "Genre",
+    "addGenre": "Ajouter un genre..."
   },
   "common": {
     "loading": "Chargement...",
@@ -95,7 +103,10 @@
     "more": "Plus",
     "less": "Moins",
     "showBackground": "Afficher l'arrière-plan",
-    "hideBackground": "Masquer l'arrière-plan"
+    "hideBackground": "Masquer l'arrière-plan",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement..."
   },
   "launch": {
     "launching": "Lancement du jeu...",
@@ -169,6 +180,11 @@
     "turnbased": "Au Tour par Tour",
     "visualnovel": "Visual Novel",
     "western": "Western"
+  },
+  "collectionDetail": {
+    "editCollection": "Modifier la collection",
+    "title": "Titre",
+    "summary": "Résumé"
   }
 }
 

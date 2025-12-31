@@ -82,7 +82,15 @@
   "gameDetail": {
     "notFound": "Juego no encontrado",
     "goBack": "Volver al inicio",
-    "andMore": "y más"
+    "andMore": "y más",
+    "editGame": "Editar Juego",
+    "title": "Título",
+    "summary": "Resumen",
+    "year": "Año",
+    "month": "Mes",
+    "day": "Día",
+    "genre": "Género",
+    "addGenre": "Añadir género..."
   },
   "common": {
     "loading": "Cargando...",
@@ -95,7 +103,10 @@
     "more": "Más",
     "less": "Menos",
     "showBackground": "Mostrar fondo",
-    "hideBackground": "Ocultar fondo"
+    "hideBackground": "Ocultar fondo",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando..."
   },
   "launch": {
     "launching": "Iniciando juego...",
@@ -169,6 +180,11 @@
     "turnbased": "Por Turnos",
     "visualnovel": "Novela Visual",
     "western": "Western"
+  },
+  "collectionDetail": {
+    "editCollection": "Editar Colección",
+    "title": "Título",
+    "summary": "Resumen"
   }
 }
 
