@@ -44,14 +44,6 @@ export default function RecommendedPage({
   const [isReady, setIsReady] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
-  // Funzione per calcolare il padding in base al numero di elementi
-  const calculatePadding = (numGames: number): number => {
-    // Base: 64px (allineamento con il titolo)
-    // Margine aggiuntivo proporzionale al numero di elementi
-    // Formula: 64 + (numero elementi * 80px) per garantire spazio sufficiente
-    return 64 + (numGames * 80);
-  };
-  
   // Restore scroll position
   useScrollRestoration(scrollContainerRef);
 
@@ -139,7 +131,6 @@ export default function RecommendedPage({
               onPlay={onPlay}
               buildCoverUrl={buildCoverUrl}
               coverSize={coverSize}
-              paddingLeft={calculatePadding(section.games.length)}
             />
           ))}
         </div>
