@@ -3,9 +3,7 @@
     "id": "test_game_1",
     "title": "Test Game 1",
     "summary": "A test game for unit testing",
-    "command": "/usr/bin/echo",
-    "args": ["test"],
-    "allowed_dir": "/usr/bin",
+    "command": "/usr/bin/echo test",
     "year": 2023,
     "stars": 8
   },
@@ -13,9 +11,7 @@
     "id": "test_game_2",
     "title": "Test Game 2",
     "summary": "Another test game",
-    "command": "/usr/bin/echo",
-    "args": ["test2"],
-    "allowed_dir": "/usr/bin",
+    "command": "/usr/bin/echo test2",
     "year": 2024,
     "month": 1,
     "day": 15,
@@ -25,9 +21,7 @@
     "id": "test_game_3",
     "title": "Test Game 3",
     "summary": "Library test game",
-    "command": "/usr/bin/echo",
-    "args": ["test3"],
-    "allowed_dir": "/usr/bin",
+    "command": "/usr/bin/echo test3",
     "year": 2022
   }
 ]

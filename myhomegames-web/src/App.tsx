@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import {
   BrowserRouter,
   Routes,
@@ -19,6 +18,7 @@ import CollectionDetail from "./pages/CollectionDetail";
 import CategoryPage from "./pages/CategoryPage";
 import AddGame from "./components/common/AddGame";
 import GameDetail from "./components/games/GameDetail";
+import LaunchModal from "./components/common/LaunchModal";
 
 type GameItem = {
   ratingKey: string;
@@ -69,38 +69,16 @@ type CollectionItem = {
 function AppContent() {
   const [allGames, setAllGames] = useState<GameItem[]>([]);
   const [allCollections, setAllCollections] = useState<CollectionItem[]>([]);
-  const [playerUrl, setPlayerUrl] = useState<string | null>(null);
+  const [launchError, setLaunchError] = useState<string | null>(null);
+  const [isLaunching, setIsLaunching] = useState(false);
   const [addGameOpen, setAddGameOpen] = useState(false);
   const navigate = useNavigate();
   const { i18n } = useTranslation();
 
-  // Block body scroll when player modal is open
-  useEffect(() => {
-    if (playerUrl) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [playerUrl]);
-
-  // Handle ESC key to close player modal
-  useEffect(() => {
-    if (!playerUrl) return;
-    
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setPlayerUrl(null);
-      }
-    }
-    
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [playerUrl]);
+  const handleCloseLaunchModal = () => {
+    setLaunchError(null);
+    setIsLaunching(false);
+  };
 
   // Load games on app startup for search
   useEffect(() => {
@@ -194,12 +172,75 @@ function AppContent() {
     loadSettings();
   }, [i18n]);
 
-  function openLauncher(item: GameItem | CollectionItem) {
-    const launchUrl = buildApiUrl(`/launcher`, {
-      gameId: item.ratingKey,
-      token: API_TOKEN,
-    });
-    setPlayerUrl(launchUrl);
+  async function openLauncher(item: GameItem | CollectionItem) {
+    setIsLaunching(true);
+    setLaunchError(null);
+    
+    try {
+      let gameId = item.ratingKey;
+      
+      // If it's a collection, get the first game from the collection
+      const isCollection = allCollections.some(c => c.ratingKey === item.ratingKey);
+      if (isCollection) {
+        try {
+          const gamesUrl = buildApiUrl(`/collections/${item.ratingKey}/games`);
+          const gamesRes = await fetch(gamesUrl, {
+            headers: {
+              Accept: "application/json",
+              "X-Auth-Token": API_TOKEN,
+            },
+          });
+          if (gamesRes.ok) {
+            const gamesJson = await gamesRes.json();
+            const games = gamesJson.games || [];
+            if (games.length > 0) {
+              // Use the first game's ID
+              gameId = games[0].id;
+            } else {
+              setIsLaunching(false);
+              setLaunchError("Collection is empty");
+              return;
+            }
+          } else {
+            setIsLaunching(false);
+            setLaunchError("Failed to load collection games");
+            return;
+          }
+        } catch (err: any) {
+          setIsLaunching(false);
+          setLaunchError(err.message || "Failed to load collection games");
+          return;
+        }
+      }
+      
+      const launchUrl = buildApiUrl(`/launcher`, {
+        gameId: gameId,
+        token: API_TOKEN,
+      });
+      const res = await fetch(launchUrl, {
+        headers: {
+          Accept: "application/json",
+          "X-Auth-Token": API_TOKEN,
+        },
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        // Prefer detail over error as it contains more specific information
+        const errorMessage = errorData.detail || errorData.error || `Failed to launch game (HTTP ${res.status})`;
+        setIsLaunching(false);
+        setLaunchError(errorMessage);
+      } else {
+        // Success - close loading after a short delay
+        setTimeout(() => {
+          setIsLaunching(false);
+        }, 500);
+      }
+    } catch (err: any) {
+      const errorMessage = err.message || "Failed to launch game";
+      setIsLaunching(false);
+      setLaunchError(errorMessage);
+    }
   }
 
   function handleGameClick(game: GameItem) {
@@ -356,104 +397,12 @@ function AppContent() {
           apiToken={API_TOKEN}
         />
 
-        {/* Modal Plex-style for launcher */}
-        {playerUrl && createPortal(
-          <div
-            style={{ 
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 99999,
-              pointerEvents: 'auto',
-              overflow: 'hidden'
-            }}
-            onClick={() => setPlayerUrl(null)}
-          >
-            <div
-              style={{
-                backgroundColor: '#1a1a1a',
-                borderRadius: '8px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                overflow: 'hidden',
-                border: '1px solid #2a2a2a',
-                width: '90%',
-                maxWidth: '1400px',
-                height: '85%',
-                maxHeight: '900px',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div style={{ 
-                padding: '16px', 
-                borderBottom: '1px solid #2a2a2a', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between', 
-                backgroundColor: '#0d0d0d',
-                flexShrink: 0
-              }}>
-                <h2 style={{ 
-                  fontSize: '18px', 
-                  fontWeight: 600, 
-                  color: '#ffffff',
-                  margin: 0
-                }}>
-                  Game Launcher
-                </h2>
-                <button
-                  style={{
-                    color: '#9ca3af',
-                    fontSize: '18px',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = '#ffffff';
-                    e.currentTarget.style.backgroundColor = '#2a2a2a';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = '#9ca3af';
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                  onClick={() => setPlayerUrl(null)}
-                  aria-label="Close"
-                >
-                  ✕ Close
-                </button>
-              </div>
-              <div style={{ 
-                flex: 1, 
-                overflow: 'hidden', 
-                minHeight: 0 
-              }}>
-                <iframe
-                  src={playerUrl}
-                  title="Game Launcher"
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    border: 'none',
-                    display: 'block'
-                  }}
-                />
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
+        {/* Launch Modal - handles both loading and error states */}
+        <LaunchModal
+          isLaunching={isLaunching}
+          launchError={launchError}
+          onClose={handleCloseLaunchModal}
+        />
       </div>
     </>
   );

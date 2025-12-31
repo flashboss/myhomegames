@@ -94,6 +94,10 @@
     "showBackground": "Hintergrund anzeigen",
     "hideBackground": "Hintergrund ausblenden"
   },
+  "launch": {
+    "launching": "Spiel wird gestartet...",
+    "error": "Startfehler"
+  },
   "gamesListToolbar": {
     "filter": {
       "label": "Filter",

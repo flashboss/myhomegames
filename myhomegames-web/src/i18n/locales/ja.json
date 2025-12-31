@@ -94,6 +94,10 @@
     "showBackground": "背景を表示",
     "hideBackground": "背景を非表示"
   },
+  "launch": {
+    "launching": "ゲームを起動中...",
+    "error": "起動エラー"
+  },
   "gamesListToolbar": {
     "filter": {
       "label": "フィルター",

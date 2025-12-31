@@ -94,6 +94,10 @@
     "showBackground": "Mostra sfondo",
     "hideBackground": "Nascondi sfondo"
   },
+  "launch": {
+    "launching": "Avvio gioco...",
+    "error": "Errore di Avvio"
+  },
   "gamesListToolbar": {
     "filter": {
       "label": "Filtro",

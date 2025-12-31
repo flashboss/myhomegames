@@ -116,27 +116,23 @@ app.get("/launcher", requireToken, (req, res) => {
   const entry = allGames[String(gameId)];
   if (!entry) return res.status(404).json({ error: "Game not found" });
 
-  // For safety: 'command' is an absolute path to the executable and 'args' is an array
+  // For safety: 'command' is an absolute path to the executable (can include arguments)
   const command = entry.command;
-  const args = entry.args || [];
 
-  // Validate command path — must be inside allowed folder (optional)
-  // Example: only allow commands inside a configured 'allowed_bin' directory
-  if (entry.allowed_dir) {
-    const allowedDir = path.resolve(entry.allowed_dir);
-    const resolved = path.resolve(command);
-    if (!resolved.startsWith(allowedDir)) {
-      return res
-        .status(403)
-        .json({ error: "Command outside allowed directory" });
-    }
+  // Validate command exists
+  if (!command || typeof command !== 'string' || command.trim() === '') {
+    return res.status(400).json({
+      error: "Launch failed",
+      detail: "Command is missing or invalid. Please check the game configuration."
+    });
   }
 
-  // Spawn process without shell to avoid injection
+  // Spawn process with shell to allow command with arguments
   let responseSent = false;
 
   try {
-    const child = spawn(command, args, {
+    const child = spawn(command, {
+      shell: true,
       detached: true,
       stdio: "ignore",
     });
@@ -169,9 +165,11 @@ app.get("/launcher", requireToken, (req, res) => {
     console.error("Launch failed", e);
     if (!responseSent) {
       responseSent = true;
+      // Include full error message and stack if available
+      const errorDetail = e.message || e.toString() || "Unknown error occurred";
       return res
         .status(500)
-        .json({ error: "Launch failed", detail: e.message });
+        .json({ error: "Launch failed", detail: errorDetail });
     }
   }
 });

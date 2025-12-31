@@ -94,6 +94,10 @@
     "showBackground": "显示背景",
     "hideBackground": "隐藏背景"
   },
+  "launch": {
+    "launching": "正在启动游戏...",
+    "error": "启动错误"
+  },
   "gamesListToolbar": {
     "filter": {
       "label": "筛选",

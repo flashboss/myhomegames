@@ -97,14 +97,13 @@ describe('GET /launcher', () => {
     expect(response.body).toHaveProperty('error', 'Game not found');
   });
 
-  test('should validate command path when allowed_dir is set', async () => {
-    // This test depends on the test fixtures having allowed_dir set
+  test('should launch game when command is valid', async () => {
     const response = await request(app)
       .get('/launcher?gameId=test_game_1')
       .set('X-Auth-Token', 'test-token');
     
     // Should either succeed (if command exists) or fail with appropriate error
-    expect([200, 403, 500]).toContain(response.status);
+    expect([200, 500]).toContain(response.status);
   });
 });
 
