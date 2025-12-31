@@ -88,6 +88,7 @@
     "close": "Close",
     "fetchError": "Failed to connect to server",
     "games": "Games",
+    "elements": "Elements",
     "play": "Play",
     "more": "More",
     "less": "Less",

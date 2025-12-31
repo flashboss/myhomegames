@@ -14,6 +14,12 @@
   /* Common hover effects handled by .cover-hover-effect class */
 }
 
+.collections-list-title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .collections-list-title {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 0.85rem;
@@ -30,6 +36,14 @@
 
 .collections-list-item:hover .collections-list-title {
   text-decoration: underline;
+}
+
+.collections-list-game-count {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.2;
 }
 
 .collections-list-play-button {

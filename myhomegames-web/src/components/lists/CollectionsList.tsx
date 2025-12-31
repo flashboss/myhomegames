@@ -7,6 +7,7 @@ type CollectionItem = {
   ratingKey: string;
   title: string;
   cover?: string;
+  gameCount?: number;
 };
 
 type CollectionsListProps = {
@@ -38,6 +39,7 @@ function CollectionListItem({
   coverSize,
   itemRefs,
 }: CollectionListItemProps) {
+  const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const showPlaceholder = !collection.cover || imageError;
   const coverHeight = coverSize * 1.5;
@@ -101,7 +103,14 @@ function CollectionListItem({
           </button>
         )}
       </div>
-      <div className="truncate collections-list-title">{collection.title}</div>
+      <div className="collections-list-title-container">
+        <div className="truncate collections-list-title">{collection.title}</div>
+        {collection.gameCount !== undefined && (
+          <div className="collections-list-game-count">
+            {collection.gameCount} {t("common.elements")}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

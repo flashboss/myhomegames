@@ -9,6 +9,7 @@ type CollectionItem = {
   ratingKey: string;
   title: string;
   cover?: string;
+  gameCount?: number;
 };
 
 type CollectionsPageProps = {
@@ -75,6 +76,7 @@ export default function CollectionsPage({
         ratingKey: v.id,
         title: v.title,
         cover: v.cover,
+        gameCount: v.gameCount,
       }));
       setCollections(parsed);
     } catch (err: any) {

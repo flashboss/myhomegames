@@ -39,6 +39,7 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
           title: c.title,
           summary: c.summary || "",
           cover: `/collection-covers/${encodeURIComponent(c.id)}`,
+          gameCount: (c.games || []).length,
         };
         const background = getCollectionBackgroundPath(metadataPath, c.id);
         if (background) {

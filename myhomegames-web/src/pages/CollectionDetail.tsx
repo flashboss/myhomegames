@@ -278,7 +278,7 @@ export default function CollectionDetail({
   const collectionCoverUrl = collection?.cover ? buildCoverUrl(apiBase, collection.cover) : "";
   const showPlaceholder = !collectionCoverUrl || imageError;
   const collectionCoverWidth = 240;
-  const collectionCoverHeight = 135; // 16:9 aspect ratio
+  const collectionCoverHeight = 360; // 2:3 aspect ratio (vertical like games)
   
   // Build background URL
   function buildBackgroundUrl(apiBase: string, background?: string) {
@@ -423,7 +423,7 @@ function CollectionDetailContent({
                 {/* Cover */}
                 <div style={{ flexShrink: 0 }}>
                   <div 
-                    className="collection-detail-cover-container cover-hover-effect relative aspect-[16/9] bg-[#2a2a2a] rounded overflow-hidden" 
+                    className="collection-detail-cover-container cover-hover-effect relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden" 
                     style={{ width: `${collectionCoverWidth}px` }}
                     onClick={() => {
                       // Click on cover plays first game
