@@ -107,9 +107,7 @@ export default function CollectionDetail({
   async function fetchCollectionGames(collectionId: string) {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, `/collections/${collectionId}/games`, {
-        sort: "title",
-      });
+      const url = buildApiUrl(apiBase, `/collections/${collectionId}/games`);
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
@@ -129,6 +127,9 @@ export default function CollectionDetail({
         year: v.year,
         stars: v.stars,
       }));
+      // Initialize customOrder with the order from backend (saved order)
+      const orderFromBackend = parsed.map(g => g.ratingKey);
+      setCustomOrder(orderFromBackend);
       setGames(parsed);
       onGamesLoaded(parsed);
     } catch (err: any) {
