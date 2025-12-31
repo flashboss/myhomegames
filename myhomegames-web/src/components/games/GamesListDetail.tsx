@@ -58,8 +58,8 @@ function GameDetailItem({
         height={coverHeight}
         onPlay={onPlay ? () => onPlay(game) : undefined}
         showTitle={false}
-        showYear={false}
-        mode="play-only"
+        detail={false}
+        play={true}
         showBorder={false}
       />
       <div className="games-list-detail-content">

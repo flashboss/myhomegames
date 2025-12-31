@@ -112,9 +112,9 @@ function GameListItem({
         onPlay={onPlay ? () => onPlay(game) : undefined}
         onClick={() => onGameClick(game)}
         showTitle={true}
-        showYear={true}
-        year={game.year}
-        mode="play-or-detail"
+        subtitle={game.year}
+        detail={true}
+        play={true}
         showBorder={viewMode !== "detail"}
       />
     </div>

@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
+import Cover from "../games/Cover";
 import { useNavigate } from "react-router-dom";
 import type { GameItem, CollectionItem } from "../../types";
 import "./SearchResultsList.css";
@@ -10,7 +9,6 @@ type SearchResultsListProps = {
   collections: CollectionItem[];
   apiBase: string;
   onGameClick: (game: GameItem) => void;
-  onPlay?: (item: GameItem | CollectionItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
 };
 
@@ -20,7 +18,6 @@ type SearchResultItemProps = {
   game: GameItem;
   apiBase: string;
   onGameClick: (game: GameItem) => void;
-  onPlay?: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
 };
 
@@ -28,11 +25,8 @@ function SearchResultItem({
   game,
   apiBase,
   onGameClick,
-  onPlay,
   buildCoverUrl,
 }: SearchResultItemProps) {
-  const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !game.cover || imageError;
   const coverHeight = FIXED_COVER_SIZE * 1.5;
 
   return (
@@ -41,29 +35,17 @@ function SearchResultItem({
       className="group cursor-pointer mb-6 search-results-list-item"
       onClick={() => onGameClick(game)}
     >
-      <div
-        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover cover-hover-effect"
-        style={{
-          height: `${coverHeight}px`,
-        }}
-      >
-        {showPlaceholder ? (
-          <CoverPlaceholder
-            title={game.title}
-            width={FIXED_COVER_SIZE}
-            height={coverHeight}
-          />
-        ) : (
-          <img
-            src={buildCoverUrl(apiBase, game.cover)}
-            alt={game.title}
-            className="object-cover w-full h-full"
-            onError={() => {
-              setImageError(true);
-            }}
-          />
-        )}
-      </div>
+      <Cover
+        title={game.title}
+        coverUrl={buildCoverUrl(apiBase, game.cover)}
+        width={FIXED_COVER_SIZE}
+        height={coverHeight}
+        onClick={() => onGameClick(game)}
+        showTitle={false}
+        detail={true}
+        play={false}
+        showBorder={false}
+      />
       <div className="search-results-list-content">
         <div className="text-white mb-2 search-results-list-title">
           {game.title}
@@ -79,29 +61,6 @@ function SearchResultItem({
           </div>
         )}
       </div>
-      {onPlay && (
-        <button
-          className="search-results-list-play-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onPlay(game);
-          }}
-          aria-label="Play game"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8 5v14l11-7z"
-              fill="currentColor"
-            />
-          </svg>
-        </button>
-      )}
     </div>
   );
 }
@@ -110,17 +69,13 @@ function CollectionResultItem({
   collection,
   apiBase,
   buildCoverUrl,
-  onPlay,
 }: {
   collection: CollectionItem;
   apiBase: string;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
-  onPlay?: (item: GameItem | CollectionItem) => void;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !collection.cover || imageError;
   const coverHeight = FIXED_COVER_SIZE * 1.5;
 
   return (
@@ -129,29 +84,17 @@ function CollectionResultItem({
       className="group cursor-pointer mb-6 search-results-list-item"
       onClick={() => navigate(`/collections/${collection.ratingKey}`)}
     >
-      <div
-        className="relative bg-[#2a2a2a] rounded overflow-hidden flex-shrink-0 search-results-list-cover cover-hover-effect"
-        style={{
-          height: `${coverHeight}px`,
-        }}
-      >
-        {showPlaceholder ? (
-          <CoverPlaceholder
-            title={collection.title}
-            width={FIXED_COVER_SIZE}
-            height={coverHeight}
-          />
-        ) : (
-          <img
-            src={buildCoverUrl(apiBase, collection.cover)}
-            alt={collection.title}
-            className="object-cover w-full h-full"
-            onError={() => {
-              setImageError(true);
-            }}
-          />
-        )}
-      </div>
+      <Cover
+        title={collection.title}
+        coverUrl={buildCoverUrl(apiBase, collection.cover)}
+        width={FIXED_COVER_SIZE}
+        height={coverHeight}
+        onClick={() => navigate(`/collections/${collection.ratingKey}`)}
+        showTitle={false}
+        detail={true}
+        play={false}
+        showBorder={false}
+      />
       <div className="search-results-list-content">
         <div className="text-white mb-2 search-results-list-title">
           {collection.title}
@@ -160,29 +103,6 @@ function CollectionResultItem({
           {t("search.collection")}
         </div>
       </div>
-      {onPlay && (
-        <button
-          className="search-results-list-play-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onPlay(collection);
-          }}
-          aria-label="Play collection"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8 5v14l11-7z"
-              fill="currentColor"
-            />
-          </svg>
-        </button>
-      )}
     </div>
   );
 }
@@ -192,7 +112,6 @@ export default function SearchResultsList({
   collections,
   apiBase,
   onGameClick,
-  onPlay,
   buildCoverUrl,
 }: SearchResultsListProps) {
   const { t } = useTranslation();
@@ -210,7 +129,6 @@ export default function SearchResultsList({
           collection={collection}
           apiBase={apiBase}
           buildCoverUrl={buildCoverUrl}
-          onPlay={onPlay}
         />
       ))}
       {games.map((game) => (
@@ -219,7 +137,6 @@ export default function SearchResultsList({
           game={game}
           apiBase={apiBase}
           onGameClick={onGameClick}
-          onPlay={onPlay}
           buildCoverUrl={buildCoverUrl}
         />
       ))}

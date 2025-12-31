@@ -144,7 +144,6 @@ export default function SearchResultsPage({
             collections={collections || []}
             apiBase={apiBase}
             onGameClick={onGameClick}
-            onPlay={onPlay}
             buildCoverUrl={buildCoverUrl}
           />
         </div>

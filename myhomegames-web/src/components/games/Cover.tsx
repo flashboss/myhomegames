@@ -11,9 +11,9 @@ type CoverProps = {
   onPlay?: () => void;
   onClick?: () => void;
   showTitle?: boolean;
-  showYear?: boolean;
-  year?: number | null;
-  mode?: "play-only" | "play-or-detail" | "no-click";
+  subtitle?: string | number | null;
+  detail?: boolean;
+  play?: boolean;
   showBorder?: boolean;
 };
 
@@ -25,9 +25,9 @@ export default function Cover({
   onPlay,
   onClick,
   showTitle = false,
-  showYear = false,
-  year,
-  mode = "play-or-detail",
+  subtitle,
+  detail = true,
+  play = true,
   showBorder = true,
 }: CoverProps) {
   const { t } = useTranslation();
@@ -35,15 +35,15 @@ export default function Cover({
   const showPlaceholder = !coverUrl || imageError;
 
   const handleCoverClick = (e: React.MouseEvent) => {
-    if (mode === "play-only" && onPlay) {
-      // In play-only mode, clicking the cover plays the game
+    if (play && !detail && onPlay) {
+      // If play only (no detail), clicking the cover plays
       e.stopPropagation(); // Prevent event from bubbling to parent
       onPlay();
-    } else if (mode === "play-or-detail" && onClick) {
-      // In play-or-detail mode, clicking the cover goes to detail
+    } else if (detail && onClick) {
+      // If detail enabled, clicking the cover goes to detail
       onClick();
     }
-    // In no-click mode, do nothing
+    // If neither play nor detail, do nothing
   };
 
   const handlePlayClick = (e: React.MouseEvent) => {
@@ -53,14 +53,14 @@ export default function Cover({
     }
   };
 
-  const shouldShowPlayButton = mode !== "no-click" && onPlay;
-  const isNoClick = mode === "no-click";
+  const shouldShowPlayButton = play && onPlay;
+  const isClickable = detail || play;
 
   return (
     <>
       <div
-        className={`games-list-cover relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} games-list-cover-${mode}`}
-        style={{ width: `${width}px`, cursor: isNoClick ? 'default' : 'pointer' }}
+        className={`games-list-cover relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} ${play ? 'games-list-cover-play' : ''} ${detail ? 'games-list-cover-detail' : ''}`}
+        style={{ width: `${width}px`, cursor: isClickable ? 'pointer' : 'default' }}
         onClick={handleCoverClick}
       >
         {showPlaceholder ? (
@@ -82,7 +82,7 @@ export default function Cover({
         {shouldShowPlayButton && (
           <button
             onClick={handlePlayClick}
-            className={`games-list-play-button games-list-play-button-${mode}`}
+            className={`games-list-play-button ${detail ? 'games-list-play-button-detail' : 'games-list-play-button-play-only'}`}
             aria-label={t("common.play")}
           >
             <svg
@@ -100,12 +100,12 @@ export default function Cover({
           </button>
         )}
       </div>
-      {(showTitle || (showYear && year != null)) && (
+      {(showTitle || subtitle != null) && (
         <div className="games-list-title-wrapper">
           {showTitle && (
             <div 
-              className={`truncate games-list-title ${mode === "play-or-detail" ? "games-list-title-clickable" : ""}`}
-              onClick={mode === "play-or-detail" && onClick ? (e) => {
+              className={`truncate games-list-title ${detail ? "games-list-title-clickable" : ""}`}
+              onClick={detail && onClick ? (e) => {
                 e.stopPropagation();
                 onClick();
               } : undefined}
@@ -113,8 +113,8 @@ export default function Cover({
               {title}
             </div>
           )}
-          {showYear && year != null && typeof year === 'number' && (
-            <div className="games-list-year">{year}</div>
+          {subtitle != null && (
+            <div className="games-list-year">{subtitle}</div>
           )}
         </div>
       )}

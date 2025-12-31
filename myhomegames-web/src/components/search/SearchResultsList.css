@@ -19,12 +19,8 @@
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-.search-results-list-cover {
-  width: 100px;
-  height: 150px;
-  min-width: 100px;
-  min-height: 150px;
-  /* Common hover effects handled by .cover-hover-effect class */
+.search-results-list-item .games-list-cover {
+  flex-shrink: 0;
 }
 
 .search-results-list-content {
@@ -50,32 +46,4 @@
 
 .search-results-list-date {
   font-size: 0.85rem;
-}
-
-.search-results-list-play-button {
-  flex-shrink: 0;
-  background: none;
-  border: 2px solid #E5A00D;
-  color: #E5A00D;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: color 0.2s ease, border-color 0.2s ease;
-  margin-left: 12px;
-  width: 40px;
-  height: 40px;
-  align-self: center;
-}
-
-.search-results-list-play-button:hover {
-  color: #ffffff;
-  border-color: #ffffff;
-}
-
-.search-results-list-play-button svg {
-  width: 20px;
-  height: 20px;
 }
