@@ -21,33 +21,17 @@ import GameDetail from "./components/games/GameDetail";
 import LaunchModal from "./components/common/LaunchModal";
 
 import type { GameItem, CollectionItem } from "./types";
+import { buildApiUrl, buildCoverUrl, buildBackgroundUrl } from "./utils/api";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
 const API_TOKEN = import.meta.env.VITE_API_TOKEN || "";
 
-function buildApiUrl(
+// Wrapper function for buildApiUrl that uses API_BASE
+function buildApiUrlWithBase(
   path: string,
   params: Record<string, string | number | boolean> = {}
 ) {
-  const u = new URL(path, API_BASE);
-  Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));
-  return u.toString();
-}
-
-function buildCoverUrl(apiBase: string, cover?: string) {
-  if (!cover) return "";
-  // Cover is already a full path from server (e.g., /covers/gameId)
-  // We need to prepend the API base URL
-  const u = new URL(cover, apiBase);
-  return u.toString();
-}
-
-function buildBackgroundUrl(apiBase: string, background?: string) {
-  if (!background) return "";
-  // Background is already a full path from server (e.g., /backgrounds/gameId)
-  // We need to prepend the API base URL
-  const u = new URL(background, apiBase);
-  return u.toString();
+  return buildApiUrl(API_BASE, path, params);
 }
 
 function AppContent() {
@@ -68,7 +52,7 @@ function AppContent() {
   useEffect(() => {
     async function loadGames() {
       try {
-        const url = buildApiUrl("/libraries/library/games", {
+        const url = buildApiUrlWithBase("/libraries/library/games", {
           sort: "title",
         });
         const res = await fetch(url, {
@@ -103,7 +87,7 @@ function AppContent() {
   useEffect(() => {
     async function loadCollections() {
       try {
-        const url = buildApiUrl("/collections");
+          const url = buildApiUrlWithBase("/collections");
         const res = await fetch(url, {
           headers: {
             Accept: "application/json",
@@ -167,7 +151,7 @@ function AppContent() {
       const isCollection = allCollections.some(c => c.ratingKey === item.ratingKey);
       if (isCollection) {
         try {
-          const gamesUrl = buildApiUrl(`/collections/${item.ratingKey}/games`);
+            const gamesUrl = buildApiUrlWithBase(`/collections/${item.ratingKey}/games`);
           const gamesRes = await fetch(gamesUrl, {
             headers: {
               Accept: "application/json",
@@ -197,7 +181,7 @@ function AppContent() {
         }
       }
       
-      const launchUrl = buildApiUrl(`/launcher`, {
+      const launchUrl = buildApiUrlWithBase(`/launcher`, {
         gameId: gameId,
         token: API_TOKEN,
       });
@@ -309,9 +293,9 @@ function AppContent() {
                   });
                 }}
                 onPlay={openLauncher}
-                buildApiUrl={(_apiBase: string, path: string, params?: Record<string, string | number | boolean>) => 
-                  buildApiUrl(path, params)
-                }
+                 buildApiUrl={(apiBase: string, path: string, params?: Record<string, string | number | boolean>) => 
+                   buildApiUrl(apiBase, path, params)
+                 }
                 buildCoverUrl={buildCoverUrl}
               />
             }
@@ -335,9 +319,9 @@ function AppContent() {
                   });
                 }}
                 onPlay={openLauncher}
-                buildApiUrl={(_apiBase: string, path: string, params?: Record<string, string | number | boolean>) => 
-                  buildApiUrl(path, params)
-                }
+                 buildApiUrl={(apiBase: string, path: string, params?: Record<string, string | number | boolean>) => 
+                   buildApiUrl(apiBase, path, params)
+                 }
                 buildCoverUrl={buildCoverUrl}
               />
             }
@@ -413,7 +397,7 @@ function GameDetailPage({
     setLoading(true);
     try {
       // Fetch single game from dedicated endpoint
-      const url = buildApiUrl(`/games/${gameId}`);
+        const url = buildApiUrlWithBase(`/games/${gameId}`);
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",

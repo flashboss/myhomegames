@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import Cover from "./Cover";
 import StarRating from "../common/StarRating";
@@ -6,6 +5,7 @@ import Summary from "../common/Summary";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
 import type { GameItem } from "../../types";
+import { formatGameDate } from "../../utils/date";
 import "./GameDetail.css";
 
 type GameDetailProps = {
@@ -27,20 +27,7 @@ export default function GameDetail({
   const hasBackground = Boolean(backgroundUrl && backgroundUrl.trim() !== "");
 
   // Format release date
-  const releaseDate = useMemo(() => {
-    if (game.year !== null && game.year !== undefined) {
-      if (
-        game.day !== null &&
-        game.day !== undefined &&
-        game.month !== null &&
-        game.month !== undefined
-      ) {
-        return `${game.day}/${game.month}/${game.year}`;
-      }
-      return game.year.toString();
-    }
-    return null;
-  }, [game.year, game.month, game.day]);
+  const releaseDate = formatGameDate(game);
 
   // Convert stars from 1-10 to 0-5 scale
   const rating = game.stars ? game.stars / 2 : null;

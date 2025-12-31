@@ -9,6 +9,7 @@ import StarRating from "../components/common/StarRating";
 import Summary from "../components/common/Summary";
 import BackgroundManager, { useBackground } from "../components/common/BackgroundManager";
 import { compareTitles } from "../utils/stringUtils";
+import { buildBackgroundUrl } from "../utils/api";
 import type { GameItem, CollectionInfo } from "../types";
 import "./CollectionDetail.css";
 
@@ -283,13 +284,6 @@ export default function CollectionDetail({
   const collectionCoverUrl = collection?.cover ? buildCoverUrl(apiBase, collection.cover) : "";
   const collectionCoverWidth = 240;
   const collectionCoverHeight = 360; // 2:3 aspect ratio (vertical like games)
-  
-  // Build background URL
-  function buildBackgroundUrl(apiBase: string, background?: string) {
-    if (!background) return "";
-    const u = new URL(background, apiBase);
-    return u.toString();
-  }
   
   const backgroundUrl = buildBackgroundUrl(apiBase, collection?.background);
   const hasBackground = Boolean(backgroundUrl && backgroundUrl.trim() !== "");

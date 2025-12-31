@@ -6,6 +6,7 @@ import RecommendedPage from "./RecommendedPage";
 import CollectionsPage from "./CollectionsPage";
 import CategoriesPage from "./CategoriesPage";
 import type { GameItem, CategoryItem } from "../types";
+import { buildApiUrl, buildCoverUrl } from "../utils/api";
 import "./HomePage.css";
 
 type GameLibrarySection = {
@@ -23,22 +24,6 @@ type HomePageProps = {
   onGamesLoaded: (games: GameItem[]) => void;
   onPlay?: (game: GameItem) => void;
 };
-
-function buildApiUrl(
-  apiBase: string,
-  path: string,
-  params: Record<string, string | number | boolean> = {}
-) {
-  const u = new URL(path, apiBase);
-  Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, String(v)));
-  return u.toString();
-}
-
-function buildCoverUrl(apiBase: string, cover?: string) {
-  if (!cover) return "";
-  // Cover is already a full path from server (e.g., /covers/gameId)
-  return buildApiUrl(apiBase, cover);
-}
 
 export default function HomePage({
   apiBase,
