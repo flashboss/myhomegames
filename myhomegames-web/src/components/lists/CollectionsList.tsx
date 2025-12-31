@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CoverPlaceholder from "../common/CoverPlaceholder";
+import Cover from "../games/Cover";
 import type { CollectionItem } from "../../types";
 import "./CollectionsList.css";
 
@@ -34,16 +33,7 @@ function CollectionListItem({
   itemRefs,
 }: CollectionListItemProps) {
   const { t } = useTranslation();
-  const [imageError, setImageError] = useState(false);
-  const showPlaceholder = !collection.cover || imageError;
   const coverHeight = coverSize * 1.5;
-
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onPlay) {
-      onPlay(collection);
-    }
-  };
 
   return (
     <div
@@ -57,46 +47,18 @@ function CollectionListItem({
       style={{ width: `${coverSize}px`, minWidth: `${coverSize}px` }}
       onClick={() => onCollectionClick(collection)}
     >
-      <div className="relative aspect-[2/3] bg-[#2a2a2a] rounded overflow-hidden mb-2 transition-all group-hover:shadow-lg group-hover:shadow-[#E5A00D]/20 collections-list-cover cover-hover-effect">
-        {showPlaceholder ? (
-          <CoverPlaceholder
-            title={collection.title}
-            width={coverSize}
-            height={coverHeight}
-          />
-        ) : (
-          <>
-            <img
-              src={buildCoverUrl(apiBase, collection.cover)}
-              alt={collection.title}
-              className="object-cover w-full h-full"
-              onError={() => {
-                setImageError(true);
-              }}
-            />
-          </>
-        )}
-        {onPlay && (
-          <button
-            onClick={handlePlayClick}
-            className="collections-list-play-button"
-            aria-label="Play collection"
-          >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 5v14l11-7z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
+      <Cover
+        title={collection.title}
+        coverUrl={buildCoverUrl(apiBase, collection.cover)}
+        width={coverSize}
+        height={coverHeight}
+        onPlay={onPlay ? () => onPlay(collection) : undefined}
+        onClick={() => onCollectionClick(collection)}
+        showTitle={false}
+        detail={true}
+        play={true}
+        showBorder={true}
+      />
       <div className="collections-list-title-container">
         <div className="truncate collections-list-title">{collection.title}</div>
         {collection.gameCount !== undefined && (
