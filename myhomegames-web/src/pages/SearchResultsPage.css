@@ -4,6 +4,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding-top: 64px;
 }
 
 .search-results-page-empty {

@@ -3,6 +3,7 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-top: 64px;
 }
 
 .settings-container {

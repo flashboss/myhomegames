@@ -28,8 +28,6 @@ function setScrollPosition(key: string, position: number): void {
 type RecommendedSectionProps = {
   sectionId: string;
   games: GameItem[];
-  apiBase: string;
-  apiToken?: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onGameUpdate?: (updatedGame: GameItem) => void;
@@ -40,8 +38,6 @@ type RecommendedSectionProps = {
 export default function RecommendedSection({
   sectionId,
   games,
-  apiBase,
-  apiToken,
   onGameClick,
   onPlay,
   onGameUpdate,
@@ -389,8 +385,6 @@ export default function RecommendedSection({
         <div ref={gamesListRef}>
           <GamesList
             games={games}
-            apiBase={apiBase}
-            apiToken={apiToken}
             onGameClick={onGameClick}
             onPlay={onPlay}
             onGameUpdate={onGameUpdate}

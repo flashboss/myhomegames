@@ -361,8 +361,6 @@ function AppContent() {
             console.log("Game selected from IGDB:", game);
             // TODO: Implement game addition logic
           }}
-          apiBase={API_BASE}
-          apiToken={API_TOKEN}
         />
 
         {/* Launch Modal - handles both loading and error states */}

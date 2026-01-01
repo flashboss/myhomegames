@@ -128,8 +128,6 @@ export default function RecommendedPage({
               key={section.id}
               sectionId={section.id}
               games={section.games}
-              apiBase={apiBase}
-              apiToken={apiToken}
               onGameClick={onGameClick}
               onPlay={onPlay}
               onGameUpdate={handleGameUpdate}

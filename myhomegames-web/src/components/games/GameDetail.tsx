@@ -177,7 +177,7 @@ function GameDetailContent({
           onViewModeChange={() => {}}
         />
       </div>
-      <div style={{ position: 'relative', zIndex: 2, height: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', zIndex: 2, height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <div 
           className="home-page-main-container"
           style={{

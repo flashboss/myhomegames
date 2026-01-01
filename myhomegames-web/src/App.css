@@ -5,16 +5,18 @@
 
 /* Plex-style Header */
 .plex-header {
-  background-color: #0d0d0d;
-  border-top: 8px solid #1a1a1a;
-  border-left: 8px solid #1a1a1a;
-  border-right: 8px solid #1a1a1a;
+  background-color: transparent;
+  border-top: 8px solid transparent;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
   padding: 0;
   height: 64px;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 10004;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: none;
 }
 
 .plex-header-container {
@@ -70,17 +72,28 @@
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
   padding: 0;
 }
 
 .plex-header-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 1);
 }
 
 .plex-header-button:active {
-  background-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Dim header components when a modal is open */
+body:has(.edit-game-modal-overlay),
+body:has(.edit-collection-modal-overlay),
+body:has(.dropdown-menu-confirm-overlay),
+body:has(.add-game-overlay),
+body:has(.launch-modal-overlay) {
+  .plex-header {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 /* Plex-style Search Bar */
@@ -153,11 +166,14 @@
 
 /* Plex-style Libraries Bar */
 .plex-libraries-bar {
-  background-color: #1a1a1a;
+  background-color: transparent;
   padding: 0;
-  position: sticky;
-  top: 72px;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
   z-index: 999;
+  min-height: 64px;
 }
 
 .plex-libraries-bar-container {
@@ -167,7 +183,7 @@
   max-width: 1920px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 100%;
+  min-height: 64px;
   position: relative;
 }
 

@@ -307,8 +307,6 @@ export default function CollectionDetail({
         onPlay={onPlay}
         sortedGames={sortedGames}
         loading={loading}
-        apiBase={apiBase}
-        apiToken={apiToken}
         onGameClick={onGameClick}
         buildCoverUrl={buildCoverUrl}
         coverSize={coverSize}
@@ -340,8 +338,6 @@ function CollectionDetailContent({
   onPlay,
   sortedGames,
   loading,
-  apiBase,
-  apiToken,
   onGameClick,
   buildCoverUrl,
   coverSize,
@@ -366,8 +362,6 @@ function CollectionDetailContent({
   onPlay?: (game: GameItem) => void;
   sortedGames: GameItem[];
   loading: boolean;
-  apiBase: string;
-  apiToken: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
@@ -400,7 +394,7 @@ function CollectionDetailContent({
         onViewModeChange={() => {}}
       />
       </div>
-      <div style={{ position: 'relative', zIndex: 2, height: 'calc(100vh - 64px - 64px)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', zIndex: 2, height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <div 
           className="home-page-main-container"
           style={{
