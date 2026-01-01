@@ -1,24 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../common/Tooltip";
+import { useAuth } from "../../contexts/AuthContext";
 import "./ProfileDropdown.css";
 
 type ProfileDropdownProps = {
-  userName?: string;
-  userImage?: string;
   onViewProfile?: () => void;
   onChangeUser?: () => void;
   onLogout?: () => void;
 };
 
 export default function ProfileDropdown({
-  userName = "User",
-  userImage,
   onViewProfile,
   onChangeUser,
   onLogout,
 }: ProfileDropdownProps) {
   const { t } = useTranslation();
+  const { user, login, logout } = useAuth();
+  
+  const userName = user?.userName || "User";
+  const userImage = user?.userImage || undefined;
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -70,11 +71,15 @@ export default function ProfileDropdown({
     setIsOpen(false);
     if (onChangeUser) {
       onChangeUser();
+    } else {
+      // Default: initiate login
+      login();
     }
   };
 
   const handleLogout = () => {
     setIsOpen(false);
+    logout();
     if (onLogout) {
       onLogout();
     }

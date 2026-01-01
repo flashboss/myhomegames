@@ -13,6 +13,7 @@ const libraryRoutes = require("./routes/library");
 const recommendedRoutes = require("./routes/recommended");
 const categoriesRoutes = require("./routes/categories");
 const collectionsRoutes = require("./routes/collections");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 app.use(express.json());
@@ -31,15 +32,28 @@ const METADATA_PATH =
     "MyHomeGames"
   );
 
-// Simple token auth middleware
+// Token auth middleware - supports both development token and Twitch tokens
 function requireToken(req, res, next) {
   const token =
     req.header("X-Auth-Token") ||
     req.query.token ||
     req.header("Authorization");
-  if (!token || token !== API_TOKEN)
+  
+  if (!token) {
     return res.status(401).json({ error: "Unauthorized" });
-  next();
+  }
+
+  // Check if it's the development token (for development only)
+  if (token === API_TOKEN) {
+    return next();
+  }
+
+  // Check if it's a valid Twitch token
+  if (authRoutes.isValidToken(token, METADATA_PATH)) {
+    return next();
+  }
+
+  return res.status(401).json({ error: "Unauthorized" });
 }
 
 // Load games whitelist from JSON files
@@ -52,6 +66,7 @@ libraryRoutes.loadLibraryGames(METADATA_GAMES_DIR, allGames);
 // Recommended games are now just IDs pointing to games already in allGames
 
 // Register routes
+authRoutes.registerAuthRoutes(app, METADATA_PATH);
 libraryRoutes.registerLibraryRoutes(app, requireToken, METADATA_GAMES_DIR, allGames);
 recommendedRoutes.registerRecommendedRoutes(app, requireToken, METADATA_GAMES_DIR, allGames);
 categoriesRoutes.registerCategoriesRoutes(app, requireToken, METADATA_PATH, METADATA_GAMES_DIR);

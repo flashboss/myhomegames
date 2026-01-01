@@ -94,20 +94,7 @@ export default function Header({
               </svg>
             </button>
           </Tooltip>
-          <ProfileDropdown
-            onViewProfile={() => {
-              // TODO: Implement view profile functionality
-              console.log("View profile");
-            }}
-            onChangeUser={() => {
-              // TODO: Implement change user functionality
-              console.log("Change user");
-            }}
-            onLogout={() => {
-              // TODO: Implement logout functionality
-              console.log("Logout");
-            }}
-          />
+          <ProfileDropdown />
         </div>
       </div>
     </header>

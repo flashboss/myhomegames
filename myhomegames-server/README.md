@@ -15,7 +15,10 @@ The server can be configured using environment variables. Create a `.env` file i
 ### Environment Variables
 
 - `PORT` (default: `4000`) - Port on which the server will listen
-- `API_TOKEN` (default: `changeme`) - Authentication token for API requests
+- `API_TOKEN` (default: `changeme`) - Authentication token for API requests (development only)
+- `TWITCH_CLIENT_ID` - Twitch OAuth client ID for user authentication
+- `TWITCH_CLIENT_SECRET` - Twitch OAuth client secret for user authentication
+- `API_BASE` (default: `http://127.0.0.1:4000`) - Base URL of the API server (used for OAuth redirects)
 - `IGDB_CLIENT_ID` - IGDB API client ID for game search functionality
 - `IGDB_CLIENT_SECRET` - IGDB API client secret for game search functionality
 - `METADATA_PATH` - Path where game metadata (covers, descriptions, etc.) are stored
@@ -172,6 +175,10 @@ When adding new functionality:
 
 ## API Endpoints
 
+- `GET /auth/twitch` - Initiate Twitch OAuth flow
+- `GET /auth/twitch/callback` - Twitch OAuth callback
+- `GET /auth/me` - Get current user information (requires authentication)
+- `POST /auth/logout` - Logout (requires authentication)
 - `GET /libraries` - Get list of game libraries (requires authentication)
 - `GET /games/:library` - Get games for a specific library (requires authentication)
 - `POST /launch/:gameId` - Launch a game (requires authentication)
@@ -182,10 +189,38 @@ All authenticated endpoints require the `X-Auth-Token` header with a valid token
 
 ## Authentication
 
-API requests must include the `X-Auth-Token` header with the value set in the `API_TOKEN` environment variable.
+The server supports two authentication methods:
+
+### Development Mode (changeme token)
+
+For development, you can use the `API_TOKEN` environment variable (default: `changeme`). This allows quick testing without setting up Twitch OAuth.
 
 Example:
 ```bash
-curl -H "X-Auth-Token: your-token-here" http://localhost:4000/libraries
+curl -H "X-Auth-Token: changeme" http://localhost:4000/libraries
 ```
+
+### Production Mode (Twitch OAuth)
+
+For production, users authenticate via Twitch OAuth. To enable this:
+
+1. Create a Twitch application at https://dev.twitch.tv/console/apps
+2. Set the OAuth redirect URL to: `http://your-api-domain:4000/auth/twitch/callback`
+3. Set environment variables:
+   - `TWITCH_CLIENT_ID` - Your Twitch application client ID
+   - `TWITCH_CLIENT_SECRET` - Your Twitch application client secret
+   - `API_BASE` - Your API base URL (e.g., `https://api.example.com`)
+
+Users will authenticate via Twitch, and their access tokens will be stored in `${METADATA_PATH}/tokens.json`.
+
+### Authentication Endpoints
+
+- `GET /auth/twitch` - Initiate Twitch OAuth flow (returns `authUrl`)
+- `GET /auth/twitch/callback` - Twitch OAuth callback (handles redirect)
+- `GET /auth/me` - Get current user information (requires valid token)
+- `POST /auth/logout` - Logout (clears token on client side)
+
+All authenticated endpoints require the `X-Auth-Token` header with either:
+- The development token (`changeme` or value from `API_TOKEN`)
+- A valid Twitch OAuth access token
 
