@@ -8,6 +8,10 @@
   padding-left: 64px;
   padding-right: 64px;
   margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
 }
 
 .recommended-section-title {
