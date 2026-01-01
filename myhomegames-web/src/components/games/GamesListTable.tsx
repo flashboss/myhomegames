@@ -5,6 +5,7 @@ import StarRating from "../common/StarRating";
 import EditGameModal from "./EditGameModal";
 import DropdownMenu from "../common/DropdownMenu";
 import Tooltip from "../common/Tooltip";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 import type { GameItem } from "../../types";
 import { buildApiUrl } from "../../utils/api";
 import "./GamesListTable.css";
@@ -43,6 +44,12 @@ export default function GamesListTable({
   onSortChange,
   onSortDirectionChange,
 }: GamesListTableProps) {
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const actualScrollRef = scrollContainerRef || internalScrollRef;
+  
+  // Usa useScrollRestoration direttamente qui, così viene eseguito solo quando il componente è montato
+  useScrollRestoration(actualScrollRef, "table");
+  
   const [localGames, setLocalGames] = useState<GameItem[]>(games);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
@@ -205,7 +212,7 @@ export default function GamesListTable({
     <div className="games-table-container">
       <div
         className="games-table-scroll"
-        ref={scrollContainerRef as React.RefObject<HTMLDivElement>}
+        ref={actualScrollRef as React.RefObject<HTMLDivElement>}
       >
         <table className="games-table">
           <thead>
@@ -436,8 +443,8 @@ export default function GamesListTable({
                           gap={3} 
                           color="rgba(255, 255, 255, 0.4)" 
                           noStroke={true}
-                          readOnly={!apiBase || !apiToken}
-                          onRatingChange={apiBase && apiToken ? (newStars) => handleRatingChange(it.ratingKey, newStars) : undefined}
+                          readOnly={!API_BASE || !API_TOKEN}
+                          onRatingChange={API_BASE && API_TOKEN ? (newStars) => handleRatingChange(it.ratingKey, newStars) : undefined}
                         />
                       </div>
                     </td>

@@ -72,9 +72,9 @@ export default function LibraryPage({
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
   
-  // Restore scroll position (use the appropriate ref based on view mode)
-  const activeScrollRef = viewMode === "table" ? tableScrollRef : scrollContainerRef;
-  useScrollRestoration(activeScrollRef);
+  // Restore scroll position (only for grid/detail views)
+  // Table view handles its own scroll restoration in GamesListTable
+  useScrollRestoration(scrollContainerRef, viewMode === "table" ? undefined : viewMode);
 
   useEffect(() => {
     fetchLibraryGames();

@@ -59,7 +59,7 @@ export default function CategoryPage({
   
   // Restore scroll position (use the appropriate ref based on view mode)
   const activeScrollRef = viewMode === "table" ? tableScrollRef : scrollContainerRef;
-  useScrollRestoration(activeScrollRef);
+  useScrollRestoration(activeScrollRef, viewMode);
 
   useEffect(() => {
     fetchLibraryGames();

@@ -1,73 +1,122 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
-// Store scroll positions for each route
-const scrollPositions = new Map<string, number>();
+// Helper per sessionStorage
+function getScrollPosition(key: string): number {
+  try {
+    const stored = sessionStorage.getItem(key);
+    return stored ? parseInt(stored, 10) : 0;
+  } catch {
+    return 0;
+  }
+}
 
-export function useScrollRestoration(scrollContainerRef: React.RefObject<HTMLElement | null>) {
+function setScrollPosition(key: string, position: number): void {
+  try {
+    sessionStorage.setItem(key, position.toString());
+  } catch {
+    // Ignore
+  }
+}
+
+export function useScrollRestoration(
+  scrollContainerRef: React.RefObject<HTMLElement | null>,
+  viewMode?: string // Optional viewMode to differentiate scroll keys
+) {
   const location = useLocation();
   const isRestoringRef = useRef(false);
-  const timeoutRef = useRef<number | null>(null);
+  const storageKey = viewMode 
+    ? `${location.pathname}:${viewMode}` 
+    : location.pathname;
 
   // Restore scroll position when route changes
   useLayoutEffect(() => {
-    // Clear any pending timeouts
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    const container = scrollContainerRef.current;
+    if (!container) {
+      // Container not ready yet, retry after a delay
+      const timer = setTimeout(() => {
+        const retryContainer = scrollContainerRef.current;
+        if (retryContainer) {
+          const savedPosition = getScrollPosition(storageKey);
+          if (savedPosition > 0) {
+            retryContainer.scrollTop = savedPosition;
+          }
+        }
+      }, 200);
+      return () => clearTimeout(timer);
     }
 
     isRestoringRef.current = true;
-    
+    const savedPosition = getScrollPosition(storageKey);
+
+    if (savedPosition <= 0) {
+      isRestoringRef.current = false;
+      return;
+    }
+
+    // Verify when content is ready
     const restoreScroll = (attempt = 0) => {
-      const container = scrollContainerRef.current;
-      if (!container) {
-        // Container not ready yet, retry
-        if (attempt < 10) {
-          timeoutRef.current = setTimeout(() => {
-            restoreScroll(attempt + 1);
-          }, 50 * (attempt + 1));
+      const currentContainer = scrollContainerRef.current;
+      if (!currentContainer) {
+        if (attempt < 30) {
+          setTimeout(() => restoreScroll(attempt + 1), 50);
         } else {
           isRestoringRef.current = false;
         }
         return;
       }
 
-      const savedPosition = scrollPositions.get(location.pathname);
+      // Check if it's a table and if it has rows
+      const isTable = viewMode === "table";
+      const hasTableRows = isTable ? currentContainer.querySelector('tbody tr') : true;
+
+      // Verify that content is rendered (scrollHeight > clientHeight)
+      const hasContent = currentContainer.scrollHeight > currentContainer.clientHeight;
       
-      if (savedPosition !== undefined && savedPosition > 0) {
-        container.scrollTop = savedPosition;
-        
-        // Verify restoration worked, retry if needed
-        if (attempt < 5) {
-          timeoutRef.current = setTimeout(() => {
-            const currentPos = container.scrollTop;
-            if (Math.abs(currentPos - savedPosition) > 10) {
-              restoreScroll(attempt + 1);
-            } else {
-              isRestoringRef.current = false;
-            }
-          }, 100 * (attempt + 1));
+      if (!hasContent || !hasTableRows) {
+        if (attempt < 100) {
+          // Retry after a frame or timeout
+          if (attempt < 20) {
+            requestAnimationFrame(() => restoreScroll(attempt + 1));
+          } else {
+            setTimeout(() => restoreScroll(attempt + 1), 50);
+          }
         } else {
           isRestoringRef.current = false;
         }
+        return;
+      }
+
+      // Content is ready, restore position
+      currentContainer.scrollTop = savedPosition;
+      
+      // Verify restoration worked, retry if needed
+      if (attempt < 10) {
+        setTimeout(() => {
+          const currentPos = currentContainer.scrollTop;
+          if (Math.abs(currentPos - savedPosition) > 10) {
+            // Restoration failed, retry
+            currentContainer.scrollTop = savedPosition;
+            restoreScroll(attempt + 1);
+          } else {
+            isRestoringRef.current = false;
+          }
+        }, 100);
       } else {
-        // If no saved position, scroll to top
-        container.scrollTop = 0;
         isRestoringRef.current = false;
       }
     };
 
-    // Try immediately
-    requestAnimationFrame(() => {
+    // Start restoration after a delay to ensure DOM is ready
+    const timer = setTimeout(() => {
       restoreScroll();
-    });
+    }, 150);
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      clearTimeout(timer);
+      isRestoringRef.current = false;
     };
-  }, [location.pathname, scrollContainerRef]);
+  }, [location.pathname, storageKey, scrollContainerRef, viewMode]);
 
   // Save scroll position when scrolling
   useEffect(() => {
@@ -79,7 +128,7 @@ export function useScrollRestoration(scrollContainerRef: React.RefObject<HTMLEle
       
       const position = container.scrollTop;
       if (position > 0) {
-        scrollPositions.set(location.pathname, position);
+        setScrollPosition(storageKey, position);
       }
     };
 
@@ -87,12 +136,12 @@ export function useScrollRestoration(scrollContainerRef: React.RefObject<HTMLEle
 
     return () => {
       container.removeEventListener('scroll', handleScroll);
-      // Save position when leaving
-      const position = container.scrollTop;
-      if (position > 0) {
-        scrollPositions.set(location.pathname, position);
+      // Save position when component unmounts
+      const finalPosition = container.scrollTop;
+      if (finalPosition > 0 && !isRestoringRef.current) {
+        setScrollPosition(storageKey, finalPosition);
       }
     };
-  }, [location.pathname, scrollContainerRef]);
+  }, [location.pathname, storageKey, scrollContainerRef, viewMode]);
 }
 
