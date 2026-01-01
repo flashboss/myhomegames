@@ -31,7 +31,7 @@
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   z-index: 10005;
-  min-width: 180px;
+  min-width: 240px;
   padding: 4px 0;
 }
 
@@ -41,8 +41,9 @@
   align-items: center !important;
   justify-content: center !important;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 12px 32px;
   text-align: center !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .profile-dropdown-avatar {
@@ -85,15 +86,23 @@
   display: block;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
   font-size: 13px;
-  padding: 8px 24px;
+  padding: 8px 32px;
   text-align: left;
   width: 100%;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 1);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
   margin: 0;
+}
+
+.profile-dropdown-header-item {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.profile-dropdown-header-item:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .profile-dropdown-item:hover {
@@ -102,7 +111,7 @@
 }
 
 .profile-dropdown-item-danger {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 1);
 }
 
 .profile-dropdown-item-danger:hover {

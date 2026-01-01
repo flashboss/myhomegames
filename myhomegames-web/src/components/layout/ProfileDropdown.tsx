@@ -153,7 +153,6 @@ export default function ProfileDropdown({
             )}
             <span className="profile-dropdown-username">{userName}</span>
           </button>
-          <div className="profile-dropdown-separator"></div>
           <button
             className="profile-dropdown-item"
             onClick={handleViewProfile}
