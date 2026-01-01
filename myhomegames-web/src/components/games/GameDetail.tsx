@@ -5,6 +5,7 @@ import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import GameCategories from "./GameCategories";
 import EditGameModal from "./EditGameModal";
+import DropdownMenu from "../common/DropdownMenu";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
 import type { GameItem } from "../../types";
@@ -20,6 +21,7 @@ type GameDetailProps = {
   apiBase: string;
   apiToken: string;
   onGameUpdate?: (updatedGame: GameItem) => void;
+  onGameDelete?: (game: GameItem) => void;
 };
 
 export default function GameDetail({
@@ -30,6 +32,7 @@ export default function GameDetail({
   apiBase,
   apiToken,
   onGameUpdate,
+  onGameDelete,
 }: GameDetailProps) {
   const { t } = useTranslation();
   const [localGame, setLocalGame] = useState<GameItem>(game);
@@ -109,14 +112,13 @@ export default function GameDetail({
         isEditModalOpen={isEditModalOpen}
         onEditModalOpen={() => setIsEditModalOpen(true)}
         onEditModalClose={() => setIsEditModalOpen(false)}
-        apiBase={apiBase}
-        apiToken={apiToken}
         onGameUpdate={(updatedGame) => {
           setLocalGame(updatedGame);
           if (onGameUpdate) {
             onGameUpdate(updatedGame);
           }
         }}
+        onGameDelete={onGameDelete}
         t={t}
       />
     </BackgroundManager>
@@ -137,9 +139,8 @@ function GameDetailContent({
   isEditModalOpen,
   onEditModalOpen,
   onEditModalClose,
-  apiBase,
-  apiToken,
   onGameUpdate,
+  onGameDelete,
   t,
 }: {
   game: GameItem;
@@ -155,9 +156,8 @@ function GameDetailContent({
   isEditModalOpen: boolean;
   onEditModalOpen: () => void;
   onEditModalClose: () => void;
-  apiBase: string;
-  apiToken: string;
   onGameUpdate: (updatedGame: GameItem) => void;
+  onGameDelete?: (game: GameItem) => void;
   t: (key: string) => string;
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
@@ -248,7 +248,7 @@ function GameDetailContent({
                 readOnly={false}
                 onRatingChange={onRatingChange}
               />
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '16px' }}>
+              <div className="game-detail-actions" style={{ marginTop: '16px' }}>
                 <button
                   onClick={() => onPlay(game)}
                   style={{
@@ -291,23 +291,7 @@ function GameDetailContent({
                 </button>
                 <button
                   onClick={onEditModalOpen}
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: 'rgba(255, 255, 255, 0.8)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'color 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
-                  }}
+                  className="game-detail-edit-button"
                 >
                   <svg
                     width="24"
@@ -323,13 +307,23 @@ function GameDetailContent({
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
+                <DropdownMenu
+                  onEdit={onEditModalOpen}
+                  gameId={game.ratingKey}
+                  gameTitle={game.title}
+                  onGameDelete={onGameDelete ? (gameId: string) => {
+                    if (game.ratingKey === gameId && onGameDelete) {
+                      onGameDelete(game);
+                    }
+                  } : undefined}
+                  horizontal={true}
+                  className="game-detail-dropdown-menu"
+                />
               </div>
               <EditGameModal
                 isOpen={isEditModalOpen}
                 onClose={onEditModalClose}
                 game={game}
-                apiBase={apiBase}
-                apiToken={apiToken}
                 onGameUpdate={onGameUpdate}
               />
               {game.summary && <Summary summary={game.summary} />}

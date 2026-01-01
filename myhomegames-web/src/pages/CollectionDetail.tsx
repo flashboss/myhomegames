@@ -8,6 +8,7 @@ import LibrariesBar from "../components/layout/LibrariesBar";
 import StarRating from "../components/common/StarRating";
 import Summary from "../components/common/Summary";
 import EditCollectionModal from "../components/collections/EditCollectionModal";
+import DropdownMenu from "../components/common/DropdownMenu";
 import BackgroundManager, { useBackground } from "../components/common/BackgroundManager";
 import { compareTitles } from "../utils/stringUtils";
 import { buildBackgroundUrl } from "../utils/api";
@@ -532,23 +533,7 @@ function CollectionDetailContent({
                         {collection && (
                           <button
                             onClick={onEditModalOpen}
-                            style={{
-                              backgroundColor: 'transparent',
-                              color: 'rgba(255, 255, 255, 0.8)',
-                              border: 'none',
-                              cursor: 'pointer',
-                              padding: '8px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'color 0.2s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
-                            }}
+                            className="collection-detail-edit-button"
                           >
                             <svg
                               width="24"
@@ -565,6 +550,21 @@ function CollectionDetailContent({
                             </svg>
                           </button>
                         )}
+                        {collection && (
+                          <DropdownMenu
+                            onEdit={onEditModalOpen}
+                            collectionId={collection.id}
+                            collectionTitle={collection.title}
+                            onCollectionDelete={(collectionId: string) => {
+                              if (collection.id === collectionId) {
+                                // Navigate back after deletion
+                                window.history.back();
+                              }
+                            }}
+                            horizontal={true}
+                            className="collection-detail-dropdown-menu"
+                          />
+                        )}
                       </div>
                     ) : null}
                     {collection && (
@@ -572,8 +572,6 @@ function CollectionDetailContent({
                         isOpen={isEditModalOpen}
                         onClose={onEditModalClose}
                         collection={collection}
-                        apiBase={apiBase}
-                        apiToken={apiToken}
                         onCollectionUpdate={onCollectionUpdate}
                       />
                     )}
@@ -608,7 +606,6 @@ function CollectionDetailContent({
                 <div className="collection-detail-games-list">
                   <GamesList
                     games={sortedGames}
-                    apiBase={apiBase}
                     onGameClick={onGameClick}
                     onPlay={onPlay}
                     buildCoverUrl={buildCoverUrl}

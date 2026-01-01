@@ -473,6 +473,10 @@ function GameDetailPage({
       onGameUpdate={(updatedGame) => {
         setGame(updatedGame);
       }}
+      onGameDelete={() => {
+        // Navigate back after deletion
+        window.history.back();
+      }}
     />
   );
 }

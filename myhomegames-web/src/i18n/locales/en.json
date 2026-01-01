@@ -109,6 +109,7 @@
     "saving": "Saving...",
     "edit": "Edit",
     "delete": "Delete",
+    "deleteTitle": "Delete",
     "deleting": "Deleting...",
     "confirmDelete": "Are you sure you want to delete \"{{title}}\"?",
     "deleteError": "Failed to delete game"

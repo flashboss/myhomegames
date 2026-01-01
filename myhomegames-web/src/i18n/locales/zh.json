@@ -109,6 +109,7 @@
     "saving": "保存中...",
     "edit": "编辑",
     "delete": "删除",
+    "deleteTitle": "删除",
     "deleting": "删除中...",
     "confirmDelete": "您确定要删除\"{{title}}\"吗？",
     "deleteError": "删除游戏失败"

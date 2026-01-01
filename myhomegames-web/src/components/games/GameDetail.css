@@ -8,3 +8,33 @@
 .game-detail-libraries-bar-transparent .plex-libraries-bar {
   background-color: transparent !important;
 }
+
+.game-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-detail-edit-button {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.game-detail-edit-button:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+.game-detail-dropdown-menu {
+  position: relative;
+}
+
+.game-detail-dropdown-menu .dropdown-menu-button {
+  opacity: 1 !important;
+}

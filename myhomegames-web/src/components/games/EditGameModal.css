@@ -35,12 +35,14 @@
   color: #ffffff;
   font-size: 1.5rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .edit-game-modal-close {
-  background: none;
+  background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 2rem;
   cursor: pointer;
   padding: 0;
@@ -54,7 +56,7 @@
 }
 
 .edit-game-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: transparent;
   color: #ffffff;
 }
 

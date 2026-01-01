@@ -109,6 +109,7 @@
     "saving": "Enregistrement...",
     "edit": "Modifier",
     "delete": "Supprimer",
+    "deleteTitle": "Supprimer",
     "deleting": "Suppression...",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer \"{{title}}\"?",
     "deleteError": "Échec de la suppression du jeu"

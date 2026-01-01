@@ -109,6 +109,7 @@
     "saving": "Speichern...",
     "edit": "Bearbeiten",
     "delete": "Löschen",
+    "deleteTitle": "Löschen",
     "deleting": "Löschen...",
     "confirmDelete": "Möchten Sie \"{{title}}\" wirklich löschen?",
     "deleteError": "Fehler beim Löschen des Spiels"

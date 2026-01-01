@@ -109,6 +109,7 @@
     "saving": "Salvando...",
     "edit": "Editar",
     "delete": "Excluir",
+    "deleteTitle": "Excluir",
     "deleting": "Excluindo...",
     "confirmDelete": "Tem certeza de que deseja excluir \"{{title}}\"?",
     "deleteError": "Falha ao excluir o jogo"
