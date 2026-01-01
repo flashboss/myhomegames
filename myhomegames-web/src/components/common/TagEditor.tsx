@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE, API_TOKEN } from "../../config";
 import { buildApiUrl } from "../../utils/api";
 import "./TagEditor.css";
 
@@ -11,8 +12,6 @@ type Category = {
 type TagEditorProps = {
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
-  apiBase: string;
-  apiToken: string;
   disabled?: boolean;
   placeholder?: string;
 };
@@ -20,8 +19,6 @@ type TagEditorProps = {
 export default function TagEditor({
   selectedTags,
   onTagsChange,
-  apiBase,
-  apiToken,
   disabled = false,
   placeholder,
 }: TagEditorProps) {
@@ -31,15 +28,15 @@ export default function TagEditor({
 
   useEffect(() => {
     fetchCategories();
-  }, [apiBase, apiToken]);
+  }, []);
 
   async function fetchCategories() {
     try {
-      const url = buildApiUrl(apiBase, "/categories");
+      const url = buildApiUrl(API_BASE, "/categories");
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": API_TOKEN,
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

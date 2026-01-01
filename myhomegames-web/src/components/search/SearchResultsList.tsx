@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../config";
 import Cover from "../games/Cover";
+import DropdownMenu from "../common/DropdownMenu";
+import EditGameModal from "../games/EditGameModal";
+import EditCollectionModal from "../collections/EditCollectionModal";
 import { useNavigate } from "react-router-dom";
-import type { GameItem, CollectionItem } from "../../types";
+import type { GameItem, CollectionItem, CollectionInfo } from "../../types";
 import "./SearchResultsList.css";
 
 type SearchResultsListProps = {
   games: GameItem[];
   collections: CollectionItem[];
-  apiBase: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   variant?: "popup" | "page"; // "popup" for dropdown, "page" for full page
@@ -15,6 +19,10 @@ type SearchResultsListProps = {
   onPlay?: (item: GameItem | CollectionItem) => void; // Play handler
   onCollectionClick?: (collection: CollectionItem) => void; // Collection click handler (for popup)
   onItemClick?: (item: GameItem | CollectionItem) => void; // Generic item click handler
+  onGameUpdate?: (updatedGame: GameItem) => void;
+  onGameDelete?: (deletedGame: GameItem) => void;
+  onCollectionUpdate?: (updatedCollection: CollectionItem) => void;
+  onCollectionDelete?: (deletedCollection: CollectionItem) => void;
 };
 
 const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
@@ -22,7 +30,6 @@ const POPUP_COVER_SIZE = 60;
 
 type SearchResultItemProps = {
   item: GameItem | CollectionItem;
-  apiBase: string;
   onGameClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   variant?: "popup" | "page";
@@ -30,11 +37,13 @@ type SearchResultItemProps = {
   onPlay?: (item: GameItem | CollectionItem) => void;
   onCollectionClick?: (collection: CollectionItem) => void;
   hasBorder?: boolean;
+  onEditClick?: (item: GameItem | CollectionItem) => void;
+  onGameDelete?: (deletedGame: GameItem) => void;
+  onCollectionDelete?: (deletedCollection: CollectionItem) => void;
 };
 
 function SearchResultItem({
   item,
-  apiBase,
   onGameClick,
   buildCoverUrl,
   variant = "page",
@@ -42,6 +51,9 @@ function SearchResultItem({
   onPlay,
   onCollectionClick,
   hasBorder = false,
+  onEditClick,
+  onGameDelete,
+  onCollectionDelete,
 }: SearchResultItemProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -99,7 +111,7 @@ function SearchResultItem({
     >
       <Cover
         title={item.title}
-        coverUrl={buildCoverUrl(apiBase, item.cover)}
+        coverUrl={buildCoverUrl(API_BASE, item.cover)}
         width={actualCoverSize}
         height={coverHeight}
         onClick={handleClick}
@@ -110,25 +122,51 @@ function SearchResultItem({
         play={false}
         showBorder={false}
       />
-      {onPlay && (
-        <button
-          className="search-result-play-button"
-          onClick={handlePlayClick}
-          aria-label={isGame ? "Play game" : "Play collection"}
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8 5v14l11-7z"
-              fill="currentColor"
-            />
-          </svg>
-        </button>
+      {(onPlay || onEditClick) && (
+        <div className="search-result-right-actions">
+          {onPlay && (
+            <button
+              className="search-result-play-button"
+              onClick={handlePlayClick}
+              aria-label={isGame ? "Play game" : "Play collection"}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 5v14l11-7z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          )}
+          {onEditClick && (
+            <div className="search-result-actions">
+              <DropdownMenu
+                onEdit={() => onEditClick(item)}
+                gameId={isGame ? item.ratingKey : undefined}
+                gameTitle={isGame ? item.title : undefined}
+                onGameDelete={isGame && onGameDelete ? (gameId: string) => {
+                  if (item.ratingKey === gameId) {
+                    onGameDelete(item);
+                  }
+                } : undefined}
+                collectionId={!isGame ? item.ratingKey : undefined}
+                collectionTitle={!isGame ? item.title : undefined}
+                onCollectionDelete={!isGame && onCollectionDelete ? (collectionId: string) => {
+                  if (item.ratingKey === collectionId) {
+                    onCollectionDelete(item);
+                  }
+                } : undefined}
+                className="search-result-dropdown-menu"
+              />
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -137,15 +175,22 @@ function SearchResultItem({
 export default function SearchResultsList({
   games,
   collections,
-  apiBase,
   onGameClick,
   buildCoverUrl,
   variant = "page",
   coverSize,
   onPlay,
   onCollectionClick,
+  onGameUpdate,
+  onGameDelete,
+  onCollectionUpdate,
+  onCollectionDelete,
 }: SearchResultsListProps) {
   const { t } = useTranslation();
+  const [isEditGameModalOpen, setIsEditGameModalOpen] = useState(false);
+  const [isEditCollectionModalOpen, setIsEditCollectionModalOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
+  const [selectedCollection, setSelectedCollection] = useState<CollectionInfo | null>(null);
   
   const totalResults = games.length + collections.length;
   if (totalResults === 0) {
@@ -157,22 +202,88 @@ export default function SearchResultsList({
 
   const allItems: (GameItem | CollectionItem)[] = [...collections, ...games];
 
+  const handleEditClick = (item: GameItem | CollectionItem) => {
+    if ("year" in item) {
+      // It's a game
+      setSelectedGame(item);
+      setIsEditGameModalOpen(true);
+    } else {
+      // It's a collection
+      const collectionInfo: CollectionInfo = {
+        id: item.ratingKey,
+        title: item.title,
+        summary: item.summary,
+        cover: item.cover,
+      };
+      setSelectedCollection(collectionInfo);
+      setIsEditCollectionModalOpen(true);
+    }
+  };
+
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    if (onGameUpdate) {
+      onGameUpdate(updatedGame);
+    }
+    setIsEditGameModalOpen(false);
+    setSelectedGame(null);
+  };
+
+  const handleCollectionUpdate = (updatedCollection: CollectionInfo) => {
+    if (onCollectionUpdate) {
+      const updatedItem: CollectionItem = {
+        ratingKey: updatedCollection.id,
+        title: updatedCollection.title,
+        summary: updatedCollection.summary,
+        cover: updatedCollection.cover,
+      };
+      onCollectionUpdate(updatedItem);
+    }
+    setIsEditCollectionModalOpen(false);
+    setSelectedCollection(null);
+  };
+
   return (
-    <div className={containerClass}>
-      {allItems.map((item, index) => (
-        <SearchResultItem
-          key={item.ratingKey}
-          item={item}
-          apiBase={apiBase}
-          onGameClick={onGameClick}
-          buildCoverUrl={buildCoverUrl}
-          variant={variant}
-          coverSize={coverSize}
-          onPlay={onPlay}
-          onCollectionClick={onCollectionClick}
-          hasBorder={isPopup && index < allItems.length - 1}
+    <>
+      <div className={containerClass}>
+        {allItems.map((item, index) => (
+          <SearchResultItem
+            key={item.ratingKey}
+            item={item}
+            onGameClick={onGameClick}
+            buildCoverUrl={buildCoverUrl}
+            variant={variant}
+            coverSize={coverSize}
+            onPlay={onPlay}
+            onCollectionClick={onCollectionClick}
+            hasBorder={isPopup && index < allItems.length - 1}
+            onEditClick={handleEditClick}
+            onGameDelete={onGameDelete}
+            onCollectionDelete={onCollectionDelete}
+          />
+        ))}
+      </div>
+      {selectedGame && (
+        <EditGameModal
+          isOpen={isEditGameModalOpen}
+          onClose={() => {
+            setIsEditGameModalOpen(false);
+            setSelectedGame(null);
+          }}
+          game={selectedGame}
+          onGameUpdate={handleGameUpdate}
         />
-      ))}
-    </div>
+      )}
+      {selectedCollection && (
+        <EditCollectionModal
+          isOpen={isEditCollectionModalOpen}
+          onClose={() => {
+            setIsEditCollectionModalOpen(false);
+            setSelectedCollection(null);
+          }}
+          collection={selectedCollection}
+          onCollectionUpdate={handleCollectionUpdate}
+        />
+      )}
+    </>
   );
 }

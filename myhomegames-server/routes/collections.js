@@ -192,6 +192,32 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
     }
   });
 
+  // Endpoint: delete collection
+  app.delete("/collections/:id", requireToken, (req, res) => {
+    const collectionId = req.params.id;
+    
+    // Find collection index
+    const collectionIndex = collectionsCache.findIndex((c) => c.id === collectionId);
+    
+    if (collectionIndex === -1) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+
+    // Remove collection from cache
+    collectionsCache.splice(collectionIndex, 1);
+
+    // Save to file
+    const fileName = "games-collections.json";
+    const filePath = path.join(metadataGamesDir, fileName);
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(collectionsCache, null, 2), "utf8");
+      res.json({ status: "success" });
+    } catch (e) {
+      console.error(`Failed to save ${fileName}:`, e.message);
+      res.status(500).json({ error: "Failed to delete collection" });
+    }
+  });
+
   // Endpoint: serve collection cover image (public, no auth required for images)
   app.get("/collection-covers/:collectionId", (req, res) => {
     const collectionId = decodeURIComponent(req.params.collectionId);

@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE, API_TOKEN } from "../../config";
 import StarRating from "../common/StarRating";
 import EditGameModal from "./EditGameModal";
+import DropdownMenu from "../common/DropdownMenu";
 import type { GameItem } from "../../types";
 import { buildApiUrl } from "../../utils/api";
 import "./GamesListTable.css";
@@ -11,14 +13,13 @@ type GamesListTableProps = {
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onGameUpdate?: (updatedGame: GameItem) => void;
+  onGameDelete?: (deletedGame: GameItem) => void;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
   sortField?: "title" | "year" | "stars" | "releaseDate";
   sortAscending?: boolean;
   onSortChange?: (field: "title" | "year" | "stars" | "releaseDate") => void;
   onSortDirectionChange?: (ascending: boolean) => void;
-  apiBase?: string;
-  apiToken?: string;
 };
 
 type ColumnVisibility = {
@@ -33,14 +34,13 @@ export default function GamesListTable({
   onGameClick,
   onPlay,
   onGameUpdate,
+  onGameDelete,
   itemRefs,
   scrollContainerRef,
   sortField,
   sortAscending = true,
   onSortChange,
   onSortDirectionChange,
-  apiBase,
-  apiToken,
 }: GamesListTableProps) {
   const [localGames, setLocalGames] = useState<GameItem[]>(games);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -52,15 +52,15 @@ export default function GamesListTable({
   }, [games]);
 
   const handleRatingChange = async (gameId: string, newStars: number) => {
-    if (!apiBase || !apiToken) return;
+    if (!API_TOKEN) return;
     
     try {
-      const url = buildApiUrl(apiBase, `/games/${gameId}`);
+      const url = buildApiUrl(API_BASE, `/games/${gameId}`);
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Auth-Token': apiToken,
+          'X-Auth-Token': API_TOKEN,
         },
         body: JSON.stringify({ stars: newStars }),
       });
@@ -450,28 +450,42 @@ export default function GamesListTable({
                     </td>
                   )}
                   <td className={`games-table-edit-cell ${rowClass}`}>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditClick(it);
-                      }}
-                      className="games-table-edit-button"
-                      aria-label="Edit"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    <div className="games-table-actions">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(it);
+                        }}
+                        className="games-table-edit-button"
+                        aria-label="Edit"
                       >
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    </button>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </button>
+                      <DropdownMenu
+                        onEdit={() => handleEditClick(it)}
+                        gameId={it.ratingKey}
+                        gameTitle={it.title}
+                        onGameDelete={onGameDelete ? (gameId: string) => {
+                          const deletedGame = it.ratingKey === gameId ? it : null;
+                          if (deletedGame) {
+                            onGameDelete(deletedGame);
+                          }
+                        } : undefined}
+                        className="games-table-dropdown-menu"
+                      />
+                    </div>
                   </td>
                 </tr>
               );
@@ -479,13 +493,11 @@ export default function GamesListTable({
           </tbody>
         </table>
       </div>
-      {selectedGame && apiToken && apiBase && (
+      {selectedGame && (
         <EditGameModal
           isOpen={isEditModalOpen}
           onClose={handleEditModalClose}
           game={selectedGame}
-          apiBase={apiBase}
-          apiToken={apiToken}
           onGameUpdate={handleGameUpdate}
         />
       )}

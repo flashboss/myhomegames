@@ -371,7 +371,6 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
             <SearchResultsList
               games={filteredGames}
               collections={filteredCollections}
-              apiBase="http://127.0.0.1:4000"
               onGameClick={handleGameSelect}
               buildCoverUrl={(apiBase, cover) => {
                 if (cover && cover.startsWith("http")) {

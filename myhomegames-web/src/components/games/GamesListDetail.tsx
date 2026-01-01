@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../config";
 import Cover from "./Cover";
 import EditGameModal from "./EditGameModal";
+import DropdownMenu from "../common/DropdownMenu";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import type { GameItem } from "../../types";
@@ -9,11 +11,10 @@ import "./GamesListDetail.css";
 
 type GamesListDetailProps = {
   games: GameItem[];
-  apiBase: string;
-  apiToken?: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onGameUpdate?: (updatedGame: GameItem) => void;
+  onGameDelete?: (deletedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
@@ -22,10 +23,10 @@ const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider posi
 
 type GameDetailItemProps = {
   game: GameItem;
-  apiBase: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onEditClick: (game: GameItem) => void;
+  onGameDelete?: (deletedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   index: number;
@@ -33,10 +34,10 @@ type GameDetailItemProps = {
 
 function GameDetailItem({
   game,
-  apiBase,
   onGameClick,
   onPlay,
   onEditClick,
+  onGameDelete,
   buildCoverUrl,
   itemRefs,
   index,
@@ -64,7 +65,7 @@ function GameDetailItem({
     >
       <Cover
         title={game.title}
-        coverUrl={buildCoverUrl(apiBase, game.cover)}
+        coverUrl={buildCoverUrl(API_BASE, game.cover)}
         width={FIXED_COVER_SIZE}
         height={coverHeight}
         onPlay={onPlay ? () => onPlay(game) : undefined}
@@ -98,36 +99,48 @@ function GameDetailItem({
           <Summary summary={game.summary} truncateOnly={true} maxLines={2} fontSize="0.85rem" />
         )}
       </div>
-      <button
-        onClick={handleEditClick}
-        className="games-list-detail-edit-button"
-        aria-label="Edit"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      <div className="games-list-detail-actions">
+        <button
+          onClick={handleEditClick}
+          className="games-list-detail-edit-button"
+          aria-label="Edit"
         >
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-        </svg>
-      </button>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+        </button>
+        <DropdownMenu
+          onEdit={() => onEditClick(game)}
+          gameId={game.ratingKey}
+          gameTitle={game.title}
+          onGameDelete={onGameDelete ? (gameId: string) => {
+            if (game.ratingKey === gameId) {
+              onGameDelete(game);
+            }
+          } : undefined}
+          className="games-list-detail-dropdown-menu"
+        />
+      </div>
     </div>
   );
 }
 
 export default function GamesListDetail({
   games,
-  apiBase,
-  apiToken,
   onGameClick,
   onPlay,
   onGameUpdate,
+  onGameDelete,
   buildCoverUrl,
   itemRefs,
 }: GamesListDetailProps) {
@@ -163,23 +176,21 @@ export default function GamesListDetail({
           <GameDetailItem
             key={game.ratingKey}
             game={game}
-            apiBase={apiBase}
             onGameClick={onGameClick}
             onPlay={onPlay}
             onEditClick={handleEditClick}
+            onGameDelete={onGameDelete}
             buildCoverUrl={buildCoverUrl}
             itemRefs={itemRefs}
             index={index}
           />
         ))}
       </div>
-      {selectedGame && apiToken && (
+      {selectedGame && (
         <EditGameModal
           isOpen={isEditModalOpen}
           onClose={handleEditModalClose}
           game={selectedGame}
-          apiBase={apiBase}
-          apiToken={apiToken}
           onGameUpdate={handleGameUpdate}
         />
       )}

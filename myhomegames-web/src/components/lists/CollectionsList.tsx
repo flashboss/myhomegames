@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../config";
 import Cover from "../games/Cover";
 import EditCollectionModal from "../collections/EditCollectionModal";
 import type { CollectionItem, CollectionInfo } from "../../types";
@@ -7,11 +8,10 @@ import "./CollectionsList.css";
 
 type CollectionsListProps = {
   collections: CollectionItem[];
-  apiBase: string;
-  apiToken?: string;
   onCollectionClick: (collection: CollectionItem) => void;
   onPlay?: (collection: CollectionItem) => void;
   onCollectionUpdate?: (updatedCollection: CollectionItem) => void;
+  onCollectionDelete?: (deletedCollection: CollectionItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -19,10 +19,10 @@ type CollectionsListProps = {
 
 type CollectionListItemProps = {
   collection: CollectionItem;
-  apiBase: string;
   onCollectionClick: (collection: CollectionItem) => void;
   onPlay?: (collection: CollectionItem) => void;
   onEditClick: (collection: CollectionItem) => void;
+  onCollectionDelete?: (deletedCollection: CollectionItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -30,10 +30,10 @@ type CollectionListItemProps = {
 
 function CollectionListItem({
   collection,
-  apiBase,
   onCollectionClick,
   onPlay,
   onEditClick,
+  onCollectionDelete,
   buildCoverUrl,
   coverSize,
   itemRefs,
@@ -54,12 +54,19 @@ function CollectionListItem({
     >
       <Cover
         title={collection.title}
-        coverUrl={buildCoverUrl(apiBase, collection.cover)}
+        coverUrl={buildCoverUrl(API_BASE, collection.cover)}
         width={coverSize}
         height={coverHeight}
         onPlay={onPlay ? () => onPlay(collection) : undefined}
         onClick={() => onCollectionClick(collection)}
         onEdit={() => onEditClick(collection)}
+        collectionId={collection.ratingKey}
+        collectionTitle={collection.title}
+        onCollectionDelete={onCollectionDelete ? (collectionId: string) => {
+          if (collection.ratingKey === collectionId) {
+            onCollectionDelete(collection);
+          }
+        } : undefined}
         showTitle={true}
         subtitle={collection.gameCount !== undefined ? `${collection.gameCount} ${t("common.elements")}` : undefined}
         detail={true}
@@ -72,11 +79,10 @@ function CollectionListItem({
 
 export default function CollectionsList({
   collections,
-  apiBase,
-  apiToken,
   onCollectionClick,
   onPlay,
   onCollectionUpdate,
+  onCollectionDelete,
   buildCoverUrl,
   coverSize = 150,
   itemRefs,
@@ -129,23 +135,21 @@ export default function CollectionsList({
           <CollectionListItem
             key={collection.ratingKey}
             collection={collection}
-            apiBase={apiBase}
             onCollectionClick={onCollectionClick}
             onPlay={onPlay}
             onEditClick={handleEditClick}
+            onCollectionDelete={onCollectionDelete}
             buildCoverUrl={buildCoverUrl}
             coverSize={coverSize}
             itemRefs={itemRefs}
           />
         ))}
       </div>
-      {selectedCollection && apiToken && (
+      {selectedCollection && (
         <EditCollectionModal
           isOpen={isEditModalOpen}
           onClose={handleEditModalClose}
           collection={selectedCollection}
-          apiBase={apiBase}
-          apiToken={apiToken}
           onCollectionUpdate={handleCollectionUpdate}
         />
       )}

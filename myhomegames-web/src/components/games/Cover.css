@@ -162,6 +162,36 @@
   color: #ffffff;
 }
 
+/* Dropdown menu wrapper styles */
+.games-list-dropdown-wrapper {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 3;
+}
+
+.games-list-dropdown-wrapper-bottom-right {
+  left: auto;
+  right: 8px;
+}
+
+.games-list-cover:hover .games-list-dropdown-wrapper .dropdown-menu-button {
+  opacity: 1;
+}
+
+.games-list-dropdown-menu .dropdown-menu-button {
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+}
+
+.games-list-dropdown-menu .dropdown-menu-popup {
+  bottom: 100%;
+  top: auto;
+  margin-bottom: 4px;
+  margin-top: 0;
+}
+
 /* Title and year styles */
 .games-list-title-wrapper {
   display: flex;

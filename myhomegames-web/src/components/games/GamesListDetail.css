@@ -49,11 +49,24 @@
   cursor: pointer;
 }
 
-.games-list-detail-edit-button {
+.games-list-detail-actions {
   position: absolute;
   top: 50%;
   right: 16px;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 3;
+}
+
+.games-list-detail-item:hover .games-list-detail-actions {
+  opacity: 1;
+}
+
+.games-list-detail-edit-button {
   border: none;
   border-radius: 4px;
   width: 32px;
@@ -63,13 +76,6 @@
   justify-content: center;
   cursor: pointer;
   background-color: transparent;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 3;
-}
-
-.games-list-detail-item:hover .games-list-detail-edit-button {
-  opacity: 1;
 }
 
 .games-list-detail-edit-button:hover {
@@ -85,4 +91,16 @@
 
 .games-list-detail-edit-button:hover svg {
   color: #ffffff;
+}
+
+.games-list-detail-dropdown-menu {
+  position: relative;
+}
+
+.games-list-detail-actions .dropdown-menu-wrapper {
+  display: inline-block;
+}
+
+.games-list-detail-actions .dropdown-menu-button {
+  opacity: 1 !important;
 }

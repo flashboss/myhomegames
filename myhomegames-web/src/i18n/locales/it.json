@@ -106,7 +106,12 @@
     "hideBackground": "Nascondi sfondo",
     "cancel": "Annulla",
     "save": "Salva",
-    "saving": "Salvataggio..."
+    "saving": "Salvataggio...",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "deleting": "Eliminazione...",
+    "confirmDelete": "Sei sicuro di voler eliminare \"{{title}}\"?",
+    "deleteError": "Impossibile eliminare il gioco"
   },
   "launch": {
     "launching": "Avvio gioco...",

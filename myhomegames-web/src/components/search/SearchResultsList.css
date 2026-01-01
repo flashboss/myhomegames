@@ -107,6 +107,57 @@
   line-height: 1.5;
 }
 
+/* Right actions container - aligns play and dropdown to the right */
+.search-result-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Actions container for dropdown */
+.search-result-actions {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.search-results-list-item:hover .search-result-actions,
+.search-dropdown-item:hover .search-result-actions {
+  opacity: 1;
+}
+
+.search-result-dropdown-menu {
+  position: relative;
+  z-index: 10005;
+}
+
+.search-result-actions {
+  position: relative;
+  z-index: 10005;
+}
+
+.search-result-actions .dropdown-menu-button {
+  opacity: 1 !important;
+}
+
+.search-result-actions .dropdown-menu-wrapper {
+  position: relative;
+  z-index: 10005;
+}
+
+/* Increase z-index for dropdown menu when inside search popup */
+.search-dropdown-item .dropdown-menu-wrapper {
+  position: relative;
+  z-index: 10005;
+}
+
+.search-dropdown-item .dropdown-menu-popup {
+  z-index: 10005 !important;
+}
+
 /* Common play button styles */
 .search-result-play-button {
   flex-shrink: 0;
@@ -120,7 +171,6 @@
   justify-content: center;
   border-radius: 50%;
   transition: color 0.2s ease, border-color 0.2s ease;
-  margin-left: auto;
   width: 40px;
   height: 40px;
 }

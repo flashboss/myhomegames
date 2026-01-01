@@ -106,7 +106,12 @@
     "hideBackground": "Ocultar fundo",
     "cancel": "Cancelar",
     "save": "Salvar",
-    "saving": "Salvando..."
+    "saving": "Salvando...",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "deleting": "Excluindo...",
+    "confirmDelete": "Tem certeza de que deseja excluir \"{{title}}\"?",
+    "deleteError": "Falha ao excluir o jogo"
   },
   "launch": {
     "launching": "Iniciando jogo...",

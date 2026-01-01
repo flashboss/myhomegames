@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type React from "react";
+import DropdownMenu from "../common/DropdownMenu";
 import "./Cover.css";
 
 type CoverProps = {
@@ -11,6 +12,13 @@ type CoverProps = {
   onPlay?: () => void;
   onClick?: () => void;
   onEdit?: () => void;
+  onDelete?: () => void;
+  gameId?: string;
+  gameTitle?: string;
+  onGameDelete?: (gameId: string) => void;
+  collectionId?: string;
+  collectionTitle?: string;
+  onCollectionDelete?: (collectionId: string) => void;
   showTitle?: boolean;
   subtitle?: string | number | null;
   detail?: boolean;
@@ -32,6 +40,13 @@ export default function Cover({
   onPlay,
   onClick,
   onEdit,
+  onDelete,
+  gameId,
+  gameTitle,
+  onGameDelete,
+  collectionId,
+  collectionTitle,
+  onCollectionDelete,
   showTitle = false,
   subtitle,
   detail = true,
@@ -83,6 +98,7 @@ export default function Cover({
       onEdit();
     }
   };
+
 
   const shouldShowPlayButton = play && onPlay;
   const isClickable = detail || play;
@@ -194,6 +210,21 @@ export default function Cover({
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
           </button>
+        )}
+        {onEdit && (
+          <div className="games-list-dropdown-wrapper games-list-dropdown-wrapper-bottom-right">
+            <DropdownMenu
+              onEdit={onEdit}
+              onDelete={onDelete}
+              gameId={gameId}
+              gameTitle={gameTitle}
+              onGameDelete={onGameDelete}
+              collectionId={collectionId}
+              collectionTitle={collectionTitle}
+              onCollectionDelete={onCollectionDelete}
+              className="games-list-dropdown-menu"
+            />
+          </div>
         )}
         {overlayContent && (
           <div className="cover-overlay-content">

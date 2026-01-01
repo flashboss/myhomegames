@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { API_BASE, API_TOKEN } from "../../config";
 import "./AddGame.css";
 
 type IGDBGame = {
@@ -15,16 +16,12 @@ type AddGameProps = {
   isOpen: boolean;
   onClose: () => void;
   onGameSelected: (game: IGDBGame) => void;
-  apiBase: string;
-  apiToken: string;
 };
 
 export default function AddGame({
   isOpen,
   onClose,
   onGameSelected,
-  apiBase,
-  apiToken,
 }: AddGameProps) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,13 +73,13 @@ export default function AddGame({
     setLoading(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const url = new URL("/igdb/search", apiBase);
+        const url = new URL("/igdb/search", API_BASE);
         url.searchParams.set("q", searchQuery.trim());
 
         const res = await fetch(url.toString(), {
           headers: {
             Accept: "application/json",
-            "X-Auth-Token": apiToken,
+            "X-Auth-Token": API_TOKEN,
           },
         });
 
@@ -106,7 +103,7 @@ export default function AddGame({
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchQuery, apiBase, apiToken]);
+  }, [searchQuery]);
 
   if (!isOpen) return null;
 

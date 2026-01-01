@@ -277,3 +277,81 @@ describe('PUT /collections/:id', () => {
   });
 });
 
+describe('DELETE /collections/:id', () => {
+  test('should delete a collection', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      // Delete the collection
+      const deleteResponse = await request(app)
+        .delete(`/collections/${collectionId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(deleteResponse.body).toHaveProperty('status', 'success');
+      
+      // Verify collection is deleted by trying to get it
+      const getResponse = await request(app)
+        .get(`/collections/${collectionId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(404);
+      
+      expect(getResponse.body).toHaveProperty('error', 'Collection not found');
+    }
+  });
+
+  test('should return 404 for non-existent collection', async () => {
+    const response = await request(app)
+      .delete('/collections/non-existent-collection-id')
+      .set('X-Auth-Token', 'test-token')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Collection not found');
+  });
+
+  test('should require authentication', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      const response = await request(app)
+        .delete(`/collections/${collectionId}`)
+        .expect(401);
+      
+      expect(response.body).toHaveProperty('error', 'Unauthorized');
+    }
+  });
+
+  test('should handle URL-encoded collection IDs', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      const encodedCollectionId = encodeURIComponent(collectionId);
+      
+      // Delete the collection
+      const deleteResponse = await request(app)
+        .delete(`/collections/${encodedCollectionId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(deleteResponse.body).toHaveProperty('status', 'success');
+    }
+  });
+});
+

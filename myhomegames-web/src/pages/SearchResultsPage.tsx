@@ -142,7 +142,6 @@ export default function SearchResultsPage({
           <SearchResultsList
             games={games || []}
             collections={collections || []}
-            apiBase={apiBase}
             onGameClick={onGameClick}
             buildCoverUrl={buildCoverUrl}
             onPlay={onPlay}

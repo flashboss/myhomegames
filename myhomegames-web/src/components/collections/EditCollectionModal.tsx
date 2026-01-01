@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { API_BASE, API_TOKEN } from "../../config";
 import type { CollectionInfo } from "../../types";
 import { buildApiUrl } from "../../utils/api";
 import "./EditCollectionModal.css";
@@ -9,8 +10,6 @@ type EditCollectionModalProps = {
   isOpen: boolean;
   onClose: () => void;
   collection: CollectionInfo;
-  apiBase: string;
-  apiToken: string;
   onCollectionUpdate: (updatedCollection: CollectionInfo) => void;
 };
 
@@ -18,8 +17,6 @@ export default function EditCollectionModal({
   isOpen,
   onClose,
   collection,
-  apiBase,
-  apiToken,
   onCollectionUpdate,
 }: EditCollectionModalProps) {
   const { t } = useTranslation();
@@ -69,12 +66,12 @@ export default function EditCollectionModal({
         return;
       }
 
-      const url = buildApiUrl(apiBase, `/collections/${collection.id}`);
+      const url = buildApiUrl(API_BASE, `/collections/${collection.id}`);
       const response = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": API_TOKEN,
         },
         body: JSON.stringify(updates),
       });

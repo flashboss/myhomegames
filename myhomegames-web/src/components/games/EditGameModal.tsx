@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { API_BASE, API_TOKEN } from "../../config";
 import TagEditor from "../common/TagEditor";
 import type { GameItem } from "../../types";
 import { buildApiUrl } from "../../utils/api";
@@ -10,8 +11,6 @@ type EditGameModalProps = {
   isOpen: boolean;
   onClose: () => void;
   game: GameItem;
-  apiBase: string;
-  apiToken: string;
   onGameUpdate: (updatedGame: GameItem) => void;
 };
 
@@ -19,8 +18,6 @@ export default function EditGameModal({
   isOpen,
   onClose,
   game,
-  apiBase,
-  apiToken,
   onGameUpdate,
 }: EditGameModalProps) {
   const { t } = useTranslation();
@@ -104,12 +101,12 @@ export default function EditGameModal({
         return;
       }
 
-      const url = buildApiUrl(apiBase, `/games/${game.ratingKey}`);
+      const url = buildApiUrl(API_BASE, `/games/${game.ratingKey}`);
       const response = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": API_TOKEN,
         },
         body: JSON.stringify(updates),
       });
@@ -230,8 +227,6 @@ export default function EditGameModal({
             <TagEditor
               selectedTags={selectedGenres}
               onTagsChange={setSelectedGenres}
-              apiBase={apiBase}
-              apiToken={apiToken}
               disabled={saving}
             />
           </div>

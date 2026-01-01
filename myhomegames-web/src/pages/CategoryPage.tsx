@@ -404,7 +404,6 @@ export default function CategoryPage({
               {viewMode === "detail" && (
                 <GamesListDetail
                   games={filteredAndSortedGames}
-                  apiBase={apiBase}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
                   buildCoverUrl={buildCoverUrl}
@@ -422,8 +421,6 @@ export default function CategoryPage({
                   sortAscending={sortAscending}
                   onSortChange={setSortField}
                   onSortDirectionChange={setSortAscending}
-                  apiBase={apiBase}
-                  apiToken={apiToken}
                 />
               )}
             </>

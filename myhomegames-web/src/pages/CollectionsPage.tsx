@@ -94,6 +94,14 @@ export default function CollectionsPage({
     );
   };
 
+  const handleCollectionDelete = (deletedCollection: CollectionItem) => {
+    setCollections((prevCollections) =>
+      prevCollections.filter((collection) =>
+        collection.ratingKey !== deletedCollection.ratingKey
+      )
+    );
+  };
+
   // Sort collections
   const sortedCollections = useMemo(() => {
     const sorted = [...collections];
@@ -122,11 +130,10 @@ export default function CollectionsPage({
           {!loading && (
             <CollectionsList
               collections={sortedCollections}
-              apiBase={apiBase}
-              apiToken={apiToken}
               onCollectionClick={handleCollectionClick}
               onPlay={onPlay as any}
               onCollectionUpdate={handleCollectionUpdate}
+              onCollectionDelete={handleCollectionDelete}
               buildCoverUrl={buildCoverUrl}
               coverSize={coverSize}
               itemRefs={itemRefs}

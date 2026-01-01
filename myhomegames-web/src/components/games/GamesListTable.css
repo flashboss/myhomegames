@@ -280,7 +280,20 @@
 .games-table-edit-cell {
   padding: 12px 16px;
   text-align: center;
-  width: 48px;
+  width: 80px;
+}
+
+.games-table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.games-table tbody tr:hover .games-table-actions {
+  opacity: 1;
 }
 
 .games-table-edit-button {
@@ -292,12 +305,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
-  opacity: 0;
-}
-
-.games-table tbody tr:hover .games-table-edit-button {
-  opacity: 1;
+  transition: background-color 0.2s ease;
 }
 
 .games-table-edit-button:hover {
@@ -313,4 +321,16 @@
 
 .games-table-edit-button:hover svg {
   color: #ffffff;
+}
+
+.games-table-dropdown-menu {
+  position: relative;
+}
+
+.games-table-actions .dropdown-menu-wrapper {
+  display: inline-block;
+}
+
+.games-table-actions .dropdown-menu-button {
+  opacity: 1 !important;
 }

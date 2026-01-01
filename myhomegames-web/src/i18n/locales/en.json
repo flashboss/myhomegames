@@ -106,7 +106,12 @@
     "hideBackground": "Hide background",
     "cancel": "Cancel",
     "save": "Save",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "confirmDelete": "Are you sure you want to delete \"{{title}}\"?",
+    "deleteError": "Failed to delete game"
   },
   "launch": {
     "launching": "Launching game...",

@@ -106,7 +106,12 @@
     "hideBackground": "Hintergrund ausblenden",
     "cancel": "Abbrechen",
     "save": "Speichern",
-    "saving": "Speichern..."
+    "saving": "Speichern...",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "deleting": "Löschen...",
+    "confirmDelete": "Möchten Sie \"{{title}}\" wirklich löschen?",
+    "deleteError": "Fehler beim Löschen des Spiels"
   },
   "launch": {
     "launching": "Spiel wird gestartet...",

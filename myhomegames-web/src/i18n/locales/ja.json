@@ -106,7 +106,12 @@
     "hideBackground": "背景を非表示",
     "cancel": "キャンセル",
     "save": "保存",
-    "saving": "保存中..."
+    "saving": "保存中...",
+    "edit": "編集",
+    "delete": "削除",
+    "deleting": "削除中...",
+    "confirmDelete": "「{{title}}」を削除してもよろしいですか？",
+    "deleteError": "ゲームの削除に失敗しました"
   },
   "launch": {
     "launching": "ゲームを起動中...",

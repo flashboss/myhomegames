@@ -382,6 +382,12 @@ export default function LibraryPage({
     );
   };
 
+  const handleGameDelete = (deletedGame: GameItem) => {
+    setGames((prevGames) =>
+      prevGames.filter((game) => game.ratingKey !== deletedGame.ratingKey)
+    );
+  };
+
   return (
     <main className="flex-1 home-page-content">
       <div className="home-page-layout">
@@ -428,11 +434,10 @@ export default function LibraryPage({
               {viewMode === "grid" && (
                 <GamesList
                   games={filteredAndSortedGames}
-                  apiBase={apiBase}
-                  apiToken={apiToken}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
                   onGameUpdate={handleGameUpdate}
+                  onGameDelete={handleGameDelete}
                   buildCoverUrl={buildCoverUrl}
                   coverSize={coverSize}
                   itemRefs={itemRefs}
@@ -442,11 +447,10 @@ export default function LibraryPage({
               {viewMode === "detail" && (
                 <GamesListDetail
                   games={filteredAndSortedGames}
-                  apiBase={apiBase}
-                  apiToken={apiToken}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
                   onGameUpdate={handleGameUpdate}
+                  onGameDelete={handleGameDelete}
                   buildCoverUrl={buildCoverUrl}
                   itemRefs={itemRefs}
                 />
@@ -457,14 +461,13 @@ export default function LibraryPage({
                   onGameClick={onGameClick}
                   onPlay={onPlay}
                   onGameUpdate={handleGameUpdate}
+                  onGameDelete={handleGameDelete}
                   itemRefs={itemRefs}
                   scrollContainerRef={tableScrollRef}
                   sortField={sortField}
                   sortAscending={sortAscending}
                   onSortChange={setSortField}
                   onSortDirectionChange={setSortAscending}
-                  apiBase={apiBase}
-                  apiToken={apiToken}
                 />
               )}
             </>

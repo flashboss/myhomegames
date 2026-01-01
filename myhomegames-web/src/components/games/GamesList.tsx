@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE, API_TOKEN } from "../../config";
 import Cover from "./Cover";
 import EditGameModal from "./EditGameModal";
 import type { GameItem } from "../../types";
@@ -7,11 +8,10 @@ import "./GamesList.css";
 
 type GamesListProps = {
   games: GameItem[];
-  apiBase: string;
-  apiToken?: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onGameUpdate?: (updatedGame: GameItem) => void;
+  onGameDelete?: (deletedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -24,10 +24,10 @@ type GamesListProps = {
 
 type GameListItemProps = {
   game: GameItem;
-  apiBase: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onEditClick: (game: GameItem) => void;
+  onGameDelete?: (deletedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -43,10 +43,10 @@ type GameListItemProps = {
 
 function GameListItem({
   game,
-  apiBase,
   onGameClick,
   onPlay,
   onEditClick,
+  onGameDelete,
   buildCoverUrl,
   coverSize,
   itemRefs,
@@ -111,12 +111,20 @@ function GameListItem({
     >
       <Cover
         title={game.title}
-        coverUrl={buildCoverUrl(apiBase, game.cover)}
+        coverUrl={buildCoverUrl(API_BASE, game.cover)}
         width={coverSize}
         height={coverHeight}
         onPlay={onPlay ? () => onPlay(game) : undefined}
         onClick={() => onGameClick(game)}
         onEdit={() => onEditClick(game)}
+        gameId={game.ratingKey}
+        gameTitle={game.title}
+        onGameDelete={onGameDelete ? (gameId: string) => {
+          const deletedGame = game.ratingKey === gameId ? game : null;
+          if (deletedGame) {
+            onGameDelete(deletedGame);
+          }
+        } : undefined}
         showTitle={true}
         subtitle={game.year}
         detail={true}
@@ -129,11 +137,10 @@ function GameListItem({
 
 export default function GamesList({
   games,
-  apiBase,
-  apiToken,
   onGameClick,
   onPlay,
   onGameUpdate,
+  onGameDelete,
   buildCoverUrl,
   coverSize = 150,
   itemRefs,
@@ -181,6 +188,7 @@ export default function GamesList({
     }
     handleEditModalClose();
   };
+
   
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
@@ -196,10 +204,10 @@ export default function GamesList({
           <GameListItem
             key={game.ratingKey}
             game={game}
-            apiBase={apiBase}
             onGameClick={onGameClick}
             onPlay={onPlay}
             onEditClick={handleEditClick}
+            onGameDelete={onGameDelete}
             buildCoverUrl={buildCoverUrl}
             coverSize={coverSize}
             itemRefs={itemRefs}
@@ -214,13 +222,11 @@ export default function GamesList({
           />
         ))}
       </div>
-      {selectedGame && apiToken && (
+      {selectedGame && API_TOKEN && (
         <EditGameModal
           isOpen={isEditModalOpen}
           onClose={handleEditModalClose}
           game={selectedGame}
-          apiBase={apiBase}
-          apiToken={apiToken}
           onGameUpdate={handleGameUpdate}
         />
       )}
