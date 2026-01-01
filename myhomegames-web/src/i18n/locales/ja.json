@@ -104,7 +104,9 @@
     "month": "月",
     "day": "日",
     "genre": "ジャンル",
-    "addGenre": "ジャンルを追加..."
+    "addGenre": "ジャンルを追加...",
+    "criticRating": "批評家評価",
+    "userRating": "ユーザー評価"
   },
   "common": {
     "loading": "読み込み中...",

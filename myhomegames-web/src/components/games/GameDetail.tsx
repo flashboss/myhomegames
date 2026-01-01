@@ -163,6 +163,22 @@ function GameDetailContent({
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
   
+  // Helper function to format rating value (0-10 float)
+  const formatRating = (value: number | null | undefined): string | null => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return null;
+    }
+    const numValue = Number(value);
+    if (numValue < 0 || numValue > 10) {
+      return null;
+    }
+    // Format to show decimal only if present (e.g., 8.5 instead of 8.50, but 8 instead of 8.0)
+    return numValue % 1 === 0 ? numValue.toString() : numValue.toFixed(1);
+  };
+  
+  const criticRating = formatRating(game.criticratings);
+  const userRating = formatRating(game.userratings);
+  
   return (
     <>
       <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
@@ -244,11 +260,84 @@ function GameDetailContent({
                 </div>
               )}
               <GameCategories game={game} />
-              <StarRating 
-                rating={rating || 0} 
-                readOnly={false}
-                onRatingChange={onRatingChange}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '8px' }}>
+                {(criticRating !== null) || (userRating !== null) ? (
+                  <>
+                    {criticRating !== null && (
+                      <Tooltip text={t("gameDetail.criticRating")}>
+                        <div 
+                          className="text-white" 
+                          style={{ 
+                            opacity: 0.8,
+                            fontFamily: 'var(--font-body-2-font-family)',
+                            fontSize: 'var(--font-body-2-font-size)',
+                            lineHeight: 'var(--font-body-2-line-height)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'help'
+                          }}
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="#FFD700"
+                            stroke="#FFA500"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ flexShrink: 0 }}
+                          >
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                          </svg>
+                          {criticRating}
+                        </div>
+                      </Tooltip>
+                    )}
+                    {userRating !== null && (
+                      <Tooltip text={t("gameDetail.userRating")}>
+                        <div 
+                          className="text-white" 
+                          style={{ 
+                            opacity: 0.8,
+                            fontFamily: 'var(--font-body-2-font-family)',
+                            fontSize: 'var(--font-body-2-font-size)',
+                            lineHeight: 'var(--font-body-2-line-height)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'help'
+                          }}
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="#4CAF50"
+                            stroke="#2E7D32"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ flexShrink: 0 }}
+                          >
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                          </svg>
+                          {userRating}
+                        </div>
+                      </Tooltip>
+                    )}
+                  </>
+                ) : null}
+                <StarRating 
+                  rating={rating || 0} 
+                  readOnly={false}
+                  onRatingChange={onRatingChange}
+                />
+              </div>
               <div className="game-detail-actions" style={{ marginTop: '16px' }}>
                 <button
                   onClick={() => onPlay(game)}

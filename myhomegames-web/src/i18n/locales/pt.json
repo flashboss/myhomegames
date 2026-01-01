@@ -104,7 +104,9 @@
     "month": "Mês",
     "day": "Dia",
     "genre": "Gênero",
-    "addGenre": "Adicionar gênero..."
+    "addGenre": "Adicionar gênero...",
+    "criticRating": "Avaliação da Crítica",
+    "userRating": "Avaliação do Público"
   },
   "common": {
     "loading": "Carregando...",

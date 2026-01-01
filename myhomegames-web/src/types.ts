@@ -11,6 +11,8 @@ export type GameItem = {
   year?: number | null;
   stars?: number | null;
   genre?: string | string[];
+  criticratings?: number | null;
+  userratings?: number | null;
 };
 
 export type CollectionItem = {

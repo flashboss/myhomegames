@@ -112,6 +112,54 @@ describe('GET /games/:gameId', () => {
       expect(game).toHaveProperty('year');
       expect(game).toHaveProperty('stars');
       expect(game).toHaveProperty('genre');
+      expect(game).toHaveProperty('criticratings');
+      expect(game).toHaveProperty('userratings');
+    }
+  });
+
+  test('should return criticratings and userratings when present', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    // Find a game with ratings (if any)
+    const gameWithRatings = libraryResponse.body.games.find(g => {
+      // We'll check by fetching the full game details
+      return true; // Check all games
+    });
+    
+    if (libraryResponse.body.games.length > 0) {
+      // Try to find a game that has ratings by checking multiple games
+      let foundGameWithRatings = null;
+      
+      for (const game of libraryResponse.body.games.slice(0, 10)) {
+        const gameResponse = await request(app)
+          .get(`/games/${game.id}`)
+          .set('X-Auth-Token', 'test-token')
+          .expect(200);
+        
+        if (gameResponse.body.criticratings !== null || gameResponse.body.userratings !== null) {
+          foundGameWithRatings = gameResponse.body;
+          break;
+        }
+      }
+      
+      if (foundGameWithRatings) {
+        // Verify ratings are numbers between 0 and 10
+        if (foundGameWithRatings.criticratings !== null) {
+          expect(typeof foundGameWithRatings.criticratings).toBe('number');
+          expect(foundGameWithRatings.criticratings).toBeGreaterThanOrEqual(0);
+          expect(foundGameWithRatings.criticratings).toBeLessThanOrEqual(10);
+        }
+        
+        if (foundGameWithRatings.userratings !== null) {
+          expect(typeof foundGameWithRatings.userratings).toBe('number');
+          expect(foundGameWithRatings.userratings).toBeGreaterThanOrEqual(0);
+          expect(foundGameWithRatings.userratings).toBeLessThanOrEqual(10);
+        }
+      }
     }
   });
 
@@ -327,6 +375,52 @@ describe('PUT /games/:gameId', () => {
       const game = updateResponse.body.game;
       expect(game).toHaveProperty('id');
       expect(game).toHaveProperty('title', 'Updated Title');
+      // Verify that criticratings and userratings are included in the response
+      expect(game).toHaveProperty('criticratings');
+      expect(game).toHaveProperty('userratings');
+    }
+  });
+
+  test('should preserve criticratings and userratings after update', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      // Find a game with ratings
+      let gameWithRatings = null;
+      let gameId = null;
+      
+      for (const game of libraryResponse.body.games.slice(0, 10)) {
+        const gameResponse = await request(app)
+          .get(`/games/${game.id}`)
+          .set('X-Auth-Token', 'test-token')
+          .expect(200);
+        
+        if (gameResponse.body.criticratings !== null || gameResponse.body.userratings !== null) {
+          gameWithRatings = gameResponse.body;
+          gameId = game.id;
+          break;
+        }
+      }
+      
+      if (gameWithRatings) {
+        const originalCriticRatings = gameWithRatings.criticratings;
+        const originalUserRatings = gameWithRatings.userratings;
+        
+        // Update a different field
+        const updateResponse = await request(app)
+          .put(`/games/${gameId}`)
+          .set('X-Auth-Token', 'test-token')
+          .send({ title: 'Updated Title' })
+          .expect(200);
+        
+        // Verify ratings are preserved
+        expect(updateResponse.body.game).toHaveProperty('criticratings', originalCriticRatings);
+        expect(updateResponse.body.game).toHaveProperty('userratings', originalUserRatings);
+      }
     }
   });
 });

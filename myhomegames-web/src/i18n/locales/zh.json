@@ -104,7 +104,9 @@
     "month": "月",
     "day": "日",
     "genre": "类型",
-    "addGenre": "添加类型..."
+    "addGenre": "添加类型...",
+    "criticRating": "评论家评分",
+    "userRating": "用户评分"
   },
   "common": {
     "loading": "加载中...",

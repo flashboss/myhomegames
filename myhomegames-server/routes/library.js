@@ -73,6 +73,8 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       year: game.year || null,
       stars: game.stars || null,
       genre: game.genre || null,
+      criticratings: game.criticratings || null,
+      userratings: game.userratings || null,
     };
     const background = getBackgroundPath(metadataPath, game.id);
     if (background) {
@@ -141,6 +143,8 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         year: updatedGame.year || null,
         stars: updatedGame.stars || null,
         genre: updatedGame.genre || null,
+        criticratings: updatedGame.criticratings || null,
+        userratings: updatedGame.userratings || null,
       };
       const background = getBackgroundPath(metadataPath, updatedGame.id);
       if (background) {

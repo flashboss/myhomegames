@@ -423,6 +423,8 @@ function GameDetailPage({
         year: found.year,
         stars: found.stars,
         genre: found.genre,
+        criticratings: found.criticratings,
+        userratings: found.userratings,
       };
       setGame(parsed);
     } catch (err: any) {
