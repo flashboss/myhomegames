@@ -115,6 +115,8 @@ export default function SettingsPage() {
             <div className="settings-field">
               <label className="settings-label">{t("settings.language")}</label>
               <select
+                id="language-select"
+                name="language"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
                 className="settings-select"

@@ -113,6 +113,8 @@ export default function AddGamePage({
           <div className="p-6 flex-1 overflow-hidden flex flex-col">
             <div className="mb-4">
               <input
+                id="add-game-page-search"
+                name="search"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

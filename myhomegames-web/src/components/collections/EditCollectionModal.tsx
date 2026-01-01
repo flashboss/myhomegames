@@ -140,8 +140,10 @@ export default function EditCollectionModal({
           )}
 
           <div className="edit-collection-modal-field">
-            <label>{t("collectionDetail.title", "Title")}</label>
+            <label htmlFor="edit-collection-title">{t("collectionDetail.title", "Title")}</label>
             <input
+              id="edit-collection-title"
+              name="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -150,8 +152,10 @@ export default function EditCollectionModal({
           </div>
 
           <div className="edit-collection-modal-field">
-            <label>{t("collectionDetail.summary", "Summary")}</label>
+            <label htmlFor="edit-collection-summary">{t("collectionDetail.summary", "Summary")}</label>
             <textarea
+              id="edit-collection-summary"
+              name="summary"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               disabled={saving}

@@ -16,6 +16,8 @@ export default function CoverSizeSlider({
   return (
     <div className="cover-size-slider-container">
       <input
+        id="cover-size-slider"
+        name="coverSize"
         type="range"
         min={min}
         max={max}

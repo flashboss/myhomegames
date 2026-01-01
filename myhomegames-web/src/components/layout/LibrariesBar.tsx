@@ -98,6 +98,8 @@ export default function LibrariesBar({
                   <div className="mhg-libraries-loading">{t("home.loadingLibraries")}</div>
                 ) : (
                   <select
+                    id="libraries-select"
+                    name="library"
                     className="mhg-libraries-combobox"
                     value={activeLibrary?.key || ""}
                     onChange={handleSelectChange}

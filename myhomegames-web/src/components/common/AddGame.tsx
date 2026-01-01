@@ -123,6 +123,8 @@ export default function AddGame({
         <div className="add-game-content">
           <div className="add-game-search-container">
             <input
+              id="add-game-search"
+              name="search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

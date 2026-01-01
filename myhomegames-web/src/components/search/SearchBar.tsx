@@ -325,6 +325,8 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
         </div>
         <input
           ref={inputRef}
+          id="search-input"
+          name="search"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -446,12 +448,13 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
           </div>
           <div className="search-dropdown-scroll">
             {recentSearches.map((query, index) => (
-              <button
+              <div
                 key={index}
                 onClick={() => handleRecentSearchClick(query)}
                 className={`w-full mhg-dropdown-item search-dropdown-item search-recent-item ${
                   index < recentSearches.length - 1 ? "has-border" : ""
                 }`}
+                style={{ cursor: 'pointer' }}
               >
                 <svg
                   className="search-recent-icon"
@@ -498,7 +501,7 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
                     />
                   </svg>
                 </button>
-              </button>
+              </div>
             ))}
           </div>
         </div>

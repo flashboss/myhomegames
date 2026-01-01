@@ -68,9 +68,15 @@ app.get("/covers/:gameId", (req, res) => {
   const gameId = decodeURIComponent(req.params.gameId);
   const coverPath = path.join(METADATA_PATH, "content", "games", gameId, "cover.webp");
 
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+
   // Check if file exists
   if (!fs.existsSync(coverPath)) {
-    return res.status(404).json({ error: "Cover not found" });
+    // Return 404 with image content type to avoid CORB issues
+    res.setHeader('Content-Type', 'image/webp');
+    return res.status(404).end();
   }
 
   // Set appropriate content type for webp
@@ -83,9 +89,15 @@ app.get("/backgrounds/:gameId", (req, res) => {
   const gameId = decodeURIComponent(req.params.gameId);
   const backgroundPath = path.join(METADATA_PATH, "content", "games", gameId, "background.webp");
 
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+
   // Check if file exists
   if (!fs.existsSync(backgroundPath)) {
-    return res.status(404).json({ error: "Background not found" });
+    // Return 404 with image content type to avoid CORB issues
+    res.setHeader('Content-Type', 'image/webp');
+    return res.status(404).end();
   }
 
   // Set appropriate content type for webp
@@ -98,9 +110,15 @@ app.get("/collection-backgrounds/:collectionId", (req, res) => {
   const collectionId = decodeURIComponent(req.params.collectionId);
   const backgroundPath = path.join(METADATA_PATH, "content", "collections", collectionId, "background.webp");
 
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+
   // Check if file exists
   if (!fs.existsSync(backgroundPath)) {
-    return res.status(404).json({ error: "Background not found" });
+    // Return 404 with image content type to avoid CORB issues
+    res.setHeader('Content-Type', 'image/webp');
+    return res.status(404).end();
   }
 
   // Set appropriate content type for webp
@@ -241,6 +259,7 @@ async function getIGDBAccessToken() {
 app.get("/igdb/search", requireToken, async (req, res) => {
   const query = req.query.q;
   if (!query || query.trim() === "") {
+    res.setHeader('Content-Type', 'application/json');
     return res.status(400).json({ error: "Missing search query" });
   }
 
@@ -281,9 +300,11 @@ app.get("/igdb/search", requireToken, async (req, res) => {
               ? new Date(game.first_release_date * 1000).getFullYear()
               : null,
           }));
+          res.setHeader('Content-Type', 'application/json');
           res.json({ games: transformed });
         } catch (e) {
           console.error("Error parsing IGDB response:", e);
+          res.setHeader('Content-Type', 'application/json');
           res.status(500).json({ error: "Failed to parse IGDB response" });
         }
       });
@@ -291,6 +312,7 @@ app.get("/igdb/search", requireToken, async (req, res) => {
 
     igdbReq.on("error", (err) => {
       console.error("IGDB request error:", err);
+      res.setHeader('Content-Type', 'application/json');
       res
         .status(500)
         .json({ error: "Failed to search IGDB", detail: err.message });
@@ -300,6 +322,7 @@ app.get("/igdb/search", requireToken, async (req, res) => {
     igdbReq.end();
   } catch (err) {
     console.error("IGDB search error:", err);
+    res.setHeader('Content-Type', 'application/json');
     res
       .status(500)
       .json({ error: "Failed to search IGDB", detail: err.message });

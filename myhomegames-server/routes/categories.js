@@ -24,9 +24,15 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
     const categoryId = decodeURIComponent(req.params.categoryId);
     const coverPath = path.join(metadataPath, "content", "categories", categoryId, "cover.webp");
 
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+
     // Check if file exists
     if (!fs.existsSync(coverPath)) {
-      return res.status(404).json({ error: "Cover not found" });
+      // Return 404 with image content type to avoid CORB issues
+      res.setHeader('Content-Type', 'image/webp');
+      return res.status(404).end();
     }
 
     // Set appropriate content type for webp

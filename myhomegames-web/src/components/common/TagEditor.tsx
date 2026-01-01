@@ -105,6 +105,8 @@ export default function TagEditor({
           );
         })}
         <input
+          id="tag-editor-input"
+          name="tag"
           type="text"
           value={tagSearch}
           onChange={(e) => setTagSearch(e.target.value)}

@@ -180,8 +180,10 @@ export default function EditGameModal({
           )}
 
           <div className="edit-game-modal-field">
-            <label>{t("gameDetail.title", "Title")}</label>
+            <label htmlFor="edit-game-title">{t("gameDetail.title", "Title")}</label>
             <input
+              id="edit-game-title"
+              name="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -190,8 +192,10 @@ export default function EditGameModal({
           </div>
 
           <div className="edit-game-modal-field">
-            <label>{t("gameDetail.summary", "Summary")}</label>
+            <label htmlFor="edit-game-summary">{t("gameDetail.summary", "Summary")}</label>
             <textarea
+              id="edit-game-summary"
+              name="summary"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               disabled={saving}
@@ -201,8 +205,10 @@ export default function EditGameModal({
 
           <div className="edit-game-modal-row">
             <div className="edit-game-modal-field">
-              <label>{t("gameDetail.year", "Year")}</label>
+              <label htmlFor="edit-game-year">{t("gameDetail.year", "Year")}</label>
               <input
+                id="edit-game-year"
+                name="year"
                 type="number"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
@@ -212,8 +218,10 @@ export default function EditGameModal({
             </div>
 
             <div className="edit-game-modal-field">
-              <label>{t("gameDetail.month", "Month")}</label>
+              <label htmlFor="edit-game-month">{t("gameDetail.month", "Month")}</label>
               <input
+                id="edit-game-month"
+                name="month"
                 type="number"
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
@@ -225,8 +233,10 @@ export default function EditGameModal({
             </div>
 
             <div className="edit-game-modal-field">
-              <label>{t("gameDetail.day", "Day")}</label>
+              <label htmlFor="edit-game-day">{t("gameDetail.day", "Day")}</label>
               <input
+                id="edit-game-day"
+                name="day"
                 type="number"
                 value={day}
                 onChange={(e) => setDay(e.target.value)}

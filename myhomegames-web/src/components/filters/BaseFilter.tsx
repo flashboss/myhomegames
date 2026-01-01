@@ -130,6 +130,8 @@ export default function BaseFilter({
       </div>
       <div className="filter-popup-search">
         <input
+          id={`filter-search-${config.id}`}
+          name="filterSearch"
           type="text"
           className="filter-popup-search-input"
           placeholder={t(config.searchPlaceholderKey)}
