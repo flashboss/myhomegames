@@ -4,6 +4,7 @@ import { API_BASE, API_TOKEN } from "../../config";
 import StarRating from "../common/StarRating";
 import EditGameModal from "./EditGameModal";
 import DropdownMenu from "../common/DropdownMenu";
+import Tooltip from "../common/Tooltip";
 import type { GameItem } from "../../types";
 import { buildApiUrl } from "../../utils/api";
 import "./GamesListTable.css";
@@ -394,12 +395,14 @@ export default function GamesListTable({
                   {columnVisibility.title && (
                     <td className={`title-cell ${rowClass} ${firstVisibleColumn === "title" ? "first-visible-cell" : ""}`}>
                       {firstVisibleColumn === "title" && onPlay && <PlayIcon />}
-                      <span 
-                        className={firstVisibleColumn === "title" ? "first-cell-text" : "title-cell-text"}
-                        onClick={() => onGameClick(it)}
-                      >
-                        {it.title}
-                      </span>
+                      <Tooltip text={it.title} delay={1000}>
+                        <span 
+                          className={firstVisibleColumn === "title" ? "first-cell-text" : "title-cell-text"}
+                          onClick={() => onGameClick(it)}
+                        >
+                          {it.title}
+                        </span>
+                      </Tooltip>
                     </td>
                   )}
                   {columnVisibility.releaseDate && (
