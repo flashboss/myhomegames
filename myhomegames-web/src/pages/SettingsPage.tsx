@@ -113,23 +113,25 @@ export default function SettingsPage() {
             </div>
 
             <div className="settings-field">
-              <label className="settings-label">{t("settings.language")}</label>
-              <select
-                id="language-select"
-                name="language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="settings-select"
-              >
-                <option value="en">{t("settings.english")}</option>
-                <option value="it">{t("settings.italian")}</option>
-                <option value="pt">{t("settings.portuguese")}</option>
-                <option value="es">{t("settings.spanish")}</option>
-                <option value="fr">{t("settings.french")}</option>
-                <option value="de">{t("settings.german")}</option>
-                <option value="zh">{t("settings.chinese")}</option>
-                <option value="ja">{t("settings.japanese")}</option>
-              </select>
+              <div className="settings-field-row">
+                <label className="settings-label">{t("settings.language")}</label>
+                <select
+                  id="language-select"
+                  name="language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="settings-select"
+                >
+                  <option value="en">{t("settings.english")}</option>
+                  <option value="it">{t("settings.italian")}</option>
+                  <option value="pt">{t("settings.portuguese")}</option>
+                  <option value="es">{t("settings.spanish")}</option>
+                  <option value="fr">{t("settings.french")}</option>
+                  <option value="de">{t("settings.german")}</option>
+                  <option value="zh">{t("settings.chinese")}</option>
+                  <option value="ja">{t("settings.japanese")}</option>
+                </select>
+              </div>
               <p className="settings-help-text">
                 {t("settings.selectLanguage")}
               </p>
