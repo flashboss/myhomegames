@@ -108,7 +108,7 @@ function SearchResultItem({
   return (
     <div
       key={item.ratingKey}
-      className={`group cursor-pointer ${isPopup ? `plex-dropdown-item search-dropdown-item ${hasBorder ? "has-border" : ""}` : "mb-6 search-results-list-item"}`}
+      className={`group cursor-pointer ${isPopup ? `mhg-dropdown-item search-dropdown-item ${hasBorder ? "has-border" : ""}` : "mb-6 search-results-list-item"}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role={isPopup ? "button" : undefined}

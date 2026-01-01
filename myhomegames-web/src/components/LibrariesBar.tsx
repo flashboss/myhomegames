@@ -85,17 +85,17 @@ export default function LibrariesBar({
   };
 
   return (
-    <div className="plex-libraries-bar">
-      <div className="plex-libraries-bar-container" ref={containerRef}>
+    <div className="mhg-libraries-bar">
+      <div className="mhg-libraries-bar-container" ref={containerRef}>
         {activeLibrary && (
           <>
             {isNarrow ? (
-              <div className="plex-libraries-combobox-container">
+              <div className="mhg-libraries-combobox-container">
                 {loading && libraries.length === 0 ? (
-                  <div className="plex-libraries-loading">{t("home.loadingLibraries")}</div>
+                  <div className="mhg-libraries-loading">{t("home.loadingLibraries")}</div>
                 ) : (
                   <select
-                    className="plex-libraries-combobox"
+                    className="mhg-libraries-combobox"
                     value={activeLibrary?.key || ""}
                     onChange={handleSelectChange}
                   >
@@ -106,18 +106,18 @@ export default function LibrariesBar({
                     ))}
                   </select>
                 )}
-                {error && <div className="plex-libraries-error">{error}</div>}
+                {error && <div className="mhg-libraries-error">{error}</div>}
               </div>
             ) : (
-              <div className="plex-libraries-container">
+              <div className="mhg-libraries-container">
                 {loading && libraries.length === 0 ? (
-                  <div className="plex-libraries-loading">{t("home.loadingLibraries")}</div>
+                  <div className="mhg-libraries-loading">{t("home.loadingLibraries")}</div>
                 ) : (
                   libraries.map((s) => (
                     <button
                       key={s.key}
-                      className={`plex-library-button ${
-                        activeLibrary?.key === s.key ? "plex-library-active" : ""
+                      className={`mhg-library-button ${
+                        activeLibrary?.key === s.key ? "mhg-library-active" : ""
                       }`}
                       onClick={() => onSelectLibrary(s)}
                     >
@@ -125,16 +125,16 @@ export default function LibrariesBar({
                     </button>
                   ))
                 )}
-                {error && <div className="plex-libraries-error">{error}</div>}
+                {error && <div className="mhg-libraries-error">{error}</div>}
               </div>
             )}
           </>
         )}
 
-        <div className="plex-libraries-actions" ref={actionsRef}>
+        <div className="mhg-libraries-actions" ref={actionsRef}>
           {onCoverSizeChange && (
             <div
-              className={`plex-libraries-actions-slider-container ${
+              className={`mhg-libraries-actions-slider-container ${
                 viewMode === "grid" ? "" : "hidden"
               }`}
             >
@@ -142,7 +142,7 @@ export default function LibrariesBar({
             </div>
           )}
           {onViewModeChange && (
-            <div className="plex-libraries-actions-view-mode-container">
+            <div className="mhg-libraries-actions-view-mode-container">
               <ViewModeSelector 
                 value={viewMode} 
                 onChange={onViewModeChange}

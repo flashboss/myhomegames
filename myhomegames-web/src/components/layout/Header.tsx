@@ -25,26 +25,26 @@ export default function Header({
   const { t } = useTranslation();
 
   return (
-    <header className="plex-header">
-      <div className="plex-header-container">
+    <header className="mhg-header">
+      <div className="mhg-header-container">
         {/* Logo on the left */}
         <button
           onClick={onHomeClick}
-          className="plex-logo-button"
+          className="mhg-logo-button"
           aria-label={t("header.home")}
         >
           <Logo />
         </button>
 
         {/* SearchBar in the center */}
-        <div className="plex-search-container">
+        <div className="mhg-search-container">
           <SearchBar games={allGames} collections={allCollections} onGameSelect={onGameSelect} onPlay={onPlay} />
         </div>
 
         {/* Buttons on the right */}
-        <div className="plex-header-actions">
+        <div className="mhg-header-actions">
           <button
-            className="plex-header-button"
+            className="mhg-header-button"
             aria-label={t("header.addGame")}
             onClick={onAddGameClick}
           >
@@ -64,7 +64,7 @@ export default function Header({
             </svg>
           </button>
           <button
-            className="plex-header-button"
+            className="mhg-header-button"
             aria-label={t("header.settings")}
             onClick={onSettingsClick}
           >
@@ -88,7 +88,7 @@ export default function Header({
               />
             </svg>
           </button>
-          <button className="plex-header-button" aria-label={t("header.account")}>
+          <button className="mhg-header-button" aria-label={t("header.account")}>
             <svg
               width="20"
               height="20"

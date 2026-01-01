@@ -1,10 +1,10 @@
-/* Plex Font */
+/* Global Font */
 * {
-  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'IBM Mhg Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Plex-style Header */
-.plex-header {
+/* Header */
+.mhg-header {
   background-color: transparent;
   border-top: 8px solid transparent;
   border-left: 8px solid transparent;
@@ -19,7 +19,7 @@
   box-shadow: none;
 }
 
-.plex-header-container {
+.mhg-header-container {
   display: flex;
   align-items: center;
   gap: 24px;
@@ -29,7 +29,7 @@
   height: 100%;
 }
 
-.plex-logo-button {
+.mhg-logo-button {
   height: 50px;
   display: flex;
   align-items: center;
@@ -42,18 +42,18 @@
   transition: opacity 0.2s ease;
 }
 
-.plex-logo-button:hover {
+.mhg-logo-button:hover {
   opacity: 0.8;
 }
 
-.plex-search-container {
+.mhg-search-container {
   flex: 1;
   display: flex;
   justify-content: center;
   max-width: 450px;
 }
 
-.plex-header-actions {
+.mhg-header-actions {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -61,7 +61,7 @@
   margin-left: auto;
 }
 
-.plex-header-button {
+.mhg-header-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -76,11 +76,11 @@
   padding: 0;
 }
 
-.plex-header-button:hover {
+.mhg-header-button:hover {
   color: rgba(255, 255, 255, 1);
 }
 
-.plex-header-button:active {
+.mhg-header-button:active {
   color: rgba(255, 255, 255, 1);
 }
 
@@ -90,14 +90,14 @@ body:has(.edit-collection-modal-overlay),
 body:has(.dropdown-menu-confirm-overlay),
 body:has(.add-game-overlay),
 body:has(.launch-modal-overlay) {
-  .plex-header {
+  .mhg-header {
     opacity: 0.5;
     pointer-events: none;
   }
 }
 
-/* Plex-style Search Bar */
-.plex-search-container-wrapper {
+/* Search Bar */
+.mhg-search-container-wrapper {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -109,13 +109,13 @@ body:has(.launch-modal-overlay) {
   overflow: hidden;
 }
 
-.plex-search-container-wrapper:focus-within {
+.mhg-search-container-wrapper:focus-within {
   background-color: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
-.plex-search-icon-wrapper {
+.mhg-search-icon-wrapper {
   flex-shrink: 0;
   pointer-events: none;
   padding-left: 16px;
@@ -124,7 +124,7 @@ body:has(.launch-modal-overlay) {
   border-radius: 20px 0 0 20px;
 }
 
-.plex-search-input {
+.mhg-search-input {
   flex: 1;
   min-width: 0;
   background: none;
@@ -137,12 +137,12 @@ body:has(.launch-modal-overlay) {
   outline: none;
 }
 
-.plex-search-input::placeholder {
+.mhg-search-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Plex-style Dropdown */
-.plex-dropdown {
+/* Dropdown */
+.mhg-dropdown {
   background-color: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
@@ -150,7 +150,7 @@ body:has(.launch-modal-overlay) {
   backdrop-filter: blur(10px);
 }
 
-.plex-dropdown-item {
+.mhg-dropdown-item {
   padding: 12px 16px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
@@ -160,12 +160,12 @@ body:has(.launch-modal-overlay) {
   box-sizing: border-box;
 }
 
-.plex-dropdown-item:hover {
+.mhg-dropdown-item:hover {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Plex-style Libraries Bar */
-.plex-libraries-bar {
+/* Libraries Bar */
+.mhg-libraries-bar {
   background-color: transparent;
   padding: 0;
   position: fixed;
@@ -176,7 +176,7 @@ body:has(.launch-modal-overlay) {
   min-height: 64px;
 }
 
-.plex-libraries-bar-container {
+.mhg-libraries-bar-container {
   display: flex;
   align-items: center;
   gap: 24px;
@@ -187,7 +187,7 @@ body:has(.launch-modal-overlay) {
   position: relative;
 }
 
-.plex-libraries-container {
+.mhg-libraries-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -202,7 +202,7 @@ body:has(.launch-modal-overlay) {
   max-width: calc(100% - 200px);
 }
 
-.plex-libraries-actions {
+.mhg-libraries-actions {
   display: flex;
   align-items: center;
   gap: 0px;
@@ -210,7 +210,7 @@ body:has(.launch-modal-overlay) {
   margin-left: auto;
 }
 
-.plex-library-button {
+.mhg-library-button {
   padding: 16px 24px;
   background: none;
   border: none;
@@ -226,11 +226,11 @@ body:has(.launch-modal-overlay) {
   box-sizing: border-box;
 }
 
-.plex-library-button:hover {
+.mhg-library-button:hover {
   color: rgba(255, 255, 255, 1);
 }
 
-.plex-library-active {
+.mhg-library-active {
   color: #E5A00D;
   border-bottom: none !important;
   font-weight: 600;
@@ -242,7 +242,7 @@ body:has(.launch-modal-overlay) {
   transition: color 0.2s ease;
 }
 
-.plex-library-active::after {
+.mhg-library-active::after {
   content: '';
   position: absolute;
   bottom: 12px;
@@ -253,17 +253,17 @@ body:has(.launch-modal-overlay) {
   transition: background-color 0.2s ease;
 }
 
-.plex-library-active:hover::after {
+.mhg-library-active:hover::after {
   background-color: rgba(255, 255, 255, 1);
 }
 
-.plex-libraries-loading {
+.mhg-libraries-loading {
   padding: 16px 24px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 14px;
 }
 
-.plex-libraries-error {
+.mhg-libraries-error {
   padding: 16px 24px;
   color: #ef4444;
   font-size: 14px;

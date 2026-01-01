@@ -1,10 +1,10 @@
-.plex-libraries-actions {
+.mhg-libraries-actions {
   transform: translateY(-2px);
   position: relative;
   z-index: 201;
 }
 
-.plex-libraries-actions-slider-container {
+.mhg-libraries-actions-slider-container {
   visibility: visible;
   width: 60px;
   flex-shrink: 0;
@@ -16,25 +16,25 @@
   pointer-events: auto;
 }
 
-.plex-libraries-actions-slider-container.hidden {
+.mhg-libraries-actions-slider-container.hidden {
   visibility: hidden;
 }
 
-.plex-libraries-actions-background-toggle-container {
+.mhg-libraries-actions-background-toggle-container {
   display: flex;
   align-items: center;
   margin-right: 3px;
   transform: translateY(3px);
 }
 
-.plex-libraries-actions-view-mode-container {
+.mhg-libraries-actions-view-mode-container {
   display: flex;
   align-items: center;
   position: relative;
   z-index: 998;
 }
 
-.plex-libraries-combobox-container {
+.mhg-libraries-combobox-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,7 +45,7 @@
   max-width: calc(100% - 200px);
 }
 
-.plex-libraries-combobox {
+.mhg-libraries-combobox {
   padding: 12px 24px 12px 0;
   background-color: transparent;
   border: none;
@@ -64,16 +64,16 @@
   transition: color 0.2s ease;
 }
 
-.plex-libraries-combobox:hover {
+.mhg-libraries-combobox:hover {
   color: rgba(255, 255, 255, 1);
 }
 
-.plex-libraries-combobox:focus {
+.mhg-libraries-combobox:focus {
   outline: none;
   color: #E5A00D;
 }
 
-.plex-libraries-combobox option {
+.mhg-libraries-combobox option {
   background-color: #2a2a2a;
   color: rgba(255, 255, 255, 0.9);
   padding: 8px;

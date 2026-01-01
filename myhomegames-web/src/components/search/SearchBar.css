@@ -14,11 +14,11 @@
   border-color: #ffffff !important;
 }
 
-.search-bar-wrapper.search-focused .plex-search-input {
+.search-bar-wrapper.search-focused .mhg-search-input {
   color: #000000 !important;
 }
 
-.search-bar-wrapper.search-focused .plex-search-input::placeholder {
+.search-bar-wrapper.search-focused .mhg-search-input::placeholder {
   color: rgba(0, 0, 0, 0.5) !important;
 }
 

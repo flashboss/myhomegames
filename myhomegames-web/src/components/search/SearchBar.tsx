@@ -305,8 +305,8 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
 
   return (
     <div ref={searchRef} className="relative search-bar-container">
-      <div className={`plex-search-container-wrapper search-bar-wrapper ${isFocused ? "search-focused" : ""}`}>
-        <div className="plex-search-icon-wrapper">
+      <div className={`mhg-search-container-wrapper search-bar-wrapper ${isFocused ? "search-focused" : ""}`}>
+        <div className="mhg-search-icon-wrapper">
           <svg
             className={isFocused ? "search-icon-focused" : "text-gray-400"}
             fill="none"
@@ -331,7 +331,7 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder={t("search.placeholder")}
-          className={`plex-search-input search-input-with-padding ${
+          className={`mhg-search-input search-input-with-padding ${
             searchQuery ? "has-query" : ""
           } ${isFocused ? "search-input-focused" : ""}`}
           onKeyDown={(e) => {
@@ -378,7 +378,7 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
       </div>
 
       {((isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && (filteredGames.length > 0 || filteredCollections.length > 0)) || isModalOpen) && (
-        <div className="plex-dropdown search-dropdown" style={{ display: isModalOpen ? 'none' : 'flex' }}>
+        <div className="mhg-dropdown search-dropdown" style={{ display: isModalOpen ? 'none' : 'flex' }}>
           <div className="search-dropdown-scroll">
             <SearchResultsList
               games={filteredGames}
@@ -434,13 +434,13 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
       )}
 
       {isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && filteredGames.length === 0 && (
-        <div className="plex-dropdown search-no-results">
+        <div className="mhg-dropdown search-no-results">
           {t("search.noResults", { query: searchQuery })}
         </div>
       )}
 
       {isOpen && isFocused && searchQuery.trim() === "" && recentSearches.length > 0 && (
-        <div className="plex-dropdown search-dropdown">
+        <div className="mhg-dropdown search-dropdown">
           <div className="search-dropdown-header">
             {t("search.recentSearches")}
           </div>
@@ -449,7 +449,7 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
               <button
                 key={index}
                 onClick={() => handleRecentSearchClick(query)}
-                className={`w-full plex-dropdown-item search-dropdown-item search-recent-item ${
+                className={`w-full mhg-dropdown-item search-dropdown-item search-recent-item ${
                   index < recentSearches.length - 1 ? "has-border" : ""
                 }`}
               >
