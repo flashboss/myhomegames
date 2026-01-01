@@ -11,6 +11,9 @@
   display: flex;
   align-items: center;
   transform: translateY(2px);
+  position: relative;
+  z-index: 202;
+  pointer-events: auto;
 }
 
 .plex-libraries-actions-slider-container.hidden {

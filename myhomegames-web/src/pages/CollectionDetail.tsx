@@ -381,7 +381,7 @@ function CollectionDetailContent({
   
   return (
     <>
-      <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
+      <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
         <LibrariesBar
         libraries={[]}
         activeLibrary={{ key: "collection", type: "collection" }}

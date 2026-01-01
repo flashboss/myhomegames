@@ -3,6 +3,7 @@
   align-items: center;
   gap: 12px;
   padding-right: 0;
+  pointer-events: auto;
 }
 
 .cover-size-slider {
