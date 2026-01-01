@@ -50,7 +50,7 @@
 }
 
 .recommended-section-scroll .games-list-container {
-  display: flex !important;
+  display: -webkit-box !important;
   flex-direction: row !important;
   gap: 24px;
   width: max-content;
