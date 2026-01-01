@@ -9,6 +9,7 @@
   border-top: 8px solid transparent;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
+  border-bottom: 8px solid transparent;
   padding: 0;
   height: 64px;
   position: fixed;
@@ -27,6 +28,7 @@
   margin: 0 auto;
   padding: 0 24px;
   height: 100%;
+  background-color: #0d0d0d;
 }
 
 .mhg-logo-button {
@@ -102,9 +104,10 @@ body:has(.launch-modal-overlay) {
   flex-direction: row;
   align-items: center;
   width: 100%;
+  height: 36px;
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
+  border-radius: 18px;
   transition: all 0.2s ease;
   overflow: hidden;
 }
@@ -129,7 +132,7 @@ body:has(.launch-modal-overlay) {
   min-width: 0;
   background: none;
   border: none;
-  padding: 8px 12px;
+  padding: 6px 12px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   font-weight: 400;
