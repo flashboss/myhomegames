@@ -34,7 +34,13 @@
     "home": "ホーム",
     "addGame": "ゲームを追加",
     "settings": "設定",
-    "account": "アカウント"
+    "account": "アカウント",
+    "profile": "プロフィール"
+  },
+  "profile": {
+    "viewProfile": "プロフィールを表示",
+    "changeUser": "ユーザーを変更",
+    "logout": "ログアウト"
   },
   "search": {
     "noResults": "用語 \"{{query}}\" の結果が見つかりません",

@@ -34,7 +34,13 @@
     "home": "首页",
     "addGame": "添加游戏",
     "settings": "设置",
-    "account": "账户"
+    "account": "账户",
+    "profile": "个人资料"
+  },
+  "profile": {
+    "viewProfile": "查看个人资料",
+    "changeUser": "切换用户",
+    "logout": "退出"
   },
   "search": {
     "noResults": "未找到术语 \"{{query}}\" 的结果",

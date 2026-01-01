@@ -34,7 +34,13 @@
     "home": "Início",
     "addGame": "Adicionar Jogo",
     "settings": "Configurações",
-    "account": "Conta"
+    "account": "Conta",
+    "profile": "Perfil"
+  },
+  "profile": {
+    "viewProfile": "Ver perfil",
+    "changeUser": "Alterar usuário",
+    "logout": "Sair"
   },
   "search": {
     "noResults": "Nenhum resultado encontrado para o termo \"{{query}}\"",

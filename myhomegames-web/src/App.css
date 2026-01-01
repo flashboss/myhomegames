@@ -64,6 +64,7 @@
 }
 
 .mhg-header-button {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,6 +78,7 @@
   transition: color 0.2s ease;
   padding: 0;
 }
+
 
 .mhg-header-button:hover {
   color: rgba(255, 255, 255, 1);

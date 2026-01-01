@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type React from "react";
 import DropdownMenu from "../common/DropdownMenu";
+import Tooltip from "../common/Tooltip";
 import "./Cover.css";
 
 type CoverProps = {
@@ -261,15 +262,17 @@ export default function Cover({
       {(showTitle || subtitle != null) && titlePosition === "bottom" && (
         <div className="games-list-title-wrapper">
           {showTitle && (
-            <div 
-              className={`truncate games-list-title ${detail ? "games-list-title-clickable" : ""}`}
-              onClick={detail && onClick ? (e) => {
-                e.stopPropagation();
-                onClick();
-              } : undefined}
-            >
-              {title}
-            </div>
+            <Tooltip text={title} position="bottom" delay={1000}>
+              <div 
+                className={`truncate games-list-title ${detail ? "games-list-title-clickable" : ""}`}
+                onClick={detail && onClick ? (e) => {
+                  e.stopPropagation();
+                  onClick();
+                } : undefined}
+              >
+                {title}
+              </div>
+            </Tooltip>
           )}
           {subtitle != null && (
             <div className="games-list-year">{subtitle}</div>
