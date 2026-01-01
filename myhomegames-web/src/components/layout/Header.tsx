@@ -45,7 +45,7 @@ export default function Header({
 
         {/* Buttons on the right */}
         <div className="mhg-header-actions">
-          <Tooltip text={t("header.addGame")} position="top" delay={1000}>
+          <Tooltip text={t("header.addGame")} position="top" delay={200}>
             <button
               className="mhg-header-button"
               aria-label={t("header.addGame")}
@@ -67,7 +67,7 @@ export default function Header({
               </svg>
             </button>
           </Tooltip>
-          <Tooltip text={t("header.settings")} position="top" delay={1000}>
+          <Tooltip text={t("header.settings")} position="top" delay={200}>
             <button
               className="mhg-header-button"
               aria-label={t("header.settings")}

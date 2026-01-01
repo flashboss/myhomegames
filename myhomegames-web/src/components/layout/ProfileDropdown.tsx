@@ -78,7 +78,7 @@ export default function ProfileDropdown({
 
   return (
     <div ref={menuRef} className="profile-dropdown-wrapper">
-      <Tooltip text={t("header.profile")} position="top" delay={1000}>
+      <Tooltip text={t("header.profile")} position="top" delay={200}>
         <button
           className="profile-dropdown-button mhg-header-button"
           onClick={handleToggle}

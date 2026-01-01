@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
 import { API_BASE, API_TOKEN } from "../../config";
+import Tooltip from "./Tooltip";
 import "./DropdownMenu.css";
 
 type DropdownMenuProps = {
@@ -17,6 +18,7 @@ type DropdownMenuProps = {
   horizontal?: boolean;
   onModalOpen?: () => void;
   onModalClose?: () => void;
+  toolTipDelay?: number;
 };
 
 export default function DropdownMenu({
@@ -32,6 +34,7 @@ export default function DropdownMenu({
   horizontal = false,
   onModalOpen,
   onModalClose,
+  toolTipDelay = 0,
 }: DropdownMenuProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -191,45 +194,55 @@ export default function DropdownMenu({
     }
   };
 
+  const buttonContent = (
+    <button
+      onClick={handleToggle}
+      className="dropdown-menu-button"
+      aria-label="Menu"
+    >
+      {horizontal ? (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="5" cy="12" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+        </svg>
+      ) : (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="5" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="12" cy="19" r="1" />
+        </svg>
+      )}
+    </button>
+  );
+
   return (
     <div className={`dropdown-menu-wrapper ${className}`} ref={menuRef}>
-      <button
-        onClick={handleToggle}
-        className="dropdown-menu-button"
-        aria-label="Menu"
-      >
-        {horizontal ? (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="5" cy="12" r="1" />
-            <circle cx="12" cy="12" r="1" />
-            <circle cx="19" cy="12" r="1" />
-          </svg>
-        ) : (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="5" r="1" />
-            <circle cx="12" cy="12" r="1" />
-            <circle cx="12" cy="19" r="1" />
-          </svg>
-        )}
-      </button>
+      {toolTipDelay > 0 ? (
+        <Tooltip text={t("common.more", "More")} delay={toolTipDelay}>
+          {buttonContent}
+        </Tooltip>
+      ) : (
+        buttonContent
+      )}
       {isOpen && (
         <div ref={popupRef} className="dropdown-menu-popup">
           <button

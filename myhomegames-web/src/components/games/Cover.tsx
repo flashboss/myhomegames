@@ -262,7 +262,7 @@ export default function Cover({
       {(showTitle || subtitle != null) && titlePosition === "bottom" && (
         <div className="games-list-title-wrapper">
           {showTitle && (
-            <Tooltip text={title} position="bottom" delay={1000}>
+            <Tooltip text={title} position="bottom">
               <div 
                 className={`truncate games-list-title ${detail ? "games-list-title-clickable" : ""}`}
                 onClick={detail && onClick ? (e) => {
