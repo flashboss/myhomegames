@@ -1,4 +1,8 @@
-export const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
+const envApiBase = import.meta.env.VITE_API_BASE;
+if (!envApiBase) {
+  throw new Error("VITE_API_BASE environment variable is required. Please set it in your .env file.");
+}
+export const API_BASE = envApiBase;
 
 // Get API token - prefer Twitch token, fallback to dev token
 export function getApiToken(): string {

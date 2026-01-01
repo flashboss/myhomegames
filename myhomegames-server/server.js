@@ -1,6 +1,9 @@
 // server.js
 // Minimal MyHomeGames backend with a safe launcher
 
+// Load environment variables from .env file
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -19,10 +22,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const API_TOKEN = process.env.API_TOKEN || "changeme";
-const PORT = process.env.PORT || 4000;
-const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID || "";
-const IGDB_CLIENT_SECRET = process.env.IGDB_CLIENT_SECRET || "";
+const API_TOKEN = process.env.API_TOKEN;
+const PORT = process.env.PORT || 4000; // PORT can have a default
+const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID;
+const IGDB_CLIENT_SECRET = process.env.IGDB_CLIENT_SECRET;
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
+const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
+const API_BASE = process.env.API_BASE;
 const METADATA_PATH =
   process.env.METADATA_PATH ||
   path.join(
@@ -44,7 +50,7 @@ function requireToken(req, res, next) {
   }
 
   // Check if it's the development token (for development only)
-  if (token === API_TOKEN) {
+  if (API_TOKEN && token === API_TOKEN) {
     return next();
   }
 
@@ -395,9 +401,59 @@ app.put("/settings", requireToken, (req, res) => {
   }
 });
 
+// Validate required environment variables
+function validateEnvironment() {
+  const errors = [];
+  
+  // Read environment variables directly
+  const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
+  const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
+  const API_BASE = process.env.API_BASE;
+  const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID;
+  const IGDB_CLIENT_SECRET = process.env.IGDB_CLIENT_SECRET;
+  
+  // Check if Twitch OAuth is configured (all or nothing)
+  const hasTwitchClientId = !!TWITCH_CLIENT_ID;
+  const hasTwitchClientSecret = !!TWITCH_CLIENT_SECRET;
+  const hasApiBase = !!API_BASE;
+  
+  if (hasTwitchClientId || hasTwitchClientSecret || hasApiBase) {
+    if (!hasTwitchClientId) {
+      errors.push("TWITCH_CLIENT_ID is required when using Twitch OAuth");
+    }
+    if (!hasTwitchClientSecret) {
+      errors.push("TWITCH_CLIENT_SECRET is required when using Twitch OAuth");
+    }
+    if (!hasApiBase) {
+      errors.push("API_BASE is required when using Twitch OAuth");
+    }
+  }
+  
+  // Check if IGDB is configured (both or neither)
+  const hasIgdbClientId = !!IGDB_CLIENT_ID;
+  const hasIgdbClientSecret = !!IGDB_CLIENT_SECRET;
+  
+  if (hasIgdbClientId !== hasIgdbClientSecret) {
+    errors.push("Both IGDB_CLIENT_ID and IGDB_CLIENT_SECRET must be set together, or both omitted");
+  }
+  
+  if (errors.length > 0) {
+    console.error("Environment configuration errors:");
+    errors.forEach(error => console.error(`  - ${error}`));
+    console.error("\nPlease configure your .env file with the required variables.");
+    process.exit(1);
+  }
+}
+
 // Only start listening if not in test environment
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => console.log(`MyHomeGames server listening on :${PORT}`));
+  validateEnvironment();
+  app.listen(PORT, () => {
+    console.log(`MyHomeGames server listening on :${PORT}`);
+    if (!API_TOKEN && !TWITCH_CLIENT_ID) {
+      console.warn("Warning: No authentication configured. Set either API_TOKEN (for dev) or TWITCH_CLIENT_ID/TWITCH_CLIENT_SECRET (for production).");
+    }
+  });
 }
 
 // Export app for testing

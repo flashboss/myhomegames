@@ -10,15 +10,45 @@ npm install
 
 ## Configuration
 
-The server can be configured using environment variables. Create a `.env` file in the `myhomegames-server` directory or set environment variables before starting the server.
+The server can be configured using environment variables. 
+
+### Development Setup
+
+For development, copy `.env.example` to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+The `.env.example` file contains a development configuration with `API_TOKEN=changeme` for local development.
+
+### Production Setup
+
+For production, copy `.env.production.example` to `.env`:
+
+```bash
+cp .env.production.example .env
+```
+
+Then edit `.env` and configure all required variables (Twitch OAuth credentials, API_BASE, etc.).
+
+**Important**: Do not use `API_TOKEN` in production. Use Twitch OAuth instead.
 
 ### Environment Variables
 
 - `PORT` (default: `4000`) - Port on which the server will listen
-- `API_TOKEN` (default: `changeme`) - Authentication token for API requests (development only)
+- `API_TOKEN` - Authentication token for API requests (development only, optional)
+- `FRONTEND_URL` - Frontend application URL (optional, rarely needed)
+  - **When is it needed?** Only when the `Origin` header is not available in OAuth callback requests
+  - **Normal case:** The browser always sends the `Origin` header, so this is not needed
+  - **When to use:** 
+    - Testing OAuth with `curl` or Postman (which don't send `Origin`)
+    - If a proxy/CDN filters or modifies the `Origin` header
+    - In production, only if you have a specific infrastructure setup that requires it
+  - **Fallback behavior:** If not set and `Origin` is missing, the server will attempt to derive the frontend URL from `API_BASE` (replacing port 4000 with 5173 for development)
 - `TWITCH_CLIENT_ID` - Twitch OAuth client ID for user authentication
 - `TWITCH_CLIENT_SECRET` - Twitch OAuth client secret for user authentication
-- `API_BASE` (default: `http://127.0.0.1:4000`) - Base URL of the API server (used for OAuth redirects)
+- `API_BASE` - Base URL of the API server (used for OAuth redirects, required if using Twitch OAuth)
 - `IGDB_CLIENT_ID` - IGDB API client ID for game search functionality
 - `IGDB_CLIENT_SECRET` - IGDB API client secret for game search functionality
 - `METADATA_PATH` - Path where game metadata (covers, descriptions, etc.) are stored
@@ -191,13 +221,18 @@ All authenticated endpoints require the `X-Auth-Token` header with a valid token
 
 The server supports two authentication methods:
 
-### Development Mode (changeme token)
+### Development Mode (API_TOKEN)
 
-For development, you can use the `API_TOKEN` environment variable (default: `changeme`). This allows quick testing without setting up Twitch OAuth.
+For development, you can use the `API_TOKEN` environment variable. This allows quick testing without setting up Twitch OAuth. Set it in your `.env` file or as an environment variable.
 
 Example:
 ```bash
-curl -H "X-Auth-Token: changeme" http://localhost:4000/libraries
+# Set API_TOKEN and API_BASE in your environment
+export API_TOKEN="your-dev-token-here"
+export API_BASE="http://127.0.0.1:4000"
+
+# Then use it in requests
+curl -H "X-Auth-Token: your-dev-token-here" ${API_BASE}/libraries
 ```
 
 ### Production Mode (Twitch OAuth)
@@ -221,6 +256,6 @@ Users will authenticate via Twitch, and their access tokens will be stored in `$
 - `POST /auth/logout` - Logout (clears token on client side)
 
 All authenticated endpoints require the `X-Auth-Token` header with either:
-- The development token (`changeme` or value from `API_TOKEN`)
+- The development token (value from `API_TOKEN` environment variable, if set)
 - A valid Twitch OAuth access token
 

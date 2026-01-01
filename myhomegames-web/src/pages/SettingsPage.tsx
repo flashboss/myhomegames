@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE, getApiToken } from "../config";
 import "./SettingsPage.css";
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
-const API_TOKEN = import.meta.env.VITE_API_TOKEN || "";
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -23,7 +21,7 @@ export default function SettingsPage() {
         const res = await fetch(url.toString(), {
           headers: {
             Accept: "application/json",
-            "X-Auth-Token": API_TOKEN,
+            "X-Auth-Token": getApiToken(),
           },
         });
         if (res.ok) {
@@ -62,7 +60,7 @@ export default function SettingsPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": API_TOKEN,
+          "X-Auth-Token": getApiToken(),
         },
         body: JSON.stringify({
           language: language,

@@ -5,10 +5,11 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 
-const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID || "";
-const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || "";
-const API_BASE = process.env.API_BASE || "http://127.0.0.1:4000";
-const API_TOKEN = process.env.API_TOKEN || "changeme";
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
+const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
+const API_BASE = process.env.API_BASE;
+const API_TOKEN = process.env.API_TOKEN;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 // Path to store user tokens
 function getTokensPath(metadataPath) {
@@ -33,6 +34,11 @@ function loadTokens(metadataPath) {
 function saveTokens(metadataPath, tokens) {
   const tokensPath = getTokensPath(metadataPath);
   try {
+    // Ensure directory exists
+    const dir = path.dirname(tokensPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
     fs.writeFileSync(tokensPath, JSON.stringify(tokens, null, 2), "utf8");
     return true;
   } catch (e) {
@@ -122,8 +128,8 @@ function getTwitchUserInfo(accessToken) {
 function registerAuthRoutes(app, metadataPath) {
   // Redirect to Twitch OAuth
   app.get("/auth/twitch", (req, res) => {
-    if (!TWITCH_CLIENT_ID) {
-      return res.status(500).json({ error: "Twitch client ID not configured" });
+    if (!TWITCH_CLIENT_ID || !API_BASE) {
+      return res.status(500).json({ error: "Twitch OAuth not configured. Please set TWITCH_CLIENT_ID and API_BASE environment variables." });
     }
 
     const redirectUri = `${API_BASE}/auth/twitch/callback`;
@@ -146,12 +152,19 @@ function registerAuthRoutes(app, metadataPath) {
     const state = req.query.state;
     const error = req.query.error;
 
+    if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET || !API_BASE) {
+      const frontendUrl = req.headers.origin || FRONTEND_URL || "http://localhost:5173";
+      return res.redirect(`${frontendUrl}?auth_error=oauth_not_configured`);
+    }
+
     if (error) {
-      return res.redirect(`${req.headers.origin || API_BASE}?auth_error=${encodeURIComponent(error)}`);
+      const frontendUrl = req.headers.origin || FRONTEND_URL || API_BASE.replace(":4000", ":5173");
+      return res.redirect(`${frontendUrl}?auth_error=${encodeURIComponent(error)}`);
     }
 
     if (!code) {
-      return res.redirect(`${req.headers.origin || API_BASE}?auth_error=no_code`);
+      const frontendUrl = req.headers.origin || FRONTEND_URL || API_BASE.replace(":4000", ":5173");
+      return res.redirect(`${frontendUrl}?auth_error=no_code`);
     }
 
     try {
@@ -218,11 +231,11 @@ function registerAuthRoutes(app, metadataPath) {
       saveTokens(metadataPath, tokens);
 
       // Redirect to frontend with token
-      const frontendUrl = req.headers.origin || API_BASE.replace(":4000", ":5173");
+      const frontendUrl = req.headers.origin || FRONTEND_URL || API_BASE.replace(":4000", ":5173");
       res.redirect(`${frontendUrl}?twitch_token=${accessToken}&user_id=${userInfo.id}`);
     } catch (err) {
       console.error("Twitch auth error:", err);
-      const frontendUrl = req.headers.origin || API_BASE.replace(":4000", ":5173");
+      const frontendUrl = req.headers.origin || FRONTEND_URL || API_BASE.replace(":4000", ":5173");
       res.redirect(`${frontendUrl}?auth_error=${encodeURIComponent(err.message)}`);
     }
   });
@@ -236,7 +249,7 @@ function registerAuthRoutes(app, metadataPath) {
     }
 
     // Check if it's the development token
-    if (token === API_TOKEN) {
+    if (API_TOKEN && token === API_TOKEN) {
       return res.json({
         userId: "dev",
         userName: "Development User",
@@ -273,7 +286,7 @@ function registerAuthRoutes(app, metadataPath) {
 // Check if token is valid (for middleware) - synchronous check only
 function isValidToken(token, metadataPath) {
   // Development token
-  if (token === API_TOKEN) {
+  if (API_TOKEN && token === API_TOKEN) {
     return true;
   }
 

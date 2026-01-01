@@ -23,9 +23,7 @@ import LaunchModal from "./components/common/LaunchModal";
 
 import type { GameItem, CollectionItem } from "./types";
 import { buildApiUrl, buildCoverUrl, buildBackgroundUrl } from "./utils/api";
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:4000";
-const API_TOKEN = import.meta.env.VITE_API_TOKEN || "";
+import { API_BASE, getApiToken } from "./config";
 
 // Wrapper function for buildApiUrl that uses API_BASE
 function buildApiUrlWithBase(
@@ -59,7 +57,7 @@ function AppContent() {
         const res = await fetch(url, {
           headers: {
             Accept: "application/json",
-            "X-Auth-Token": API_TOKEN,
+            "X-Auth-Token": getApiToken(),
           },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -92,7 +90,7 @@ function AppContent() {
         const res = await fetch(url, {
           headers: {
             Accept: "application/json",
-            "X-Auth-Token": API_TOKEN,
+            "X-Auth-Token": getApiToken(),
           },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -120,7 +118,7 @@ function AppContent() {
         const res = await fetch(url.toString(), {
           headers: {
             Accept: "application/json",
-            "X-Auth-Token": API_TOKEN,
+            "X-Auth-Token": getApiToken(),
           },
         });
         if (res.ok) {
@@ -156,7 +154,7 @@ function AppContent() {
           const gamesRes = await fetch(gamesUrl, {
             headers: {
               Accept: "application/json",
-              "X-Auth-Token": API_TOKEN,
+              "X-Auth-Token": getApiToken(),
             },
           });
           if (gamesRes.ok) {
@@ -184,12 +182,12 @@ function AppContent() {
       
       const launchUrl = buildApiUrlWithBase(`/launcher`, {
         gameId: gameId,
-        token: API_TOKEN,
+        token: getApiToken(),
       });
       const res = await fetch(launchUrl, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": API_TOKEN,
+          "X-Auth-Token": getApiToken(),
         },
       });
       
@@ -252,7 +250,7 @@ function AppContent() {
             element={
               <HomePage
                 apiBase={API_BASE}
-                apiToken={API_TOKEN}
+                apiToken={getApiToken()}
                 onGameClick={handleGameClick}
                 onPlay={openLauncher}
                 onGamesLoaded={(games) => {
@@ -280,7 +278,7 @@ function AppContent() {
             element={
               <CollectionDetail
                 apiBase={API_BASE}
-                apiToken={API_TOKEN}
+                apiToken={getApiToken()}
                 onGameClick={handleGameClick}
                 onGamesLoaded={(games) => {
                   setAllGames((prev: GameItem[]) => {
@@ -306,7 +304,7 @@ function AppContent() {
             element={
               <CategoryPage
                 apiBase={API_BASE}
-                apiToken={API_TOKEN}
+                apiToken={getApiToken()}
                 onGameClick={handleGameClick}
                 onGamesLoaded={(games) => {
                   setAllGames((prev: GameItem[]) => {
@@ -334,7 +332,7 @@ function AppContent() {
             element={
               <AddGamePage
                 apiBase={API_BASE}
-                apiToken={API_TOKEN}
+                apiToken={getApiToken()}
                 onGameSelected={(game) => {
                   console.log("Game selected from IGDB:", game);
                   // TODO: Implement game addition logic
@@ -401,7 +399,7 @@ function GameDetailPage({
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": API_TOKEN,
+          "X-Auth-Token": getApiToken(),
         },
       });
       
@@ -469,7 +467,7 @@ function GameDetailPage({
       backgroundUrl={buildBackgroundUrl(API_BASE, game.background)}
       onPlay={onPlay}
       apiBase={API_BASE}
-      apiToken={API_TOKEN}
+      apiToken={getApiToken()}
       onGameUpdate={(updatedGame) => {
         setGame(updatedGame);
       }}

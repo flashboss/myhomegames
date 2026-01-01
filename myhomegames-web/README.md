@@ -17,22 +17,37 @@ To run the application in development mode:
 # Install dependencies
 npm install
 
+# Copy the development .env file
+cp .env.example .env
+
 # Start the development server
 npm run dev
 ```
 
 The application will be available at `http://localhost:5173` (or the port shown in the terminal).
 
+**Note**: The `.env.example` file contains `VITE_API_TOKEN=changeme` for development authentication. This is only used when Twitch OAuth is not configured.
+
 ### Building for Production
 
 To create a production bundle:
 
 ```bash
+# Copy the production .env file
+cp .env.production.example .env
+
+# Edit .env and configure VITE_API_BASE with your production API URL
+# DO NOT set VITE_API_TOKEN in production - use Twitch OAuth instead
+
 # Build the application
 npm run build
 ```
 
 This will create an optimized production build in the `dist` directory.
+
+**Important**: 
+- Set `VITE_API_BASE` to your production API URL (e.g., `https://api.yourdomain.com`)
+- Do not set `VITE_API_TOKEN` in production - the application will use Twitch OAuth for authentication
 
 ### Preview Production Build Locally
 
@@ -62,7 +77,10 @@ npm start
 npm run dev
 ```
 
-The server will run on `http://127.0.0.1:4000` by default.
+**Important**: 
+- For development: Copy `.env.example` to `.env` - it includes `VITE_API_TOKEN=changeme` for local development
+- For production: Copy `.env.production.example` to `.env` and configure `VITE_API_BASE` with your production API URL
+- The application will not start without `VITE_API_BASE` configured
 
 ---
 
