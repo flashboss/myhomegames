@@ -57,7 +57,9 @@ describe('GET /covers/:gameId', () => {
       .get('/covers/nonexistent_game')
       .expect(404);
     
-    expect(response.body).toHaveProperty('error', 'Cover not found');
+    // Server returns 404 with image/webp content type and empty body to avoid CORB issues
+    expect(response.headers['content-type']).toBe('image/webp');
+    expect(response.body).toEqual(Buffer.from([]));
   });
 
   test('should return cover image for existing game', async () => {
