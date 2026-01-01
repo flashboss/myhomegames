@@ -38,15 +38,16 @@ export default function EditCollectionModal({
 
     function handleEscKey(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        event.stopPropagation();
         onClose();
       }
     }
 
-    document.addEventListener("keydown", handleEscKey);
+    document.addEventListener("keydown", handleEscKey, true);
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.removeEventListener("keydown", handleEscKey);
+      document.removeEventListener("keydown", handleEscKey, true);
       document.body.style.overflow = "";
     };
   }, [isOpen, onClose]);

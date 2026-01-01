@@ -157,6 +157,12 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        // Don't handle ESC if a modal is open (let the modal handle it)
+        const isModalOpen = document.querySelector('.edit-game-modal-overlay, .edit-collection-modal-overlay, .dropdown-menu-confirm-overlay, .add-game-overlay, .launch-modal-overlay');
+        if (isModalOpen) {
+          return;
+        }
+        
         // Mark that we're closing FIRST
         setIsClosing(true);
         
@@ -326,7 +332,10 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
         <input
           ref={inputRef}
           id="search-input"
-          name="search"
+          name="game-search-query"
+          autoComplete="off"
+          role="searchbox"
+          aria-autocomplete="list"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
