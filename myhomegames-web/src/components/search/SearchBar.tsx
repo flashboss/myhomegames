@@ -37,6 +37,7 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
   const [isClosing, setIsClosing] = useState(false);
   const blurTimeoutRef = useRef<number | null>(null);
   const isSelectingGameRef = useRef(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const saveRecentSearch = useCallback((query: string) => {
     if (query.trim() !== "") {
@@ -114,9 +115,20 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      
+      // Don't close if clicking on a modal (edit or delete)
+      if (
+        target.closest('.edit-game-modal-container') ||
+        target.closest('.edit-collection-modal-container') ||
+        target.closest('.dropdown-menu-confirm-container')
+      ) {
+        return;
+      }
+      
       if (
         searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        !searchRef.current.contains(target)
       ) {
         // Mark that we're closing FIRST, before anything else
         setIsClosing(true);
@@ -365,8 +377,8 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
         )}
       </div>
 
-      {isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && (filteredGames.length > 0 || filteredCollections.length > 0) && (
-        <div className="plex-dropdown search-dropdown">
+      {((isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && (filteredGames.length > 0 || filteredCollections.length > 0)) || isModalOpen) && (
+        <div className="plex-dropdown search-dropdown" style={{ display: isModalOpen ? 'none' : 'flex' }}>
           <div className="search-dropdown-scroll">
             <SearchResultsList
               games={filteredGames}
@@ -385,6 +397,14 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
                 setIsOpen(false);
                 setIsFocused(false);
                 setSearchQuery("");
+              }}
+              onModalOpen={() => {
+                setIsModalOpen(true);
+                setIsOpen(false);
+                setIsFocused(false);
+              }}
+              onModalClose={() => {
+                setIsModalOpen(false);
               }}
             />
           </div>

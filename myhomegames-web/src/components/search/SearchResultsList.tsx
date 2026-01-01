@@ -23,6 +23,8 @@ type SearchResultsListProps = {
   onGameDelete?: (deletedGame: GameItem) => void;
   onCollectionUpdate?: (updatedCollection: CollectionItem) => void;
   onCollectionDelete?: (deletedCollection: CollectionItem) => void;
+  onModalOpen?: () => void;
+  onModalClose?: () => void;
 };
 
 const FIXED_COVER_SIZE = 100; // Fixed size corresponding to minimum slider position
@@ -40,6 +42,8 @@ type SearchResultItemProps = {
   onEditClick?: (item: GameItem | CollectionItem) => void;
   onGameDelete?: (deletedGame: GameItem) => void;
   onCollectionDelete?: (deletedCollection: CollectionItem) => void;
+  onModalOpen?: () => void;
+  onModalClose?: () => void;
 };
 
 function SearchResultItem({
@@ -54,6 +58,8 @@ function SearchResultItem({
   onEditClick,
   onGameDelete,
   onCollectionDelete,
+  onModalOpen,
+  onModalClose,
 }: SearchResultItemProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -163,6 +169,8 @@ function SearchResultItem({
                   }
                 } : undefined}
                 className="search-result-dropdown-menu"
+                onModalOpen={onModalOpen}
+                onModalClose={onModalClose}
               />
             </div>
           )}
@@ -185,6 +193,8 @@ export default function SearchResultsList({
   onGameDelete,
   onCollectionUpdate,
   onCollectionDelete,
+  onModalOpen,
+  onModalClose,
 }: SearchResultsListProps) {
   const { t } = useTranslation();
   const [isEditGameModalOpen, setIsEditGameModalOpen] = useState(false);
@@ -203,6 +213,9 @@ export default function SearchResultsList({
   const allItems: (GameItem | CollectionItem)[] = [...collections, ...games];
 
   const handleEditClick = (item: GameItem | CollectionItem) => {
+    if (onModalOpen) {
+      onModalOpen();
+    }
     if ("year" in item) {
       // It's a game
       setSelectedGame(item);
@@ -226,6 +239,9 @@ export default function SearchResultsList({
     }
     setIsEditGameModalOpen(false);
     setSelectedGame(null);
+    if (onModalClose) {
+      onModalClose();
+    }
   };
 
   const handleCollectionUpdate = (updatedCollection: CollectionInfo) => {
@@ -240,6 +256,9 @@ export default function SearchResultsList({
     }
     setIsEditCollectionModalOpen(false);
     setSelectedCollection(null);
+    if (onModalClose) {
+      onModalClose();
+    }
   };
 
   return (
@@ -259,30 +278,42 @@ export default function SearchResultsList({
             onEditClick={handleEditClick}
             onGameDelete={onGameDelete}
             onCollectionDelete={onCollectionDelete}
+            onModalOpen={onModalOpen}
+            onModalClose={onModalClose}
           />
         ))}
       </div>
-      {selectedGame && (
-        <EditGameModal
-          isOpen={isEditGameModalOpen}
-          onClose={() => {
-            setIsEditGameModalOpen(false);
-            setSelectedGame(null);
-          }}
-          game={selectedGame}
-          onGameUpdate={handleGameUpdate}
-        />
-      )}
-      {selectedCollection && (
-        <EditCollectionModal
-          isOpen={isEditCollectionModalOpen}
-          onClose={() => {
-            setIsEditCollectionModalOpen(false);
-            setSelectedCollection(null);
-          }}
-          collection={selectedCollection}
-          onCollectionUpdate={handleCollectionUpdate}
-        />
+      {(selectedGame || selectedCollection) && (
+        <>
+          {selectedGame && (
+            <EditGameModal
+              isOpen={isEditGameModalOpen}
+              onClose={() => {
+                setIsEditGameModalOpen(false);
+                setSelectedGame(null);
+                if (onModalClose) {
+                  onModalClose();
+                }
+              }}
+              game={selectedGame}
+              onGameUpdate={handleGameUpdate}
+            />
+          )}
+          {selectedCollection && (
+            <EditCollectionModal
+              isOpen={isEditCollectionModalOpen}
+              onClose={() => {
+                setIsEditCollectionModalOpen(false);
+                setSelectedCollection(null);
+                if (onModalClose) {
+                  onModalClose();
+                }
+              }}
+              collection={selectedCollection}
+              onCollectionUpdate={handleCollectionUpdate}
+            />
+          )}
+        </>
       )}
     </>
   );

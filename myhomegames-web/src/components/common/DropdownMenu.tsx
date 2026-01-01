@@ -15,6 +15,8 @@ type DropdownMenuProps = {
   onCollectionDelete?: (collectionId: string) => void;
   className?: string;
   horizontal?: boolean;
+  onModalOpen?: () => void;
+  onModalClose?: () => void;
 };
 
 export default function DropdownMenu({
@@ -28,6 +30,8 @@ export default function DropdownMenu({
   onCollectionDelete,
   className = "",
   horizontal = false,
+  onModalOpen,
+  onModalClose,
 }: DropdownMenuProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -110,6 +114,9 @@ export default function DropdownMenu({
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
+    if (onModalOpen) {
+      onModalOpen();
+    }
     onEdit();
   };
 
@@ -119,6 +126,9 @@ export default function DropdownMenu({
     
     // Se abbiamo le props per gestire la cancellazione internamente (game o collection)
     if (API_TOKEN && ((gameId && gameTitle) || (collectionId && collectionTitle))) {
+      if (onModalOpen) {
+        onModalOpen();
+      }
       setShowConfirmModal(true);
     } else if (onDelete) {
       // Fallback al comportamento precedente
@@ -159,6 +169,9 @@ export default function DropdownMenu({
           onCollectionDelete(collectionId);
         }
         setShowConfirmModal(false);
+        if (onModalClose) {
+          onModalClose();
+        }
       } else {
         setDeleteError(t("common.deleteError"));
       }
@@ -173,6 +186,9 @@ export default function DropdownMenu({
   const handleCancelDelete = () => {
     setShowConfirmModal(false);
     setDeleteError(null);
+    if (onModalClose) {
+      onModalClose();
+    }
   };
 
   return (
