@@ -123,7 +123,10 @@ export default function ProfileDropdown({
 
       {isOpen && (
         <div ref={popupRef} className="profile-dropdown-popup">
-          <div className="profile-dropdown-header">
+          <button
+            className="profile-dropdown-item profile-dropdown-header-item"
+            onClick={handleViewProfile}
+          >
             {userImage ? (
               <img 
                 src={userImage} 
@@ -149,7 +152,7 @@ export default function ProfileDropdown({
               </div>
             )}
             <span className="profile-dropdown-username">{userName}</span>
-          </div>
+          </button>
           <div className="profile-dropdown-separator"></div>
           <button
             className="profile-dropdown-item"
