@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import Tooltip from "../common/Tooltip";
 import { useAuth } from "../../contexts/AuthContext";
 import "./ProfileDropdown.css";
@@ -17,6 +18,7 @@ export default function ProfileDropdown({
 }: ProfileDropdownProps) {
   const { t } = useTranslation();
   const { user, login, logout } = useAuth();
+  const navigate = useNavigate();
   
   const userName = user?.userName || "User";
   const userImage = user?.userImage || undefined;
@@ -64,6 +66,9 @@ export default function ProfileDropdown({
     setIsOpen(false);
     if (onViewProfile) {
       onViewProfile();
+    } else {
+      // Default: navigate to profile page
+      navigate("/profile");
     }
   };
 

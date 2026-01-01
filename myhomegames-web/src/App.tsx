@@ -12,6 +12,7 @@ import Favicon from "./components/common/Favicon";
 import Header from "./components/layout/Header";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingsPage";
+import ProfilePage from "./pages/ProfilePage";
 import AddGamePage from "./pages/AddGamePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import CollectionDetail from "./pages/CollectionDetail";
@@ -327,6 +328,7 @@ function AppContent() {
             }
           />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route
             path="/add-game"
             element={

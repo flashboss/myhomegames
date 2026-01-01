@@ -40,7 +40,15 @@
   "profile": {
     "viewProfile": "查看个人资料",
     "changeUser": "切换用户",
-    "logout": "退出"
+    "logout": "退出",
+    "title": "个人资料",
+    "subtitle": "您的账户信息",
+    "notLoggedIn": "您未登录",
+    "userInfo": "用户信息",
+    "username": "用户名",
+    "userId": "用户ID",
+    "accountType": "账户类型",
+    "developmentAccount": "开发账户"
   },
   "search": {
     "noResults": "未找到术语 \"{{query}}\" 的结果",

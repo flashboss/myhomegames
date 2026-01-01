@@ -40,7 +40,15 @@
   "profile": {
     "viewProfile": "Profil anzeigen",
     "changeUser": "Benutzer wechseln",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "title": "Profil",
+    "subtitle": "Ihre Kontoinformationen",
+    "notLoggedIn": "Sie sind nicht authentifiziert",
+    "userInfo": "Benutzerinformationen",
+    "username": "Benutzername",
+    "userId": "Benutzer-ID",
+    "accountType": "Kontotyp",
+    "developmentAccount": "Entwicklungs-Konto"
   },
   "search": {
     "noResults": "Keine Ergebnisse für den Begriff \"{{query}}\" gefunden",

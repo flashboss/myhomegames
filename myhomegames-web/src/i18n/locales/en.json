@@ -40,7 +40,15 @@
   "profile": {
     "viewProfile": "View Profile",
     "changeUser": "Change User",
-    "logout": "Logout"
+    "logout": "Logout",
+    "title": "Profile",
+    "subtitle": "Your account information",
+    "notLoggedIn": "You are not authenticated",
+    "userInfo": "User Information",
+    "username": "Username",
+    "userId": "User ID",
+    "accountType": "Account Type",
+    "developmentAccount": "Development Account"
   },
   "search": {
     "noResults": "No results found for the term \"{{query}}\"",

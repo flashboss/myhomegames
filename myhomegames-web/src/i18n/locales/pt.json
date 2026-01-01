@@ -40,7 +40,15 @@
   "profile": {
     "viewProfile": "Ver perfil",
     "changeUser": "Alterar usuário",
-    "logout": "Sair"
+    "logout": "Sair",
+    "title": "Perfil",
+    "subtitle": "Informações da sua conta",
+    "notLoggedIn": "Você não está autenticado",
+    "userInfo": "Informações do usuário",
+    "username": "Nome de usuário",
+    "userId": "ID do usuário",
+    "accountType": "Tipo de conta",
+    "developmentAccount": "Conta de desenvolvimento"
   },
   "search": {
     "noResults": "Nenhum resultado encontrado para o termo \"{{query}}\"",

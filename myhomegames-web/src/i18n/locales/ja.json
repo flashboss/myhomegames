@@ -40,7 +40,15 @@
   "profile": {
     "viewProfile": "プロフィールを表示",
     "changeUser": "ユーザーを変更",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "title": "プロフィール",
+    "subtitle": "アカウント情報",
+    "notLoggedIn": "認証されていません",
+    "userInfo": "ユーザー情報",
+    "username": "ユーザー名",
+    "userId": "ユーザーID",
+    "accountType": "アカウントタイプ",
+    "developmentAccount": "開発アカウント"
   },
   "search": {
     "noResults": "用語 \"{{query}}\" の結果が見つかりません",
