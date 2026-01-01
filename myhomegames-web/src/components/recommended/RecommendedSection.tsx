@@ -1,9 +1,28 @@
 import { useRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import GamesList from "../games/GamesList";
 import RecommendedSectionNav from "./RecommendedSectionNav";
 import type { GameItem } from "../../types";
 import "./RecommendedSection.css";
+
+// Helper per sessionStorage
+function getScrollPosition(key: string): number {
+  try {
+    const stored = sessionStorage.getItem(key);
+    return stored ? parseInt(stored, 10) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function setScrollPosition(key: string, position: number): void {
+  try {
+    sessionStorage.setItem(key, position.toString());
+  } catch {
+    // Ignore
+  }
+}
 
 type RecommendedSectionProps = {
   sectionId: string;
@@ -25,9 +44,12 @@ export default function RecommendedSection({
   coverSize,
 }: RecommendedSectionProps) {
   const { t } = useTranslation();
+  const location = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const storageKey = `${location.pathname}:${sectionId}`;
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(true);
 
   const titleKey = `recommended.${sectionId}`;
   const title = t(titleKey, { defaultValue: sectionId });
@@ -55,6 +77,53 @@ export default function RecommendedSection({
     }
   };
 
+  // Ripristina posizione quando cambia route o sezione
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    setIsRestoring(true);
+    const savedPosition = getScrollPosition(storageKey);
+
+    if (savedPosition <= 0) {
+      setIsRestoring(false);
+      return;
+    }
+
+    // Verifica quando il contenuto è pronto
+    const restoreScroll = (attempt = 0) => {
+      if (!container) {
+        setIsRestoring(false);
+        return;
+      }
+
+      // Verifica che il contenuto sia renderizzato (scrollWidth > clientWidth)
+      if (container.scrollWidth <= container.clientWidth) {
+        if (attempt < 20) {
+          // Riprova dopo un frame
+          requestAnimationFrame(() => restoreScroll(attempt + 1));
+        } else {
+          setIsRestoring(false);
+        }
+        return;
+      }
+
+      // Il contenuto è pronto, ripristina la posizione
+      container.scrollLeft = savedPosition;
+      updateScrollButtons();
+      setIsRestoring(false);
+    };
+
+    // Inizia il ripristino dopo un breve delay per assicurarsi che il DOM sia pronto
+    const timer = setTimeout(() => {
+      restoreScroll();
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      setIsRestoring(false);
+    };
+  }, [location.pathname, sectionId, storageKey, games.length]);
 
   // Salva posizione durante lo scroll
   useEffect(() => {
@@ -62,6 +131,9 @@ export default function RecommendedSection({
     if (!container) return;
 
     const handleScroll = () => {
+      if (!isRestoring) {
+        setScrollPosition(storageKey, container.scrollLeft);
+      }
       updateScrollButtons();
     };
 
@@ -102,8 +174,13 @@ export default function RecommendedSection({
     return () => {
       container.removeEventListener('scroll', handleScroll);
       container.removeEventListener('wheel', handleWheel);
+      // Salva posizione finale quando il componente viene smontato
+      const finalPosition = container.scrollLeft;
+      if (finalPosition > 0 && !isRestoring) {
+        setScrollPosition(storageKey, finalPosition);
+      }
     };
-  }, [sectionId]);
+  }, [sectionId, storageKey, isRestoring]);
 
   // Aggiorna bottoni quando cambia contenuto
   useEffect(() => {
@@ -129,7 +206,7 @@ export default function RecommendedSection({
       </div>
       <div
         ref={scrollRef}
-        className="recommended-section-scroll"
+        className={`recommended-section-scroll ${isRestoring ? 'restoring' : ''}`}
       >
         <GamesList
           games={games}
