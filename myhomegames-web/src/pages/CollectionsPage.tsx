@@ -69,6 +69,7 @@ export default function CollectionsPage({
       const parsed = items.map((v) => ({
         ratingKey: v.id,
         title: v.title,
+        summary: v.summary,
         cover: v.cover,
         gameCount: v.gameCount,
       }));
@@ -84,6 +85,14 @@ export default function CollectionsPage({
   function handleCollectionClick(collection: CollectionItem) {
     navigate(`/collections/${collection.ratingKey}`);
   }
+
+  const handleCollectionUpdate = (updatedCollection: CollectionItem) => {
+    setCollections((prevCollections) =>
+      prevCollections.map((collection) =>
+        collection.ratingKey === updatedCollection.ratingKey ? updatedCollection : collection
+      )
+    );
+  };
 
   // Sort collections
   const sortedCollections = useMemo(() => {
@@ -114,8 +123,10 @@ export default function CollectionsPage({
             <CollectionsList
               collections={sortedCollections}
               apiBase={apiBase}
+              apiToken={apiToken}
               onCollectionClick={handleCollectionClick}
               onPlay={onPlay as any}
+              onCollectionUpdate={handleCollectionUpdate}
               buildCoverUrl={buildCoverUrl}
               coverSize={coverSize}
               itemRefs={itemRefs}

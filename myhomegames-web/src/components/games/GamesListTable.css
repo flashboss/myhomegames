@@ -269,3 +269,48 @@
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.6);
 }
+
+.games-table-edit-header {
+  padding: 12px 16px;
+  text-align: center;
+  width: 48px;
+  cursor: default;
+}
+
+.games-table-edit-cell {
+  padding: 12px 16px;
+  text-align: center;
+  width: 48px;
+}
+
+.games-table-edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  opacity: 0;
+}
+
+.games-table tbody tr:hover .games-table-edit-button {
+  opacity: 1;
+}
+
+.games-table-edit-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.games-table-edit-button svg {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+}
+
+.games-table-edit-button:hover svg {
+  color: #ffffff;
+}

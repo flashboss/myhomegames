@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Cover from "./Cover";
+import EditGameModal from "./EditGameModal";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import type { GameItem } from "../../types";
@@ -8,8 +10,10 @@ import "./GamesListDetail.css";
 type GamesListDetailProps = {
   games: GameItem[];
   apiBase: string;
+  apiToken?: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
+  onGameUpdate?: (updatedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
@@ -21,6 +25,7 @@ type GameDetailItemProps = {
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
+  onEditClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   index: number;
@@ -31,12 +36,18 @@ function GameDetailItem({
   apiBase,
   onGameClick,
   onPlay,
+  onEditClick,
   buildCoverUrl,
   itemRefs,
   index,
 }: GameDetailItemProps) {
   const isEven = index % 2 === 0;
   const coverHeight = FIXED_COVER_SIZE * 1.5;
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEditClick(game);
+  };
 
   return (
     <div
@@ -87,6 +98,25 @@ function GameDetailItem({
           <Summary summary={game.summary} truncateOnly={true} maxLines={2} fontSize="0.85rem" />
         )}
       </div>
+      <button
+        onClick={handleEditClick}
+        className="games-list-detail-edit-button"
+        aria-label="Edit"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -94,31 +124,65 @@ function GameDetailItem({
 export default function GamesListDetail({
   games,
   apiBase,
+  apiToken,
   onGameClick,
   onPlay,
+  onGameUpdate,
   buildCoverUrl,
   itemRefs,
 }: GamesListDetailProps) {
   const { t } = useTranslation();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
   
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
+  const handleEditClick = (game: GameItem) => {
+    setSelectedGame(game);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedGame(null);
+  };
+
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    if (onGameUpdate) {
+      onGameUpdate(updatedGame);
+    }
+    handleEditModalClose();
+  };
+
   return (
-    <div className="games-list-detail-container">
-      {games.map((game, index) => (
-        <GameDetailItem
-          key={game.ratingKey}
-          game={game}
+    <>
+      <div className="games-list-detail-container">
+        {games.map((game, index) => (
+          <GameDetailItem
+            key={game.ratingKey}
+            game={game}
+            apiBase={apiBase}
+            onGameClick={onGameClick}
+            onPlay={onPlay}
+            onEditClick={handleEditClick}
+            buildCoverUrl={buildCoverUrl}
+            itemRefs={itemRefs}
+            index={index}
+          />
+        ))}
+      </div>
+      {selectedGame && apiToken && (
+        <EditGameModal
+          isOpen={isEditModalOpen}
+          onClose={handleEditModalClose}
+          game={selectedGame}
           apiBase={apiBase}
-          onGameClick={onGameClick}
-          onPlay={onPlay}
-          buildCoverUrl={buildCoverUrl}
-          itemRefs={itemRefs}
-          index={index}
+          apiToken={apiToken}
+          onGameUpdate={handleGameUpdate}
         />
-      ))}
-    </div>
+      )}
+    </>
   );
 }

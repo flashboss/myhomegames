@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import StarRating from "../common/StarRating";
+import EditGameModal from "./EditGameModal";
 import type { GameItem } from "../../types";
 import { buildApiUrl } from "../../utils/api";
 import "./GamesListTable.css";
@@ -9,6 +10,7 @@ type GamesListTableProps = {
   games: GameItem[];
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
+  onGameUpdate?: (updatedGame: GameItem) => void;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
   sortField?: "title" | "year" | "stars" | "releaseDate";
@@ -30,6 +32,7 @@ export default function GamesListTable({
   games,
   onGameClick,
   onPlay,
+  onGameUpdate,
   itemRefs,
   scrollContainerRef,
   sortField,
@@ -40,6 +43,8 @@ export default function GamesListTable({
   apiToken,
 }: GamesListTableProps) {
   const [localGames, setLocalGames] = useState<GameItem[]>(games);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
   
   // Sync localGames when games prop changes
   useEffect(() => {
@@ -73,6 +78,27 @@ export default function GamesListTable({
     } catch (error) {
       console.error('Error updating rating:', error);
     }
+  };
+
+  const handleEditClick = (game: GameItem) => {
+    setSelectedGame(game);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedGame(null);
+  };
+
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    const updatedGames = localGames.map(game =>
+      game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+    );
+    setLocalGames(updatedGames);
+    if (onGameUpdate) {
+      onGameUpdate(updatedGame);
+    }
+    handleEditModalClose();
   };
   const { t, i18n } = useTranslation();
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(
@@ -279,11 +305,7 @@ export default function GamesListTable({
                     {columnVisibility.releaseDate && (
                       <th
                         onClick={() => handleSort("releaseDate")}
-                        className={`${
-                          columnVisibility.stars || columnVisibility.year
-                            ? "has-border-right"
-                            : ""
-                        } ${firstVisibleColumn === "releaseDate" ? "first-visible-cell" : ""}`}
+                        className={`has-border-right ${firstVisibleColumn === "releaseDate" ? "first-visible-cell" : ""}`}
                       >
                         <span>{t("table.releaseDate")}</span>
                         <span className="sort-indicator">{getSortIcon("releaseDate")}</span>
@@ -292,7 +314,7 @@ export default function GamesListTable({
                     {columnVisibility.stars && (
                       <th
                         onClick={() => handleSort("stars")}
-                        className={`${columnVisibility.year ? "has-border-right" : ""} ${firstVisibleColumn === "stars" ? "first-visible-cell" : ""}`}
+                        className={`has-border-right ${firstVisibleColumn === "stars" ? "first-visible-cell" : ""}`}
                       >
                         <span>{t("table.stars")}</span>
                         <span className="sort-indicator">{getSortIcon("stars")}</span>
@@ -301,12 +323,13 @@ export default function GamesListTable({
                     {columnVisibility.year && (
                       <th
                         onClick={() => handleSort("year")}
-                        className={firstVisibleColumn === "year" ? "first-visible-cell" : ""}
+                        className={`has-border-right ${firstVisibleColumn === "year" ? "first-visible-cell" : ""}`}
                       >
                         <span>{t("table.year")}</span>
                         <span className="sort-indicator">{getSortIcon("year")}</span>
                       </th>
                     )}
+                    <th className="games-table-edit-header"></th>
                   </>
                 );
               })()}
@@ -417,7 +440,7 @@ export default function GamesListTable({
                     </td>
                   )}
                   {columnVisibility.year && (
-                    <td className={`year-cell ${rowClass} ${firstVisibleColumn === "year" ? "first-visible-cell" : ""}`}>
+                    <td className={`year-cell ${rowClass} has-border-right ${firstVisibleColumn === "year" ? "first-visible-cell" : ""}`}>
                       {firstVisibleColumn === "year" && onPlay && <PlayIcon />}
                       <span className={firstVisibleColumn === "year" ? "first-cell-text" : ""}>
                         {it.year !== null && it.year !== undefined
@@ -426,12 +449,46 @@ export default function GamesListTable({
                       </span>
                     </td>
                   )}
+                  <td className={`games-table-edit-cell ${rowClass}`}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditClick(it);
+                      }}
+                      className="games-table-edit-button"
+                      aria-label="Edit"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
+      {selectedGame && apiToken && apiBase && (
+        <EditGameModal
+          isOpen={isEditModalOpen}
+          onClose={handleEditModalClose}
+          game={selectedGame}
+          apiBase={apiBase}
+          apiToken={apiToken}
+          onGameUpdate={handleGameUpdate}
+        />
+      )}
     </div>
   );
 }

@@ -29,8 +29,10 @@ type RecommendedSectionProps = {
   sectionId: string;
   games: GameItem[];
   apiBase: string;
+  apiToken?: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
+  onGameUpdate?: (updatedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
 };
@@ -39,8 +41,10 @@ export default function RecommendedSection({
   sectionId,
   games,
   apiBase,
+  apiToken,
   onGameClick,
   onPlay,
+  onGameUpdate,
   buildCoverUrl,
   coverSize,
 }: RecommendedSectionProps) {
@@ -386,8 +390,10 @@ export default function RecommendedSection({
           <GamesList
             games={games}
             apiBase={apiBase}
+            apiToken={apiToken}
             onGameClick={onGameClick}
             onPlay={onPlay}
+            onGameUpdate={onGameUpdate}
             buildCoverUrl={buildCoverUrl}
             coverSize={coverSize}
             itemRefs={itemRefs}

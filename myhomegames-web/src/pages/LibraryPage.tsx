@@ -374,6 +374,14 @@ export default function LibraryPage({
     return filtered;
   }, [games, filterField, selectedYear, selectedDecade, selectedGenre, selectedCollection, sortField, sortAscending, availableGenres, collectionGameIds]);
 
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    setGames((prevGames) =>
+      prevGames.map((game) =>
+        game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+      )
+    );
+  };
+
   return (
     <main className="flex-1 home-page-content">
       <div className="home-page-layout">
@@ -421,8 +429,10 @@ export default function LibraryPage({
                 <GamesList
                   games={filteredAndSortedGames}
                   apiBase={apiBase}
+                  apiToken={apiToken}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
+                  onGameUpdate={handleGameUpdate}
                   buildCoverUrl={buildCoverUrl}
                   coverSize={coverSize}
                   itemRefs={itemRefs}
@@ -433,8 +443,10 @@ export default function LibraryPage({
                 <GamesListDetail
                   games={filteredAndSortedGames}
                   apiBase={apiBase}
+                  apiToken={apiToken}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
+                  onGameUpdate={handleGameUpdate}
                   buildCoverUrl={buildCoverUrl}
                   itemRefs={itemRefs}
                 />
@@ -444,6 +456,7 @@ export default function LibraryPage({
                   games={filteredAndSortedGames}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
+                  onGameUpdate={handleGameUpdate}
                   itemRefs={itemRefs}
                   scrollContainerRef={tableScrollRef}
                   sortField={sortField}

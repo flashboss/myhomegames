@@ -119,6 +119,49 @@
   margin-left: 3px;
 }
 
+/* Edit button styles */
+.games-list-edit-button {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  z-index: 3;
+}
+
+.games-list-edit-button-bottom-right {
+  left: auto;
+  right: 8px;
+}
+
+.games-list-cover:hover .games-list-edit-button {
+  opacity: 1;
+}
+
+.games-list-edit-button:hover {
+  background-color: transparent;
+}
+
+.games-list-edit-button svg {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+}
+
+.games-list-edit-button:hover svg {
+  color: #ffffff;
+}
+
 /* Title and year styles */
 .games-list-title-wrapper {
   display: flex;

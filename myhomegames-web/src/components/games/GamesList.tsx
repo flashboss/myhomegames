@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Cover from "./Cover";
+import EditGameModal from "./EditGameModal";
 import type { GameItem } from "../../types";
 import "./GamesList.css";
 
 type GamesListProps = {
   games: GameItem[];
   apiBase: string;
+  apiToken?: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
+  onGameUpdate?: (updatedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -24,6 +27,7 @@ type GameListItemProps = {
   apiBase: string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
+  onEditClick: (game: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -42,6 +46,7 @@ function GameListItem({
   apiBase,
   onGameClick,
   onPlay,
+  onEditClick,
   buildCoverUrl,
   coverSize,
   itemRefs,
@@ -111,6 +116,7 @@ function GameListItem({
         height={coverHeight}
         onPlay={onPlay ? () => onPlay(game) : undefined}
         onClick={() => onGameClick(game)}
+        onEdit={() => onEditClick(game)}
         showTitle={true}
         subtitle={game.year}
         detail={true}
@@ -124,8 +130,10 @@ function GameListItem({
 export default function GamesList({
   games,
   apiBase,
+  apiToken,
   onGameClick,
   onPlay,
+  onGameUpdate,
   buildCoverUrl,
   coverSize = 150,
   itemRefs,
@@ -137,6 +145,8 @@ export default function GamesList({
   const { t } = useTranslation();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
 
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
@@ -154,36 +164,66 @@ export default function GamesList({
     setDraggedIndex(null);
     setDragOverIndex(null);
   };
+
+  const handleEditClick = (game: GameItem) => {
+    setSelectedGame(game);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedGame(null);
+  };
+
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    if (onGameUpdate) {
+      onGameUpdate(updatedGame);
+    }
+    handleEditModalClose();
+  };
   
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
   return (
-    <div
-      className="games-list-container"
-      style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)`, ...style }}
-    >
-      {games.map((game, index) => (
-        <GameListItem
-          key={game.ratingKey}
-          game={game}
+    <>
+      <div
+        className="games-list-container"
+        style={{ gridTemplateColumns: `repeat(auto-fill, ${coverSize}px)`, ...style }}
+      >
+        {games.map((game, index) => (
+          <GameListItem
+            key={game.ratingKey}
+            game={game}
+            apiBase={apiBase}
+            onGameClick={onGameClick}
+            onPlay={onPlay}
+            onEditClick={handleEditClick}
+            buildCoverUrl={buildCoverUrl}
+            coverSize={coverSize}
+            itemRefs={itemRefs}
+            draggable={draggable}
+            index={index}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            isDragging={draggedIndex !== null}
+            dragOverIndex={dragOverIndex}
+            viewMode={viewMode}
+          />
+        ))}
+      </div>
+      {selectedGame && apiToken && (
+        <EditGameModal
+          isOpen={isEditModalOpen}
+          onClose={handleEditModalClose}
+          game={selectedGame}
           apiBase={apiBase}
-          onGameClick={onGameClick}
-          onPlay={onPlay}
-          buildCoverUrl={buildCoverUrl}
-          coverSize={coverSize}
-          itemRefs={itemRefs}
-          draggable={draggable}
-          index={index}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-          isDragging={draggedIndex !== null}
-          dragOverIndex={dragOverIndex}
-          viewMode={viewMode}
+          apiToken={apiToken}
+          onGameUpdate={handleGameUpdate}
         />
-      ))}
-    </div>
+      )}
+    </>
   );
 }

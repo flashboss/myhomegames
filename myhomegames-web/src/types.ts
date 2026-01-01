@@ -16,6 +16,7 @@ export type GameItem = {
 export type CollectionItem = {
   ratingKey: string;
   title: string;
+  summary?: string;
   cover?: string;
   gameCount?: number;
 };

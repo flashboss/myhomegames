@@ -50,6 +50,30 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
     });
   });
 
+  // Endpoint: get single collection by ID
+  app.get("/collections/:id", requireToken, (req, res) => {
+    const collectionId = req.params.id;
+    const collection = collectionsCache.find((c) => c.id === collectionId);
+    
+    if (!collection) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+    
+    const collectionData = {
+      id: collection.id,
+      title: collection.title,
+      summary: collection.summary || "",
+      cover: `/collection-covers/${encodeURIComponent(collection.id)}`,
+      gameCount: (collection.games || []).length,
+    };
+    const background = getCollectionBackgroundPath(metadataPath, collection.id);
+    if (background) {
+      collectionData.background = background;
+    }
+    
+    res.json(collectionData);
+  });
+
   // Endpoint: get games for a collection (returns games by their IDs)
   app.get("/collections/:id/games", requireToken, (req, res) => {
     const collectionId = req.params.id;

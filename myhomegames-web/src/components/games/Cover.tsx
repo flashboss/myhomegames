@@ -10,6 +10,7 @@ type CoverProps = {
   height: number;
   onPlay?: () => void;
   onClick?: () => void;
+  onEdit?: () => void;
   showTitle?: boolean;
   subtitle?: string | number | null;
   detail?: boolean;
@@ -20,6 +21,7 @@ type CoverProps = {
   brightness?: number; // Brightness filter (0-100 or higher, default: 100)
   blur?: number; // Blur filter in pixels (default: 0)
   titlePosition?: "bottom" | "overlay"; // Position of title: below cover or inside image (default: "bottom")
+  editButtonPosition?: "bottom-left" | "bottom-right"; // Position of edit button (default: "bottom-left")
 };
 
 export default function Cover({
@@ -29,6 +31,7 @@ export default function Cover({
   height,
   onPlay,
   onClick,
+  onEdit,
   showTitle = false,
   subtitle,
   detail = true,
@@ -39,6 +42,7 @@ export default function Cover({
   brightness,
   blur,
   titlePosition = "bottom",
+  editButtonPosition = "bottom-left",
 }: CoverProps) {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
@@ -70,6 +74,13 @@ export default function Cover({
     e.stopPropagation();
     if (onPlay) {
       onPlay();
+    }
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEdit) {
+      onEdit();
     }
   };
 
@@ -160,6 +171,27 @@ export default function Cover({
                 d="M8 5v14l11-7z"
                 fill="currentColor"
               />
+            </svg>
+          </button>
+        )}
+        {onEdit && (
+          <button
+            onClick={handleEditClick}
+            className={`games-list-edit-button ${editButtonPosition === "bottom-right" ? "games-list-edit-button-bottom-right" : ""}`}
+            aria-label={t("common.edit", "Edit")}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
           </button>
         )}

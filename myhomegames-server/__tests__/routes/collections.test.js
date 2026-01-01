@@ -47,6 +47,103 @@ describe('GET /collections', () => {
   });
 });
 
+describe('GET /collections/:id', () => {
+  test('should return a single collection by ID', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      const response = await request(app)
+        .get(`/collections/${collectionId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('id', collectionId);
+      expect(response.body).toHaveProperty('title');
+      expect(response.body).toHaveProperty('summary');
+      expect(response.body).toHaveProperty('cover');
+      expect(response.body.cover).toContain('/collection-covers/');
+    }
+  });
+
+  test('should return collection with correct structure', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      const response = await request(app)
+        .get(`/collections/${collectionId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      const collection = response.body;
+      expect(collection).toHaveProperty('id');
+      expect(collection).toHaveProperty('title');
+      expect(collection).toHaveProperty('summary');
+      expect(collection).toHaveProperty('cover');
+      expect(collection).toHaveProperty('gameCount');
+      expect(typeof collection.gameCount).toBe('number');
+    }
+  });
+
+  test('should return 404 for non-existent collection', async () => {
+    const response = await request(app)
+      .get('/collections/non-existent-collection-id')
+      .set('X-Auth-Token', 'test-token')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Collection not found');
+  });
+
+  test('should require authentication', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      const response = await request(app)
+        .get(`/collections/${collectionId}`)
+        .expect(401);
+      
+      expect(response.body).toHaveProperty('error', 'Unauthorized');
+    }
+  });
+
+  test('should handle URL-encoded collection IDs', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      const encodedCollectionId = encodeURIComponent(collectionId);
+      
+      const response = await request(app)
+        .get(`/collections/${encodedCollectionId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('id', collectionId);
+    }
+  });
+});
+
 describe('GET /collections/:id/games', () => {
   test('should return games for a valid collection', async () => {
     const response = await request(app)

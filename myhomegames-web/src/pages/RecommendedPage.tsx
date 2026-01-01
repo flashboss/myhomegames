@@ -37,6 +37,17 @@ export default function RecommendedPage({
   // Restore scroll position
   useScrollRestoration(scrollContainerRef);
 
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    setSections((prevSections) =>
+      prevSections.map((section) => ({
+        ...section,
+        games: section.games.map((game) =>
+          game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+        ),
+      }))
+    );
+  };
+
   useEffect(() => {
     fetchRecommendedSections();
   }, []);
@@ -80,6 +91,7 @@ export default function RecommendedPage({
           month: v.month,
           year: v.year,
           stars: v.stars,
+          genre: v.genre,
         })),
       }));
       
@@ -117,8 +129,10 @@ export default function RecommendedPage({
               sectionId={section.id}
               games={section.games}
               apiBase={apiBase}
+              apiToken={apiToken}
               onGameClick={onGameClick}
               onPlay={onPlay}
+              onGameUpdate={handleGameUpdate}
               buildCoverUrl={buildCoverUrl}
               coverSize={coverSize}
             />
