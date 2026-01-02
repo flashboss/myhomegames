@@ -16,5 +16,3 @@ certs/*.pem
 .env
 .env.local
 .env.*.local
-myhomegames-server/.env
-myhomegames-web/.env
