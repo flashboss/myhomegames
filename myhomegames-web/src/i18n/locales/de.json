@@ -128,7 +128,9 @@
     "deleteTitle": "Löschen",
     "deleting": "Löschen...",
     "confirmDelete": "Möchten Sie \"{{title}}\" wirklich löschen?",
-    "deleteError": "Fehler beim Löschen des Spiels"
+    "deleteError": "Fehler beim Löschen des Spiels",
+    "reloadMetadata": "Alle Metadaten neu laden",
+    "reloadingMetadata": "Metadaten werden neu geladen..."
   },
   "launch": {
     "launching": "Spiel wird gestartet...",

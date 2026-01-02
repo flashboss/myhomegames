@@ -128,7 +128,9 @@
     "deleteTitle": "削除",
     "deleting": "削除中...",
     "confirmDelete": "「{{title}}」を削除してもよろしいですか？",
-    "deleteError": "ゲームの削除に失敗しました"
+    "deleteError": "ゲームの削除に失敗しました",
+    "reloadMetadata": "すべてのメタデータを再読み込み",
+    "reloadingMetadata": "メタデータを再読み込み中..."
   },
   "launch": {
     "launching": "ゲームを起動中...",

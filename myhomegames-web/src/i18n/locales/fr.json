@@ -128,7 +128,9 @@
     "deleteTitle": "Supprimer",
     "deleting": "Suppression...",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer \"{{title}}\"?",
-    "deleteError": "Échec de la suppression du jeu"
+    "deleteError": "Échec de la suppression du jeu",
+    "reloadMetadata": "Recharger tous les métadonnées",
+    "reloadingMetadata": "Rechargement des métadonnées..."
   },
   "launch": {
     "launching": "Lancement du jeu...",

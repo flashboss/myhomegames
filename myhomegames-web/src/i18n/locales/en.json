@@ -128,7 +128,9 @@
     "deleteTitle": "Delete",
     "deleting": "Deleting...",
     "confirmDelete": "Are you sure you want to delete \"{{title}}\"?",
-    "deleteError": "Failed to delete game"
+    "deleteError": "Failed to delete game",
+    "reloadMetadata": "Reload all metadata",
+    "reloadingMetadata": "Reloading metadata..."
   },
   "launch": {
     "launching": "Launching game...",

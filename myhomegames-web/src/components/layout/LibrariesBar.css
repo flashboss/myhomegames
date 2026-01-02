@@ -1,3 +1,26 @@
+.mhg-libraries-menu-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  z-index: 200;
+  padding: 0 24px;
+  height: 100%;
+}
+
+.mhg-libraries-menu-dropdown .dropdown-menu-button {
+  opacity: 1;
+}
+
+.mhg-libraries-menu-dropdown .dropdown-menu-popup {
+  left: 0;
+  right: auto;
+  top: 100%;
+  bottom: auto;
+  margin-top: 4px;
+}
+
 .mhg-libraries-actions {
   transform: translateY(-2px);
   position: relative;

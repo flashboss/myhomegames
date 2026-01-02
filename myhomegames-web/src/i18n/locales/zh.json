@@ -128,7 +128,9 @@
     "deleteTitle": "删除",
     "deleting": "删除中...",
     "confirmDelete": "您确定要删除\"{{title}}\"吗？",
-    "deleteError": "删除游戏失败"
+    "deleteError": "删除游戏失败",
+    "reloadMetadata": "重新加载所有元数据",
+    "reloadingMetadata": "正在重新加载元数据..."
   },
   "launch": {
     "launching": "正在启动游戏...",

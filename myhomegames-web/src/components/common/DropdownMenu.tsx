@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
-import { API_BASE, API_TOKEN } from "../../config";
+import { API_BASE, getApiToken } from "../../config";
+import { buildApiUrl } from "../../utils/api";
 import Tooltip from "./Tooltip";
 import "./DropdownMenu.css";
 
 type DropdownMenuProps = {
   onEdit?: () => void;
   onDelete?: () => void;
+  onReload?: () => void;
   gameId?: string;
   gameTitle?: string;
   onGameDelete?: (gameId: string) => void;
@@ -24,6 +26,7 @@ type DropdownMenuProps = {
 export default function DropdownMenu({
   onEdit,
   onDelete,
+  onReload,
   gameId,
   gameTitle,
   onGameDelete,
@@ -40,6 +43,7 @@ export default function DropdownMenu({
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -130,7 +134,8 @@ export default function DropdownMenu({
     setIsOpen(false);
     
     // Se abbiamo le props per gestire la cancellazione internamente (game o collection)
-    if (API_TOKEN && ((gameId && gameTitle) || (collectionId && collectionTitle))) {
+    const apiToken = getApiToken();
+    if (apiToken && ((gameId && gameTitle) || (collectionId && collectionTitle))) {
       if (onModalOpen) {
         onModalOpen();
       }
@@ -141,14 +146,56 @@ export default function DropdownMenu({
     }
   };
 
+  const handleReload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsOpen(false);
+    
+    if (onReload) {
+      // Se c'è una callback personalizzata, usala
+      onReload();
+      return;
+    }
+    
+    // Altrimenti gestisci il reload internamente
+    const apiToken = getApiToken();
+    if (!API_BASE || !apiToken) {
+      console.error("API_BASE or API_TOKEN not available");
+      return;
+    }
+    
+    setIsReloading(true);
+    
+    try {
+      const url = buildApiUrl(API_BASE, "/reload-games");
+      
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "X-Auth-Token": apiToken,
+        },
+      });
+
+      if (response.ok) {
+        // Reload the page to show updated data
+        window.location.reload();
+      } else {
+        console.error("Failed to reload metadata");
+        setIsReloading(false);
+      }
+    } catch (error) {
+      console.error("Error reloading metadata:", error);
+      setIsReloading(false);
+    }
+  };
+
   const handleConfirmDelete = async () => {
-    if (!API_TOKEN) return;
+    const apiToken = getApiToken();
+    if (!apiToken) return;
 
     setIsDeleting(true);
     setDeleteError(null);
 
     try {
-      const { buildApiUrl } = await import("../../utils/api");
       let url: string;
 
       // Determina se stiamo cancellando un game o una collection
@@ -163,7 +210,7 @@ export default function DropdownMenu({
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
-          "X-Auth-Token": API_TOKEN,
+          "X-Auth-Token": apiToken,
         },
       });
 
@@ -255,7 +302,16 @@ export default function DropdownMenu({
               <span>{t("common.edit", "Edit")}</span>
             </button>
           )}
-          {(onDelete || (API_TOKEN && (gameId || collectionId))) && (
+          {onReload && (
+            <button
+              onClick={handleReload}
+              className="dropdown-menu-item"
+              disabled={isReloading}
+            >
+              <span>{isReloading ? t("common.reloadingMetadata", "Reloading metadata...") : t("common.reloadMetadata", "Reload all metadata")}</span>
+            </button>
+          )}
+          {(onDelete || (getApiToken() && (gameId || collectionId))) && (
             <button
               onClick={handleDeleteClick}
               className="dropdown-menu-item dropdown-menu-item-danger"

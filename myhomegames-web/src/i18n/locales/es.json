@@ -128,7 +128,9 @@
     "deleteTitle": "Eliminar",
     "deleting": "Eliminando...",
     "confirmDelete": "¿Estás seguro de que quieres eliminar \"{{title}}\"?",
-    "deleteError": "Error al eliminar el juego"
+    "deleteError": "Error al eliminar el juego",
+    "reloadMetadata": "Recargar todos los metadatos",
+    "reloadingMetadata": "Recargando metadatos..."
   },
   "launch": {
     "launching": "Iniciando juego...",
