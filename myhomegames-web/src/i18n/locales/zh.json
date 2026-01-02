@@ -56,6 +56,11 @@
     "accountType": "账户类型",
     "developmentAccount": "开发账户"
   },
+  "login": {
+    "title": "欢迎使用 MyHomeGames",
+    "subtitle": "请登录以继续",
+    "button": "使用 Twitch 登录"
+  },
   "search": {
     "noResults": "未找到术语 \"{{query}}\" 的结果",
     "viewAllResults": "查看所有结果 ({{count}})",
@@ -97,6 +102,7 @@
     "releaseDate": "发布日期",
     "year": "年份",
     "stars": "评分",
+    "criticRating": "评论家评分",
     "noGames": "未找到游戏"
   },
   "gameDetail": {
@@ -167,7 +173,9 @@
       "title": "标题",
       "year": "年份",
       "stars": "评分",
-      "releaseDate": "发布日期"
+      "releaseDate": "发布日期",
+      "criticRating": "评论家评分",
+      "userRating": "用户评分"
     },
     "gamesCount_one": "显示 {{count}} 个游戏",
     "gamesCount_other": "显示 {{count}} 个游戏"

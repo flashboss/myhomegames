@@ -5,7 +5,7 @@ import SortPopup from "../toolbar/SortPopup";
 import type { FilterField, GameItem } from "../filters/types";
 import "./GamesListToolbar.css";
 
-type SortField = "title" | "year" | "stars" | "releaseDate";
+type SortField = "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating";
 
 type GamesListToolbarProps = {
   gamesCount: number;
@@ -87,6 +87,8 @@ export default function GamesListToolbar({
     { value: "year" as SortField, label: t("gamesListToolbar.sort.year") },
     { value: "stars" as SortField, label: t("gamesListToolbar.sort.stars") },
     { value: "releaseDate" as SortField, label: t("gamesListToolbar.sort.releaseDate") },
+    { value: "criticRating" as SortField, label: t("gamesListToolbar.sort.criticRating") },
+    { value: "userRating" as SortField, label: t("gamesListToolbar.sort.userRating") },
   ];
   const currentSortLabel = sortOptions.find((opt) => opt.value === currentSort)?.label || "";
 

@@ -47,7 +47,7 @@ export default function CategoryPage({
   const [availableGenres, setAvailableGenres] = useState<Array<{ id: string; title: string }>>([]);
   const [availableCollections, setAvailableCollections] = useState<Array<{ id: string; title: string }>>([]);
   const [collectionGameIds, setCollectionGameIds] = useState<Map<string, string[]>>(new Map());
-  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">("title");
+  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating">("title");
   const [sortAscending, setSortAscending] = useState<boolean>(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
@@ -193,6 +193,8 @@ export default function CategoryPage({
         year: v.year,
         stars: v.stars,
         genre: v.genre,
+        criticratings: v.criticratings,
+        userratings: v.userratings,
       }));
       setGames(parsed);
       onGamesLoaded(parsed);
@@ -319,6 +321,16 @@ export default function CategoryPage({
               compareResult = dayB - dayA;
             }
           }
+          break;
+        case "criticRating":
+          const criticA = a.criticratings ?? 0;
+          const criticB = b.criticratings ?? 0;
+          compareResult = criticB - criticA;
+          break;
+        case "userRating":
+          const userA = a.userratings ?? 0;
+          const userB = b.userratings ?? 0;
+          compareResult = userB - userA;
           break;
         default:
           return 0;

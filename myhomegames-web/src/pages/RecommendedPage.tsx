@@ -4,7 +4,7 @@ import { useLoading } from "../contexts/LoadingContext";
 import RecommendedSection from "../components/recommended/RecommendedSection";
 import type { GameItem } from "../types";
 import { API_BASE, getApiToken } from "../config";
-import { buildApiUrl, buildCoverUrl } from "../utils/api";
+import { buildApiUrl } from "../utils/api";
 
 type RecommendedSection = {
   id: string;

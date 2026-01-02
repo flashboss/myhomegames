@@ -56,6 +56,11 @@
     "accountType": "Tipo de conta",
     "developmentAccount": "Conta de desenvolvimento"
   },
+  "login": {
+    "title": "Bem-vindo ao MyHomeGames",
+    "subtitle": "Por favor, faça login para continuar",
+    "button": "Entrar com Twitch"
+  },
   "search": {
     "noResults": "Nenhum resultado encontrado para o termo \"{{query}}\"",
     "viewAllResults": "Ver todos os resultados ({{count}})",
@@ -97,6 +102,7 @@
     "releaseDate": "Data de Lançamento",
     "year": "Ano",
     "stars": "Avaliação",
+    "criticRating": "Avaliação da Crítica",
     "noGames": "Nenhum jogo encontrado"
   },
   "gameDetail": {
@@ -167,7 +173,9 @@
       "title": "Título",
       "year": "Ano",
       "stars": "Avaliação",
-      "releaseDate": "Data de lançamento"
+      "releaseDate": "Data de lançamento",
+      "criticRating": "Avaliação da Crítica",
+      "userRating": "Avaliação do Público"
     },
     "gamesCount_one": "{{count}} jogo exibido",
     "gamesCount_other": "{{count}} jogos exibidos"

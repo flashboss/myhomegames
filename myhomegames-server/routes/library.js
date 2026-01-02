@@ -50,6 +50,8 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         year: g.year || null,
         stars: g.stars || null,
         genre: g.genre || null,
+        criticratings: g.criticratings || null,
+        userratings: g.userratings || null,
       })),
     });
   });

@@ -56,9 +56,9 @@ export default function LibraryPage({
   const [availableGenres, setAvailableGenres] = useState<Array<{ id: string; title: string }>>([]);
   const [availableCollections, setAvailableCollections] = useState<Array<{ id: string; title: string }>>([]);
   const [collectionGameIds, setCollectionGameIds] = useState<Map<string, string[]>>(new Map());
-  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate">(() => {
+  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating">(() => {
     const saved = localStorage.getItem("librarySortField");
-    return (saved as "title" | "year" | "stars" | "releaseDate") || "title";
+    return (saved as "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating") || "title";
   });
   const [sortAscending, setSortAscending] = useState<boolean>(() => {
     const saved = localStorage.getItem("librarySortAscending");
@@ -264,6 +264,8 @@ export default function LibraryPage({
         year: v.year,
         stars: v.stars,
         genre: v.genre,
+        criticratings: v.criticratings,
+        userratings: v.userratings,
       }));
       setGames(parsed);
       onGamesLoaded(parsed);
@@ -357,6 +359,16 @@ export default function LibraryPage({
               compareResult = dayB - dayA;
             }
           }
+          break;
+        case "criticRating":
+          const criticA = a.criticratings ?? 0;
+          const criticB = b.criticratings ?? 0;
+          compareResult = criticB - criticA;
+          break;
+        case "userRating":
+          const userA = a.userratings ?? 0;
+          const userB = b.userratings ?? 0;
+          compareResult = userB - userA;
           break;
         default:
           return 0;

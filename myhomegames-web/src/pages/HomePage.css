@@ -25,6 +25,10 @@
   margin-top: -20px;
 }
 
+.home-page-content-wrapper.has-toolbar .home-page-scroll-container.table-view {
+  padding-top: 20px;
+}
+
 .home-page-scroll-container {
   flex: 1;
   overflow-y: auto;

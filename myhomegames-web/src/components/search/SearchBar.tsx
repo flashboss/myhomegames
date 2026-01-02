@@ -395,12 +395,6 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
               games={filteredGames}
               collections={filteredCollections}
               onGameClick={handleGameSelect}
-              buildCoverUrl={(apiBase, cover) => {
-                if (cover && cover.startsWith("http")) {
-                  return cover;
-                }
-                return `${apiBase}${cover || ""}`;
-              }}
               variant="popup"
               onPlay={onPlay}
               onCollectionClick={(collection) => {
