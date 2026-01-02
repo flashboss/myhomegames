@@ -9,6 +9,5 @@ dist
 .vite
 
 # environment / configurazioni locali
-.env
 .env.local
 .env.*.local
