@@ -53,6 +53,9 @@ export default function DropdownMenu({
   const [reloadError, setReloadError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  
+  // Check if we're in a cover (grid list) to use portal
+  const isInCover = className.includes('games-list-dropdown-menu');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -397,42 +400,58 @@ export default function DropdownMenu({
       ) : (
         buttonContent
       )}
-      {isOpen && (
-        <div ref={popupRef} className="dropdown-menu-popup">
-          {onEdit && (
-            <button
-              onClick={handleEdit}
-              className="dropdown-menu-item"
-            >
-              <span>{t("common.edit", "Edit")}</span>
-            </button>
-          )}
-          {(onReload || (gameId && onGameUpdate) || (collectionId && onCollectionUpdate) || (!gameId && !collectionId && !onEdit && !onDelete)) && (
-            <button
-              onClick={handleReload}
-              className="dropdown-menu-item"
-              disabled={isReloading}
-            >
-              <span>
-                {isReloading 
-                  ? t("common.reloadingMetadata", "Reloading metadata...")
-                  : (gameId || collectionId)
-                    ? t("common.reloadSingleMetadata", "Reload metadata")
-                    : t("common.reloadMetadata", "Reload all metadata")
-                }
-              </span>
-            </button>
-          )}
-          {(onDelete || (getApiToken() && (gameId || collectionId))) && (
-            <button
-              onClick={handleDeleteClick}
-              className="dropdown-menu-item dropdown-menu-item-danger"
-            >
-              <span>{t("common.delete", "Delete")}</span>
-            </button>
-          )}
-        </div>
-      )}
+      {isOpen && (() => {
+        const popupContent = (
+          <div 
+            ref={popupRef} 
+            className="dropdown-menu-popup"
+            style={isInCover && menuRef.current ? (() => {
+              const rect = menuRef.current!.getBoundingClientRect();
+              return {
+                position: 'fixed',
+                bottom: `${window.innerHeight - rect.top + 4}px`,
+                right: `${window.innerWidth - rect.right}px`,
+                top: 'auto',
+              };
+            })() : undefined}
+          >
+            {onEdit && (
+              <button
+                onClick={handleEdit}
+                className="dropdown-menu-item"
+              >
+                <span>{t("common.edit", "Edit")}</span>
+              </button>
+            )}
+            {(onReload || (gameId && onGameUpdate) || (collectionId && onCollectionUpdate) || (!gameId && !collectionId && !onEdit && !onDelete)) && (
+              <button
+                onClick={handleReload}
+                className="dropdown-menu-item"
+                disabled={isReloading}
+              >
+                <span>
+                  {isReloading 
+                    ? t("common.reloadingMetadata", "Reloading metadata...")
+                    : (gameId || collectionId)
+                      ? t("common.reloadSingleMetadata", "Reload metadata")
+                      : t("common.reloadMetadata", "Reload all metadata")
+                  }
+                </span>
+              </button>
+            )}
+            {(onDelete || (getApiToken() && (gameId || collectionId))) && (
+              <button
+                onClick={handleDeleteClick}
+                className="dropdown-menu-item dropdown-menu-item-danger"
+              >
+                <span>{t("common.delete", "Delete")}</span>
+              </button>
+            )}
+          </div>
+        );
+        
+        return isInCover ? createPortal(popupContent, document.body) : popupContent;
+      })()}
 
       {/* Reload Confirmation Modal */}
       {showReloadConfirmModal && createPortal(

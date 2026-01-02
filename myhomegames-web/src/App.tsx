@@ -24,6 +24,7 @@ import LaunchModal from "./components/common/LaunchModal";
 import type { GameItem, CollectionItem } from "./types";
 import { buildApiUrl, buildCoverUrl, buildBackgroundUrl } from "./utils/api";
 import { API_BASE, getApiToken } from "./config";
+import { useLoading } from "./contexts/LoadingContext";
 
 // Wrapper function for buildApiUrl that uses API_BASE
 function buildApiUrlWithBase(
@@ -41,6 +42,7 @@ function AppContent() {
   const [addGameOpen, setAddGameOpen] = useState(false);
   const navigate = useNavigate();
   const { i18n } = useTranslation();
+  const { setLoading } = useLoading();
 
   const handleCloseLaunchModal = () => {
     setLaunchError(null);
@@ -50,6 +52,7 @@ function AppContent() {
   // Load games on app startup for search
   useEffect(() => {
     async function loadGames() {
+      setLoading(true);
       try {
         const url = buildApiUrlWithBase("/libraries/library/games", {
           sort: "title",
@@ -77,14 +80,17 @@ function AppContent() {
       } catch (err: any) {
         const errorMessage = String(err.message || err);
         console.error("Error loading games for search:", errorMessage);
+      } finally {
+        setLoading(false);
       }
     }
     loadGames();
-  }, []);
+  }, [setLoading]);
 
   // Load collections on app startup
   useEffect(() => {
     async function loadCollections() {
+      setLoading(true);
       try {
           const url = buildApiUrlWithBase("/collections");
         const res = await fetch(url, {
@@ -105,10 +111,12 @@ function AppContent() {
       } catch (err: any) {
         const errorMessage = String(err.message || err);
         console.error("Error loading collections:", errorMessage);
+      } finally {
+        setLoading(false);
       }
     }
     loadCollections();
-  }, []);
+  }, [setLoading]);
 
   // Load settings from server on app startup
   useEffect(() => {

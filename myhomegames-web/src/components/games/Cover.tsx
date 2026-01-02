@@ -219,7 +219,6 @@ export default function Cover({
         {onEdit && (
           <div className="games-list-dropdown-wrapper games-list-dropdown-wrapper-bottom-right">
             <DropdownMenu
-              onEdit={onEdit}
               onDelete={onDelete}
               gameId={gameId}
               gameTitle={gameTitle}

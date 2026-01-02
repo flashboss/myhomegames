@@ -40,7 +40,8 @@
     "addGame": "Adicionar Jogo",
     "settings": "Configurações",
     "account": "Conta",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "loading": "Carregando"
   },
   "profile": {
     "viewProfile": "Ver perfil",
