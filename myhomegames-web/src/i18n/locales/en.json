@@ -130,7 +130,10 @@
     "confirmDelete": "Are you sure you want to delete \"{{title}}\"?",
     "deleteError": "Failed to delete game",
     "reloadMetadata": "Reload all metadata",
-    "reloadingMetadata": "Reloading metadata..."
+    "reloadSingleMetadata": "Reload metadata",
+    "reloadingMetadata": "Reloading metadata...",
+    "confirmReload": "Are you sure you want to reload all metadata? This will refresh all games, collections, and categories.",
+    "reloadError": "Failed to reload metadata"
   },
   "launch": {
     "launching": "Launching game...",

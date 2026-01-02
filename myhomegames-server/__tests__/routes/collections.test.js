@@ -355,3 +355,80 @@ describe('DELETE /collections/:id', () => {
   });
 });
 
+describe('POST /collections/:id/reload', () => {
+  test('should reload metadata for a single collection', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      const response = await request(app)
+        .post(`/collections/${collectionId}/reload`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'reloaded');
+      expect(response.body).toHaveProperty('collection');
+      expect(response.body.collection).toHaveProperty('id', collectionId);
+      expect(response.body.collection).toHaveProperty('title');
+      expect(response.body.collection).toHaveProperty('summary');
+      expect(response.body.collection).toHaveProperty('cover');
+    }
+  });
+
+  test('should return collection with correct structure after reload', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      const response = await request(app)
+        .post(`/collections/${collectionId}/reload`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      const collection = response.body.collection;
+      expect(collection).toHaveProperty('id');
+      expect(collection).toHaveProperty('title');
+      expect(collection).toHaveProperty('summary');
+      expect(collection).toHaveProperty('cover');
+      expect(collection.cover).toContain('/collection-covers/');
+    }
+  });
+
+  test('should return 404 for non-existent collection', async () => {
+    const response = await request(app)
+      .post('/collections/non-existent-collection-id/reload')
+      .set('X-Auth-Token', 'test-token')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Collection not found');
+  });
+
+  test('should require authentication', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      
+      const response = await request(app)
+        .post(`/collections/${collectionId}/reload`)
+        .expect(401);
+      
+      expect(response.body).toHaveProperty('error', 'Unauthorized');
+    }
+  });
+});
+

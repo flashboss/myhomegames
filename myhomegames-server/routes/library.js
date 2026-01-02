@@ -157,6 +157,46 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       res.status(500).json({ error: "Failed to save game updates" });
     }
   });
+
+  // Endpoint: reload metadata for a single game
+  app.post("/games/:gameId/reload", requireToken, (req, res) => {
+    const gameId = req.params.gameId;
+    
+    try {
+      // Reload library games to refresh metadata
+      loadLibraryGames(metadataGamesDir, allGames);
+      
+      // Check if game exists after reload
+      const game = allGames[gameId];
+      if (!game) {
+        return res.status(404).json({ error: "Game not found" });
+      }
+      
+      // Return updated game data
+      const gameData = {
+        id: game.id,
+        title: game.title,
+        summary: game.summary || "",
+        cover: `/covers/${encodeURIComponent(game.id)}`,
+        day: game.day || null,
+        month: game.month || null,
+        year: game.year || null,
+        stars: game.stars || null,
+        genre: game.genre || null,
+        criticratings: game.criticratings || null,
+        userratings: game.userratings || null,
+      };
+      const background = getBackgroundPath(metadataPath, game.id);
+      if (background) {
+        gameData.background = background;
+      }
+      
+      res.json({ status: "reloaded", game: gameData });
+    } catch (e) {
+      console.error(`Failed to reload game ${gameId}:`, e.message);
+      res.status(500).json({ error: "Failed to reload game metadata" });
+    }
+  });
 }
 
 module.exports = {

@@ -130,7 +130,10 @@
     "confirmDelete": "Sei sicuro di voler eliminare \"{{title}}\"?",
     "deleteError": "Impossibile eliminare il gioco",
     "reloadMetadata": "Aggiorna tutti i metadati",
-    "reloadingMetadata": "Aggiornamento metadati..."
+    "reloadSingleMetadata": "Aggiorna metadati",
+    "reloadingMetadata": "Aggiornamento metadati...",
+    "confirmReload": "Sei sicuro di voler aggiornare tutti i metadati? Questo ricaricherà tutti i giochi, le collezioni e le categorie.",
+    "reloadError": "Impossibile aggiornare i metadati"
   },
   "launch": {
     "launching": "Avvio gioco...",

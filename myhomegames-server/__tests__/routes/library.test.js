@@ -425,3 +425,87 @@ describe('PUT /games/:gameId', () => {
   });
 });
 
+describe('POST /games/:gameId/reload', () => {
+  test('should reload metadata for a single game', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/reload`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'reloaded');
+      expect(response.body).toHaveProperty('game');
+      expect(response.body.game).toHaveProperty('id', gameId);
+      expect(response.body.game).toHaveProperty('title');
+      expect(response.body.game).toHaveProperty('summary');
+      expect(response.body.game).toHaveProperty('cover');
+    }
+  });
+
+  test('should return game with correct structure after reload', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/reload`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      const game = response.body.game;
+      expect(game).toHaveProperty('id');
+      expect(game).toHaveProperty('title');
+      expect(game).toHaveProperty('summary');
+      expect(game).toHaveProperty('cover');
+      expect(game.cover).toContain('/covers/');
+      expect(game).toHaveProperty('day');
+      expect(game).toHaveProperty('month');
+      expect(game).toHaveProperty('year');
+      expect(game).toHaveProperty('stars');
+      expect(game).toHaveProperty('genre');
+      expect(game).toHaveProperty('criticratings');
+      expect(game).toHaveProperty('userratings');
+    }
+  });
+
+  test('should return 404 for non-existent game', async () => {
+    const response = await request(app)
+      .post('/games/non-existent-game-id/reload')
+      .set('X-Auth-Token', 'test-token')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Game not found');
+  });
+
+  test('should require authentication', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/reload`)
+        .expect(401);
+      
+      expect(response.body).toHaveProperty('error', 'Unauthorized');
+    }
+  });
+});
+

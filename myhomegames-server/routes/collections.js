@@ -239,6 +239,28 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
     res.sendFile(coverPath);
   });
 
+  // Endpoint: reload metadata for a single collection
+  app.post("/collections/:id/reload", requireToken, (req, res) => {
+    const collectionId = req.params.id;
+    
+    try {
+      // Reload collections to refresh metadata
+      collectionsCache = loadCollections(metadataGamesDir);
+      
+      // Find the collection
+      const collection = collectionsCache.find((c) => c.id === collectionId);
+      if (!collection) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+      
+      // Return updated collection data
+      res.json({ status: "reloaded", collection });
+    } catch (e) {
+      console.error(`Failed to reload collection ${collectionId}:`, e.message);
+      res.status(500).json({ error: "Failed to reload collection metadata" });
+    }
+  });
+
   // Return reload function
   return {
     reload: () => {

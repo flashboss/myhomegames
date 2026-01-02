@@ -6,7 +6,6 @@ import BackgroundToggle from "../ui/BackgroundToggle";
 import DropdownMenu from "../common/DropdownMenu";
 import { useBackground } from "../common/BackgroundManager";
 import { API_BASE, getApiToken } from "../../config";
-import { buildApiUrl } from "../../utils/api";
 import "./LibrariesBar.css";
 
 type GameLibrarySection = {
@@ -90,31 +89,6 @@ export default function LibrariesBar({
     }
   };
 
-  // Handle reload metadata
-  const handleReloadMetadata = async () => {
-    const apiToken = getApiToken();
-    if (!API_BASE || !apiToken) return;
-    
-    try {
-      const url = buildApiUrl(API_BASE, "/reload-games");
-      
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "X-Auth-Token": apiToken,
-        },
-      });
-
-      if (response.ok) {
-        // Reload the page to show updated data
-        window.location.reload();
-      } else {
-        console.error("Failed to reload metadata");
-      }
-    } catch (error) {
-      console.error("Error reloading metadata:", error);
-    }
-  };
 
   return (
     <div className="mhg-libraries-bar">
@@ -123,7 +97,6 @@ export default function LibrariesBar({
         {API_BASE && getApiToken() && (
           <div className="mhg-libraries-menu-container">
             <DropdownMenu
-              onReload={handleReloadMetadata}
               className="mhg-libraries-menu-dropdown"
             />
           </div>

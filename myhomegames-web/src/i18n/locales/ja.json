@@ -130,7 +130,10 @@
     "confirmDelete": "「{{title}}」を削除してもよろしいですか？",
     "deleteError": "ゲームの削除に失敗しました",
     "reloadMetadata": "すべてのメタデータを再読み込み",
-    "reloadingMetadata": "メタデータを再読み込み中..."
+    "reloadSingleMetadata": "メタデータを再読み込み",
+    "reloadingMetadata": "メタデータを再読み込み中...",
+    "confirmReload": "すべてのメタデータを再読み込みしてもよろしいですか？これにより、すべてのゲーム、コレクション、カテゴリが更新されます。",
+    "reloadError": "メタデータの再読み込みに失敗しました"
   },
   "launch": {
     "launching": "ゲームを起動中...",
