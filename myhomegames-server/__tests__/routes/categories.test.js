@@ -47,3 +47,310 @@ describe('GET /categories', () => {
   });
 });
 
+describe('POST /categories', () => {
+  test('should create a new category', async () => {
+    const response = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'testcategory' })
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('category');
+    expect(response.body.category).toHaveProperty('id');
+    expect(response.body.category).toHaveProperty('title', 'testcategory');
+    expect(response.body.category).toHaveProperty('cover');
+    
+    // Verify category was added to the list
+    const listResponse = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const createdCategory = listResponse.body.categories.find(
+      c => c.id === response.body.category.id
+    );
+    expect(createdCategory).toBeDefined();
+    expect(createdCategory.title).toBe('testcategory');
+  });
+
+  test('should generate correct ID format', async () => {
+    const response = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'New Test Category' })
+      .expect(200);
+    
+    expect(response.body.category.id).toMatch(/^genre_/);
+    expect(response.body.category.id).toBe('genre_new_test_category');
+  });
+
+  test('should normalize title to lowercase', async () => {
+    const response = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'UPPERCASE CATEGORY' })
+      .expect(200);
+    
+    expect(response.body.category.title).toBe('uppercase category');
+  });
+
+  test('should return 409 if category already exists', async () => {
+    // First create a category
+    await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'duplicate' })
+      .expect(200);
+    
+    // Try to create it again
+    const response = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'duplicate' })
+      .expect(409);
+    
+    expect(response.body).toHaveProperty('error', 'Category already exists');
+  });
+
+  test('should return 400 if title is missing', async () => {
+    const response = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({})
+      .expect(400);
+    
+    expect(response.body).toHaveProperty('error', 'Title is required');
+  });
+
+  test('should return 400 if title is empty', async () => {
+    const response = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: '   ' })
+      .expect(400);
+    
+    expect(response.body).toHaveProperty('error', 'Title is required');
+  });
+
+  test('should require authentication', async () => {
+    const response = await request(app)
+      .post('/categories')
+      .send({ title: 'test' })
+      .expect(401);
+    
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
+  });
+});
+
+describe('DELETE /categories/:categoryId', () => {
+  test('should delete unused category', async () => {
+    // First create a category
+    const createResponse = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'unusedcategory' })
+      .expect(200);
+    
+    const categoryId = createResponse.body.category.id;
+    
+    // Delete the category
+    const deleteResponse = await request(app)
+      .delete(`/categories/${categoryId}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(deleteResponse.body).toHaveProperty('status', 'success');
+    
+    // Verify category was removed from the list
+    const listResponse = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const deletedCategory = listResponse.body.categories.find(
+      c => c.id === categoryId
+    );
+    expect(deletedCategory).toBeUndefined();
+  });
+
+  test('should return 409 if category is still in use', async () => {
+    // Get a game from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      // Get existing categories
+      const categoriesResponse = await request(app)
+        .get('/categories')
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      if (categoriesResponse.body.categories.length > 0) {
+        const categoryId = categoriesResponse.body.categories[0].id;
+        
+        // Assign category to a game
+        await request(app)
+          .put(`/games/${gameId}`)
+          .set('X-Auth-Token', 'test-token')
+          .send({ genre: [categoryId] })
+          .expect(200);
+        
+        // Try to delete the category (should fail)
+        const deleteResponse = await request(app)
+          .delete(`/categories/${categoryId}`)
+          .set('X-Auth-Token', 'test-token')
+          .expect(409);
+        
+        expect(deleteResponse.body).toHaveProperty('error', 'Category is still in use by one or more games');
+        
+        // Cleanup: remove genre from game
+        await request(app)
+          .put(`/games/${gameId}`)
+          .set('X-Auth-Token', 'test-token')
+          .send({ genre: [] })
+          .expect(200);
+      }
+    }
+  });
+
+  test('should return 404 if category does not exist', async () => {
+    const response = await request(app)
+      .delete('/categories/nonexistent_category_id')
+      .set('X-Auth-Token', 'test-token')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Category not found');
+  });
+
+  test('should require authentication', async () => {
+    const response = await request(app)
+      .delete('/categories/some_category_id')
+      .expect(401);
+    
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
+  });
+});
+
+describe('Game update with category creation and deletion', () => {
+  test('should create category when updating game with new genre', async () => {
+    // Get a game from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      // Create a new category
+      const createCategoryResponse = await request(app)
+        .post('/categories')
+        .set('X-Auth-Token', 'test-token')
+        .send({ title: 'newtestgenre' })
+        .expect(200);
+      
+      const newCategoryId = createCategoryResponse.body.category.id;
+      
+      // Update game with the new genre
+      const updateResponse = await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ genre: [newCategoryId] })
+        .expect(200);
+      
+      expect(updateResponse.body.game).toHaveProperty('genre');
+      expect(Array.isArray(updateResponse.body.game.genre)).toBe(true);
+      expect(updateResponse.body.game.genre).toContain(newCategoryId);
+      
+      // Verify category still exists
+      const categoriesResponse = await request(app)
+        .get('/categories')
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      const categoryExists = categoriesResponse.body.categories.some(
+        c => c.id === newCategoryId
+      );
+      expect(categoryExists).toBe(true);
+      
+      // Cleanup: remove genre from game and delete category
+      await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ genre: [] })
+        .expect(200);
+      
+      await request(app)
+        .delete(`/categories/${newCategoryId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+    }
+  });
+
+  test('should allow deletion of category after removing from last game', async () => {
+    // Get a game from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      // Create a new category
+      const createCategoryResponse = await request(app)
+        .post('/categories')
+        .set('X-Auth-Token', 'test-token')
+        .send({ title: 'temporarygenre' })
+        .expect(200);
+      
+      const categoryId = createCategoryResponse.body.category.id;
+      
+      // Assign category to game
+      await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ genre: [categoryId] })
+        .expect(200);
+      
+      // Verify category cannot be deleted while in use
+      const deleteWhileInUseResponse = await request(app)
+        .delete(`/categories/${categoryId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(409);
+      
+      expect(deleteWhileInUseResponse.body).toHaveProperty('error', 'Category is still in use by one or more games');
+      
+      // Remove category from game
+      await request(app)
+        .put(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .send({ genre: [] })
+        .expect(200);
+      
+      // Now category should be deletable
+      const deleteResponse = await request(app)
+        .delete(`/categories/${categoryId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(deleteResponse.body).toHaveProperty('status', 'success');
+      
+      // Verify category was removed
+      const categoriesResponse = await request(app)
+        .get('/categories')
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      const categoryExists = categoriesResponse.body.categories.some(
+        c => c.id === categoryId
+      );
+      expect(categoryExists).toBe(false);
+    }
+  });
+});
+
