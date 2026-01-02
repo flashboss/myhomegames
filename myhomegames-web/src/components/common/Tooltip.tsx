@@ -11,7 +11,6 @@ type TooltipProps = {
 
 export default function Tooltip({
   text,
-  position = "bottom",
   delay = 1000,
   children,
 }: TooltipProps) {

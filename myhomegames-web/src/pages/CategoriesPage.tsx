@@ -1,23 +1,19 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import CategoriesList from "../components/lists/CategoriesList";
 import type { CategoryItem, GameItem } from "../types";
+import { API_BASE, getApiToken } from "../config";
+import { buildApiUrl } from "../utils/api";
 
 type CategoriesPageProps = {
-  apiBase: string;
-  apiToken: string;
-  buildApiUrl: (apiBase: string, path: string, params?: Record<string, string | number | boolean>) => string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
 };
 
 export default function CategoriesPage({
-  apiBase,
-  apiToken,
-  buildApiUrl,
-  buildCoverUrl,
   coverSize,
 }: CategoriesPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const [allCategories, setAllCategories] = useState<CategoryItem[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [games, setGames] = useState<GameItem[]>([]);
@@ -78,11 +74,11 @@ export default function CategoriesPage({
 
   async function fetchCategories() {
     try {
-      const url = buildApiUrl(apiBase, "/categories");
+      const url = buildApiUrl(API_BASE, "/categories");
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -103,13 +99,13 @@ export default function CategoriesPage({
   async function fetchLibraryGames() {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, "/libraries/library/games", {
+      const url = buildApiUrl(API_BASE, "/libraries/library/games", {
         sort: "title",
       });
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -132,6 +128,7 @@ export default function CategoriesPage({
       console.error("Error fetching library games:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 
@@ -149,8 +146,6 @@ export default function CategoriesPage({
           {!loading && (
             <CategoriesList
               categories={categories}
-              apiBase={apiBase}
-              buildCoverUrl={buildCoverUrl}
               coverSize={coverSize * 2}
               itemRefs={itemRefs}
             />

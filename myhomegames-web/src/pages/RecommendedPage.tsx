@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import RecommendedSection from "../components/recommended/RecommendedSection";
 import type { GameItem } from "../types";
+import { API_BASE, getApiToken } from "../config";
+import { buildApiUrl, buildCoverUrl } from "../utils/api";
 
 type RecommendedSection = {
   id: string;
@@ -9,26 +12,19 @@ type RecommendedSection = {
 };
 
 type RecommendedPageProps = {
-  apiBase: string;
-  apiToken: string;
   onGameClick: (game: GameItem) => void;
   onGamesLoaded: (games: GameItem[]) => void;
   onPlay?: (game: GameItem) => void;
-  buildApiUrl: (apiBase: string, path: string, params?: Record<string, string | number | boolean>) => string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
 };
 
 export default function RecommendedPage({
-  apiBase,
-  apiToken,
   onGameClick,
   onGamesLoaded,
   onPlay,
-  buildApiUrl,
-  buildCoverUrl,
   coverSize,
 }: RecommendedPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const [sections, setSections] = useState<RecommendedSection[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -69,11 +65,11 @@ export default function RecommendedPage({
   async function fetchRecommendedSections() {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, `/recommended`);
+      const url = buildApiUrl(API_BASE, `/recommended`);
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -105,6 +101,7 @@ export default function RecommendedPage({
       console.error("Error fetching recommended sections:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 
@@ -131,7 +128,7 @@ export default function RecommendedPage({
               onGameClick={onGameClick}
               onPlay={onPlay}
               onGameUpdate={handleGameUpdate}
-              buildCoverUrl={buildCoverUrl}
+              buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
               coverSize={coverSize}
             />
           ))}

@@ -257,8 +257,6 @@ function AppContent() {
             path="/"
             element={
               <HomePage
-                apiBase={API_BASE}
-                apiToken={getApiToken()}
                 onGameClick={handleGameClick}
                 onPlay={openLauncher}
                 onGamesLoaded={(games) => {
@@ -285,8 +283,6 @@ function AppContent() {
             path="/collections/:collectionId"
             element={
               <CollectionDetail
-                apiBase={API_BASE}
-                apiToken={getApiToken()}
                 onGameClick={handleGameClick}
                 onGamesLoaded={(games) => {
                   setAllGames((prev: GameItem[]) => {
@@ -300,10 +296,6 @@ function AppContent() {
                   });
                 }}
                 onPlay={openLauncher}
-                 buildApiUrl={(apiBase: string, path: string, params?: Record<string, string | number | boolean>) => 
-                   buildApiUrl(apiBase, path, params)
-                 }
-                buildCoverUrl={buildCoverUrl}
               />
             }
           />
@@ -311,8 +303,6 @@ function AppContent() {
             path="/category/:categoryId"
             element={
               <CategoryPage
-                apiBase={API_BASE}
-                apiToken={getApiToken()}
                 onGameClick={handleGameClick}
                 onGamesLoaded={(games) => {
                   setAllGames((prev: GameItem[]) => {
@@ -326,10 +316,6 @@ function AppContent() {
                   });
                 }}
                 onPlay={openLauncher}
-                 buildApiUrl={(apiBase: string, path: string, params?: Record<string, string | number | boolean>) => 
-                   buildApiUrl(apiBase, path, params)
-                 }
-                buildCoverUrl={buildCoverUrl}
               />
             }
           />
@@ -339,8 +325,6 @@ function AppContent() {
             path="/add-game"
             element={
               <AddGamePage
-                apiBase={API_BASE}
-                apiToken={getApiToken()}
                 onGameSelected={(game) => {
                   console.log("Game selected from IGDB:", game);
                   // TODO: Implement game addition logic
@@ -352,8 +336,6 @@ function AppContent() {
             path="/search-results"
             element={
               <SearchResultsPage
-                apiBase={API_BASE}
-                buildCoverUrl={buildCoverUrl}
                 onPlay={openLauncher}
                 onGameClick={handleGameClick}
               />
@@ -388,6 +370,7 @@ function GameDetailPage({
   onPlay: (game: GameItem) => void;
 }) {
   const { t } = useTranslation();
+  const { setLoading: setGlobalLoading } = useLoading();
   const { gameId } = useParams<{ gameId: string }>();
   const [game, setGame] = useState<GameItem | null>(null);
   const [loading, setLoading] = useState(false);
@@ -401,6 +384,7 @@ function GameDetailPage({
 
   async function fetchGame(gameId: string) {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       // Fetch single game from dedicated endpoint
         const url = buildApiUrlWithBase(`/games/${gameId}`);
@@ -441,6 +425,7 @@ function GameDetailPage({
       setGame(null);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 
@@ -476,8 +461,6 @@ function GameDetailPage({
       coverUrl={buildCoverUrl(API_BASE, game.cover)}
       backgroundUrl={buildBackgroundUrl(API_BASE, game.background)}
       onPlay={onPlay}
-      apiBase={API_BASE}
-      apiToken={getApiToken()}
       onGameUpdate={(updatedGame) => {
         setGame(updatedGame);
       }}

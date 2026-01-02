@@ -1,7 +1,8 @@
 // contexts/AuthContext.tsx
 // Authentication context for Twitch OAuth
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import { API_BASE, updateApiToken } from "../config";
 
 interface User {

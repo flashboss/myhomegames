@@ -122,7 +122,6 @@ function GameDetailItem({
           </svg>
         </button>
         <DropdownMenu
-          onEdit={() => onEditClick(game)}
           gameId={game.ratingKey}
           gameTitle={game.title}
           onGameDelete={onGameDelete ? (gameId: string) => {

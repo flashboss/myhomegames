@@ -2,28 +2,24 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cover from "../games/Cover";
 import type { CategoryItem } from "../../types";
+import { buildCoverUrl } from "../../utils/api";
+import { API_BASE } from "../../config";
 import "./CategoriesList.css";
 
 type CategoriesListProps = {
   categories: CategoryItem[];
-  apiBase: string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize?: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
 type CategoryListItemProps = {
   category: CategoryItem;
-  apiBase: string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
 };
 
 function CategoryListItem({
   category,
-  apiBase,
-  buildCoverUrl,
   coverSize,
   itemRefs,
 }: CategoryListItemProps) {
@@ -49,7 +45,7 @@ function CategoryListItem({
     >
       <Cover
         title={t(`genre.${category.title}`, category.title)}
-        coverUrl={buildCoverUrl(apiBase, category.cover)}
+        coverUrl={buildCoverUrl(API_BASE, category.cover)}
         width={coverSize}
         height={coverHeight}
         onClick={handleClick}
@@ -68,8 +64,6 @@ function CategoryListItem({
 
 export default function CategoriesList({
   categories,
-  apiBase,
-  buildCoverUrl,
   coverSize = 150,
   itemRefs,
 }: CategoriesListProps) {
@@ -88,8 +82,6 @@ export default function CategoriesList({
         <CategoryListItem
           key={category.ratingKey}
           category={category}
-          apiBase={apiBase}
-          buildCoverUrl={buildCoverUrl}
           coverSize={coverSize}
           itemRefs={itemRefs}
         />

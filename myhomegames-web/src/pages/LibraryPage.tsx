@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import GamesList from "../components/games/GamesList";
 import GamesListDetail from "../components/games/GamesListDetail";
 import GamesListTable from "../components/games/GamesListTable";
@@ -9,30 +10,25 @@ import type { ViewMode } from "../components/layout/LibrariesBar";
 import type { FilterField } from "../components/filters/types";
 import { compareTitles } from "../utils/stringUtils";
 import type { GameItem } from "../types";
+import { API_BASE, getApiToken } from "../config";
+import { buildApiUrl, buildCoverUrl } from "../utils/api";
 
 type LibraryPageProps = {
-  apiBase: string;
-  apiToken: string;
   onGameClick: (game: GameItem) => void;
   onGamesLoaded: (games: GameItem[]) => void;
   onPlay?: (game: GameItem) => void;
-  buildApiUrl: (apiBase: string, path: string, params?: Record<string, string | number | boolean>) => string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   viewMode: ViewMode;
 };
 
 export default function LibraryPage({
-  apiBase,
-  apiToken,
   onGameClick,
   onGamesLoaded,
   onPlay,
-  buildApiUrl,
-  buildCoverUrl,
   coverSize,
   viewMode,
 }: LibraryPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -177,11 +173,11 @@ export default function LibraryPage({
 
   async function fetchCategories() {
     try {
-      const url = buildApiUrl(apiBase, "/categories");
+      const url = buildApiUrl(API_BASE, "/categories");
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -200,11 +196,11 @@ export default function LibraryPage({
 
   async function fetchCollections() {
     try {
-      const url = buildApiUrl(apiBase, "/collections");
+      const url = buildApiUrl(API_BASE, "/collections");
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -220,11 +216,11 @@ export default function LibraryPage({
       const gameIdsMap = new Map<string, string[]>();
       for (const collection of parsed) {
         try {
-          const gamesUrl = buildApiUrl(apiBase, `/collections/${collection.id}/games`);
+          const gamesUrl = buildApiUrl(API_BASE, `/collections/${collection.id}/games`);
           const gamesRes = await fetch(gamesUrl, {
             headers: {
               Accept: "application/json",
-              "X-Auth-Token": apiToken,
+              "X-Auth-Token": getApiToken(),
             },
           });
           if (gamesRes.ok) {
@@ -246,13 +242,13 @@ export default function LibraryPage({
   async function fetchLibraryGames() {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, `/libraries/library/games`, {
+      const url = buildApiUrl(API_BASE, `/libraries/library/games`, {
         sort: "title",
       });
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -277,6 +273,7 @@ export default function LibraryPage({
       console.error("Error fetching library games:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 
