@@ -8,20 +8,33 @@ This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE
 
 ## myhomegames-server
 
+- Copy `.env.example` to `.env` before starting
 - npm install
 - npm run dev
+
+**Note**: The `.env` file contains `API_TOKEN=changeme` for development.
+
+**Note**: Copy `.env.example` to `.env` before starting. The `.env` file contains `API_TOKEN=changeme` for development.
 
 ## myhomegames-web
 
 Starter MyHomeGames Web App (React + TypeScript + Tailwind)
 
 Instructions:
-- Provide environment variables (create a `.env` file in `myhomegames-web/`):
+
+- Copy `.env.example` to `.env`:
+
+  ```bash
+  cp .env.example .env
   ```
+
+- The `.env` file should contain:
+
+  ```bash
   VITE_API_BASE=http://127.0.0.1:4000
-  VITE_API_TOKEN=YOUR_API_TOKEN  # Optional, for development mode
+  VITE_API_TOKEN=changeme
   ```
-  
+
   **Note**: `VITE_API_BASE` is required. The application will not start without it.
 
 Notes:
@@ -31,4 +44,3 @@ Notes:
   GET /libraries -> list of libraries
   GET /libraries/:id/games -> games in library
   GET /launcher?gameId=... -> launches game or returns stream URL
-
