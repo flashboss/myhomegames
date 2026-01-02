@@ -409,6 +409,30 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
                 setIsFocused(false);
                 setSearchQuery("");
               }}
+              onGameUpdate={(updatedGame) => {
+                setFilteredGames((prevGames) =>
+                  prevGames.map((game) =>
+                    game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+                  )
+                );
+                setAllFilteredGames((prevGames) =>
+                  prevGames.map((game) =>
+                    game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+                  )
+                );
+              }}
+              onCollectionUpdate={(updatedCollection) => {
+                setFilteredCollections((prevCollections) =>
+                  prevCollections.map((collection) =>
+                    collection.ratingKey === updatedCollection.ratingKey ? updatedCollection : collection
+                  )
+                );
+                setAllFilteredCollections((prevCollections) =>
+                  prevCollections.map((collection) =>
+                    collection.ratingKey === updatedCollection.ratingKey ? updatedCollection : collection
+                  )
+                );
+              }}
               onModalOpen={() => {
                 setIsModalOpen(true);
                 setIsOpen(false);

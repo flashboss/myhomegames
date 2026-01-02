@@ -28,6 +28,7 @@ type GameListItemProps = {
   onPlay?: (game: GameItem) => void;
   onEditClick: (game: GameItem) => void;
   onGameDelete?: (deletedGame: GameItem) => void;
+  onGameUpdate?: (updatedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -47,6 +48,7 @@ function GameListItem({
   onPlay,
   onEditClick,
   onGameDelete,
+  onGameUpdate,
   buildCoverUrl,
   coverSize,
   itemRefs,
@@ -123,6 +125,11 @@ function GameListItem({
           const deletedGame = game.ratingKey === gameId ? game : null;
           if (deletedGame) {
             onGameDelete(deletedGame);
+          }
+        } : undefined}
+        onGameUpdate={onGameUpdate ? (updatedGame) => {
+          if (updatedGame.ratingKey === game.ratingKey) {
+            onGameUpdate(updatedGame);
           }
         } : undefined}
         showTitle={true}
@@ -208,6 +215,7 @@ export default function GamesList({
             onPlay={onPlay}
             onEditClick={handleEditClick}
             onGameDelete={onGameDelete}
+            onGameUpdate={onGameUpdate}
             buildCoverUrl={buildCoverUrl}
             coverSize={coverSize}
             itemRefs={itemRefs}

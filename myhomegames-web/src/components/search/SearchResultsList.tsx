@@ -41,7 +41,9 @@ type SearchResultItemProps = {
   hasBorder?: boolean;
   onEditClick?: (item: GameItem | CollectionItem) => void;
   onGameDelete?: (deletedGame: GameItem) => void;
+  onGameUpdate?: (updatedGame: GameItem) => void;
   onCollectionDelete?: (deletedCollection: CollectionItem) => void;
+  onCollectionUpdate?: (updatedCollection: CollectionItem) => void;
   onModalOpen?: () => void;
   onModalClose?: () => void;
 };
@@ -57,7 +59,9 @@ function SearchResultItem({
   hasBorder = false,
   onEditClick,
   onGameDelete,
+  onGameUpdate,
   onCollectionDelete,
+  onCollectionUpdate,
   onModalOpen,
   onModalClose,
 }: SearchResultItemProps) {
@@ -161,11 +165,29 @@ function SearchResultItem({
                     onGameDelete(item);
                   }
                 } : undefined}
+                onGameUpdate={isGame && onGameUpdate ? (updatedGame) => {
+                  if (updatedGame.ratingKey === item.ratingKey) {
+                    onGameUpdate(updatedGame);
+                  }
+                } : undefined}
                 collectionId={!isGame ? item.ratingKey : undefined}
                 collectionTitle={!isGame ? item.title : undefined}
                 onCollectionDelete={!isGame && onCollectionDelete ? (collectionId: string) => {
                   if (item.ratingKey === collectionId) {
                     onCollectionDelete(item);
+                  }
+                } : undefined}
+                onCollectionUpdate={!isGame && onCollectionUpdate ? (updatedCollection) => {
+                  // Converti CollectionInfo in CollectionItem
+                  const updatedItem: CollectionItem = {
+                    ratingKey: updatedCollection.id,
+                    title: updatedCollection.title,
+                    summary: updatedCollection.summary,
+                    cover: updatedCollection.cover,
+                    gameCount: "gameCount" in item ? item.gameCount : undefined,
+                  };
+                  if (updatedItem.ratingKey === item.ratingKey) {
+                    onCollectionUpdate(updatedItem);
                   }
                 } : undefined}
                 className="search-result-dropdown-menu"
@@ -277,7 +299,9 @@ export default function SearchResultsList({
             hasBorder={isPopup && index < allItems.length - 1}
             onEditClick={handleEditClick}
             onGameDelete={onGameDelete}
+            onGameUpdate={onGameUpdate}
             onCollectionDelete={onCollectionDelete}
+            onCollectionUpdate={onCollectionUpdate}
             onModalOpen={onModalOpen}
             onModalClose={onModalClose}
           />

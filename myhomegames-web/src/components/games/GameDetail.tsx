@@ -231,7 +231,7 @@ function GameDetailContent({
               width={coverWidth}
               height={coverHeight}
               onPlay={() => onPlay(game)}
-              showTitle={true}
+              showTitle={false}
               titlePosition="overlay"
               detail={false}
               play={true}

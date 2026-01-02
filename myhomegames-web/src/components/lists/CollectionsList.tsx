@@ -23,6 +23,7 @@ type CollectionListItemProps = {
   onPlay?: (collection: CollectionItem) => void;
   onEditClick: (collection: CollectionItem) => void;
   onCollectionDelete?: (deletedCollection: CollectionItem) => void;
+  onCollectionUpdate?: (updatedCollection: CollectionItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
@@ -34,6 +35,7 @@ function CollectionListItem({
   onPlay,
   onEditClick,
   onCollectionDelete,
+  onCollectionUpdate,
   buildCoverUrl,
   coverSize,
   itemRefs,
@@ -65,6 +67,19 @@ function CollectionListItem({
         onCollectionDelete={onCollectionDelete ? (collectionId: string) => {
           if (collection.ratingKey === collectionId) {
             onCollectionDelete(collection);
+          }
+        } : undefined}
+        onCollectionUpdate={onCollectionUpdate ? (updatedCollection) => {
+          // Converti CollectionInfo in CollectionItem
+          const updatedItem: CollectionItem = {
+            ratingKey: updatedCollection.id,
+            title: updatedCollection.title,
+            summary: updatedCollection.summary,
+            cover: updatedCollection.cover,
+            gameCount: collection.gameCount, // Mantieni il gameCount esistente
+          };
+          if (updatedItem.ratingKey === collection.ratingKey) {
+            onCollectionUpdate(updatedItem);
           }
         } : undefined}
         showTitle={true}
@@ -139,6 +154,7 @@ export default function CollectionsList({
             onPlay={onPlay}
             onEditClick={handleEditClick}
             onCollectionDelete={onCollectionDelete}
+            onCollectionUpdate={onCollectionUpdate}
             buildCoverUrl={buildCoverUrl}
             coverSize={coverSize}
             itemRefs={itemRefs}

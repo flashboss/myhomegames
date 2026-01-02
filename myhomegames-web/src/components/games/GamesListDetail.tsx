@@ -27,6 +27,7 @@ type GameDetailItemProps = {
   onPlay?: (game: GameItem) => void;
   onEditClick: (game: GameItem) => void;
   onGameDelete?: (deletedGame: GameItem) => void;
+  onGameUpdate?: (updatedGame: GameItem) => void;
   buildCoverUrl: (apiBase: string, cover?: string) => string;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   index: number;
@@ -38,6 +39,7 @@ function GameDetailItem({
   onPlay,
   onEditClick,
   onGameDelete,
+  onGameUpdate,
   buildCoverUrl,
   itemRefs,
   index,
@@ -128,6 +130,11 @@ function GameDetailItem({
               onGameDelete(game);
             }
           } : undefined}
+          onGameUpdate={onGameUpdate ? (updatedGame) => {
+            if (updatedGame.ratingKey === game.ratingKey) {
+              onGameUpdate(updatedGame);
+            }
+          } : undefined}
           className="games-list-detail-dropdown-menu"
         />
       </div>
@@ -180,6 +187,7 @@ export default function GamesListDetail({
             onPlay={onPlay}
             onEditClick={handleEditClick}
             onGameDelete={onGameDelete}
+            onGameUpdate={onGameUpdate}
             buildCoverUrl={buildCoverUrl}
             itemRefs={itemRefs}
             index={index}
