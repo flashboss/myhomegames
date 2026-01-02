@@ -10,7 +10,12 @@
     "recently_installed": "Récemment Installés",
     "best_western": "Meilleurs Jeux Western",
     "recommended": "Recommandés",
-    "oldest": "Les Plus Anciens"
+    "oldest": "Les Plus Anciens",
+    "new_releases": "Nouveautés",
+    "top_rated": "Mieux Notés",
+    "action_games": "Jeux d'Action",
+    "indie_gems": "Jeux Indépendants",
+    "classics": "Classiques"
   },
   "settings": {
     "title": "Paramètres",

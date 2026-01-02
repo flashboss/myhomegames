@@ -47,7 +47,7 @@ export default function GamesListTable({
   const internalScrollRef = useRef<HTMLDivElement>(null);
   const actualScrollRef = scrollContainerRef || internalScrollRef;
   
-  // Usa useScrollRestoration direttamente qui, così viene eseguito solo quando il componente è montato
+  // Use useScrollRestoration directly here, so it's executed only when the component is mounted
   useScrollRestoration(actualScrollRef, "table");
   
   const [localGames, setLocalGames] = useState<GameItem[]>(games);

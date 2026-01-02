@@ -23,13 +23,13 @@ export default function ProfilePage() {
     <div className="profile-page">
       <div className="profile-container">
         <div className="profile-header">
-          <h1 className="profile-title">{t("profile.title", "Profilo")}</h1>
-          <p className="profile-subtitle">{t("profile.subtitle", "Informazioni del tuo account")}</p>
+          <h1 className="profile-title">{t("profile.title", "Profile")}</h1>
+          <p className="profile-subtitle">{t("profile.subtitle", "Your account information")}</p>
         </div>
 
         <div className="bg-[#1a1a1a] profile-card">
           <div className="profile-card-header">
-            <h2 className="profile-card-title">{t("profile.userInfo", "Informazioni utente")}</h2>
+            <h2 className="profile-card-title">{t("profile.userInfo", "User Information")}</h2>
           </div>
 
           <div className="profile-card-content">
@@ -62,20 +62,20 @@ export default function ProfilePage() {
 
             <div className="profile-info-section">
               <div className="profile-field">
-                <label className="profile-label">{t("profile.username", "Nome utente")}</label>
+                <label className="profile-label">{t("profile.username", "Username")}</label>
                 <div className="profile-value">{user.userName}</div>
               </div>
 
               <div className="profile-field">
-                <label className="profile-label">{t("profile.userId", "ID utente")}</label>
+                <label className="profile-label">{t("profile.userId", "User ID")}</label>
                 <div className="profile-value">{user.userId}</div>
               </div>
 
               {user.isDev && (
                 <div className="profile-field">
-                  <label className="profile-label">{t("profile.accountType", "Tipo account")}</label>
+                  <label className="profile-label">{t("profile.accountType", "Account Type")}</label>
                   <div className="profile-value profile-value-dev">
-                    {t("profile.developmentAccount", "Account di sviluppo")}
+                    {t("profile.developmentAccount", "Development Account")}
                   </div>
                 </div>
               )}
