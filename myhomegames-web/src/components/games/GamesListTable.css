@@ -23,8 +23,12 @@
 .games-table thead {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 50;
   background-color: #1a1a1a;
+}
+
+.home-page-content-wrapper.has-toolbar .games-table thead {
+  top: 40px;
 }
 
 .games-table th {

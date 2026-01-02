@@ -75,6 +75,7 @@ function AppContent() {
           month: v.month,
           year: v.year,
           stars: v.stars,
+          genre: v.genre,
         }));
         setAllGames(parsed);
       } catch (err: any) {

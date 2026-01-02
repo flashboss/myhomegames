@@ -287,11 +287,14 @@ export default function EditGameModal({
 
           <div className="edit-game-modal-field">
             <label>{t("gameDetail.genre", "Genre")}</label>
-            <TagEditor
-              selectedTags={selectedGenres}
-              onTagsChange={setSelectedGenres}
-              disabled={saving}
-            />
+            {isOpen && (
+              <TagEditor
+                key={`tag-editor-${game.ratingKey}-${isOpen}`}
+                selectedTags={selectedGenres}
+                onTagsChange={setSelectedGenres}
+                disabled={saving}
+              />
+            )}
           </div>
         </div>
 
