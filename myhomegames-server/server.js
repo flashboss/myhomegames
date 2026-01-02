@@ -219,8 +219,16 @@ app.post("/reload-games", requireToken, (req, res) => {
   libraryRoutes.loadLibraryGames(METADATA_GAMES_DIR, allGames);
   // Recommended games are now just IDs pointing to games already in allGames
   const collectionsCache = collectionsHandler.reload();
+  const recommendedSections = recommendedRoutes.loadRecommendedSections(METADATA_GAMES_DIR);
+  const categories = categoriesRoutes.loadCategories(METADATA_GAMES_DIR);
   const totalCount = Object.keys(allGames).length;
-  res.json({ status: "reloaded", count: totalCount, collections: collectionsCache.length });
+  res.json({ 
+    status: "reloaded", 
+    count: totalCount, 
+    collections: collectionsCache.length,
+    recommended: recommendedSections.length,
+    categories: categories.length
+  });
 });
 
 // IGDB Access Token cache

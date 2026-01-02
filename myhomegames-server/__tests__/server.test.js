@@ -120,6 +120,12 @@ describe('POST /reload-games', () => {
     expect(response.body).toHaveProperty('count');
     expect(typeof response.body.count).toBe('number');
     expect(response.body.count).toBeGreaterThan(0);
+    expect(response.body).toHaveProperty('collections');
+    expect(typeof response.body.collections).toBe('number');
+    expect(response.body).toHaveProperty('recommended');
+    expect(typeof response.body.recommended).toBe('number');
+    expect(response.body).toHaveProperty('categories');
+    expect(typeof response.body.categories).toBe('number');
   });
 
   test('should require authentication', async () => {
