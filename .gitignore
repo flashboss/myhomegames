@@ -7,7 +7,3 @@ Thumbs.db
 *.log
 dist
 .vite
-
-# environment / configurazioni locali
-.env.local
-.env.*.local
