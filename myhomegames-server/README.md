@@ -12,15 +12,7 @@ npm install
 
 The server can be configured using environment variables. 
 
-### Development Setup
-
-For development, copy `.env.example` to `.env`:
-
-```bash
-cp .env.example .env
-```
-
-The `.env.example` file contains a development configuration with `API_TOKEN=changeme` for local development.
+For development setup instructions, see [DEVELOPMENT.md](../DEVELOPMENT.md).
 
 ### Production Setup
 
@@ -105,13 +97,7 @@ Then create the required JSON files or copy them from a backup. The server will 
 
 ## Running the Server
 
-### Development Mode
-
-```bash
-npm run dev
-```
-
-This uses `nodemon` to automatically restart the server when files change.
+For development mode instructions, see [DEVELOPMENT.md](../DEVELOPMENT.md).
 
 ### Production Mode
 
@@ -128,33 +114,7 @@ The server includes a comprehensive test suite using Jest and Supertest to ensur
 - Test dependencies (`jest`, `supertest`) are in `devDependencies` and won't be installed with `npm install --production`
 - Tests are only needed during development and CI/CD pipelines
 
-### Prerequisites
-
-Before running tests, make sure all dependencies are installed:
-
-```bash
-npm install
-```
-
-### Running Tests
-
-To run all tests once:
-
-```bash
-npm test
-```
-
-This will execute all test suites and display a summary of passed/failed tests.
-
-### Running Tests in Watch Mode
-
-To run tests in watch mode (automatically re-runs tests when files change):
-
-```bash
-npm run test:watch
-```
-
-This is useful during development as it provides immediate feedback when making changes.
+For running tests, see [DEVELOPMENT.md](../DEVELOPMENT.md).
 
 ### Test Coverage
 
@@ -172,36 +132,7 @@ The test suite covers:
 
 ### Test Structure
 
-Tests are organized in the `__tests__` directory:
-
-```
-__tests__/
-├── setup.js              # Test environment setup and teardown
-├── server.test.js        # API endpoint tests
-├── helpers.test.js       # Helper function tests
-└── fixtures/             # Test data files
-    ├── games-recommended.json
-    ├── games-library.json
-    ├── games-collections.json
-    ├── games-categories.json
-    └── settings.json
-```
-
-### Test Environment
-
-The test suite uses a temporary metadata directory created in the system temp folder. This ensures:
-- Tests don't interfere with production data
-- Each test run starts with a clean state
-- Tests are isolated and can run independently
-- No cleanup required after tests complete
-
-### Writing New Tests
-
-When adding new functionality:
-1. Add test cases to the appropriate test file (`server.test.js` for endpoints, `helpers.test.js` for utilities)
-2. Add test fixtures if needed in `__tests__/fixtures/`
-3. Ensure tests are isolated and don't depend on external services (mock when necessary)
-4. Run `npm test` to verify all tests pass
+Tests are organized in the `__tests__` directory. See [DEVELOPMENT.md](../DEVELOPMENT.md) for details on running and writing tests.
 
 ## API Endpoints
 
@@ -221,19 +152,7 @@ All authenticated endpoints require the `X-Auth-Token` header with a valid token
 
 The server supports two authentication methods:
 
-### Development Mode (API_TOKEN)
-
-For development, you can use the `API_TOKEN` environment variable. This allows quick testing without setting up Twitch OAuth. Set it in your `.env` file or as an environment variable.
-
-Example:
-```bash
-# Set API_TOKEN and API_BASE in your environment
-export API_TOKEN="your-dev-token-here"
-export API_BASE="http://127.0.0.1:4000"
-
-# Then use it in requests
-curl -H "X-Auth-Token: your-dev-token-here" ${API_BASE}/libraries
-```
+For development authentication setup, see [DEVELOPMENT.md](../DEVELOPMENT.md).
 
 ### Production Mode (Twitch OAuth)
 

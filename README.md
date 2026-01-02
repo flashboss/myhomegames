@@ -6,41 +6,17 @@ MyHomeGames - Personal videogame management system
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
 
-## myhomegames-server
+## Project Structure
 
-- Copy `.env.example` to `.env` before starting
-- npm install
-- npm run dev
+- `myhomegames-server/` - Express.js backend server
+- `myhomegames-web/` - React + TypeScript frontend application
 
-**Note**: The `.env` file contains `API_TOKEN=changeme` for development.
+## Getting Started
 
-**Note**: Copy `.env.example` to `.env` before starting. The `.env` file contains `API_TOKEN=changeme` for development.
+For development setup instructions, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
-## myhomegames-web
+## Documentation
 
-Starter MyHomeGames Web App (React + TypeScript + Tailwind)
-
-Instructions:
-
-- Copy `.env.example` to `.env`:
-
-  ```bash
-  cp .env.example .env
-  ```
-
-- The `.env` file should contain:
-
-  ```bash
-  VITE_API_BASE=http://127.0.0.1:4000
-  VITE_API_TOKEN=changeme
-  ```
-
-  **Note**: `VITE_API_BASE` is required. The application will not start without it.
-
-Notes:
-
-- This is a web front-end for MyHomeGames, a personal videogame management server.
-- Expected endpoints:
-  GET /libraries -> list of libraries
-  GET /libraries/:id/games -> games in library
-  GET /launcher?gameId=... -> launches game or returns stream URL
+- [DEVELOPMENT.md](DEVELOPMENT.md) - Development environment setup guide
+- [myhomegames-server/README.md](myhomegames-server/README.md) - Server documentation
+- [myhomegames-web/README.md](myhomegames-web/README.md) - Web application documentation

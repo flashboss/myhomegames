@@ -2,28 +2,9 @@
 
 React + TypeScript + Vite application for managing and browsing game collections.
 
-## Building and Running Locally
+## Building and Running
 
-### Prerequisites
-
-- Node.js (v18 or higher recommended)
-- npm or yarn
-
-### Development Mode
-
-To run the application in development mode:
-
-```bash
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
-
-The application will be available at `http://localhost:5173` (or the port shown in the terminal).
-
-**Note**: The `.env` file is committed to the repository and contains `VITE_API_TOKEN=changeme` for development authentication (on the `0-X-SNAPSHOT` branch). This is only used when Twitch OAuth is not configured.
+For development setup instructions, see [DEVELOPMENT.md](../DEVELOPMENT.md).
 
 ### Building for Production
 
@@ -38,7 +19,7 @@ This will create an optimized production build in the `dist` directory.
 
 **Important**: 
 - The `.env` file is committed to the repository
-- On the `master` branch: `.env` contains production configuration (no `VITE_API_TOKEN`, production `VITE_API_BASE`)
+- On the `main` branch: `.env` contains production configuration (no `VITE_API_TOKEN`, `VITE_DISCOVERY_SERVICE`)
 - On the `0-X-SNAPSHOT` branch: `.env` contains development configuration (`VITE_API_TOKEN=changeme`, local `VITE_API_BASE`)
 - Do not set `VITE_API_TOKEN` in production - the application will use Twitch OAuth for authentication
 
@@ -52,29 +33,6 @@ npm run preview
 ```
 
 This will serve the production build locally, typically at `http://localhost:4173`.
-
-### Server Setup
-
-Make sure the backend server is running. Navigate to the `myhomegames-server` directory:
-
-```bash
-cd ../myhomegames-server
-
-# Install dependencies
-npm install
-
-# Start the server
-npm start
-
-# Or run in development mode with auto-reload
-npm run dev
-```
-
-**Important**: 
-- The `.env` file is committed to the repository with appropriate configuration for each branch
-- On the `master` branch: production configuration (no `VITE_API_TOKEN`, production `VITE_API_BASE`)
-- On the `0-X-SNAPSHOT` branch: development configuration (`VITE_API_TOKEN=changeme`, local `VITE_API_BASE`)
-- The application will not start without `VITE_API_BASE` configured
 
 ---
 
