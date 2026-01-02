@@ -25,8 +25,6 @@ app.use(cors());
 
 const API_TOKEN = process.env.API_TOKEN;
 const PORT = process.env.PORT || 4000; // PORT can have a default
-const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID;
-const IGDB_CLIENT_SECRET = process.env.IGDB_CLIENT_SECRET;
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
 const API_BASE = process.env.API_BASE;
@@ -241,12 +239,12 @@ async function getIGDBAccessToken() {
     return igdbAccessToken;
   }
 
-  if (!IGDB_CLIENT_ID || !IGDB_CLIENT_SECRET) {
+  if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) {
     throw new Error("IGDB credentials not configured");
   }
 
   return new Promise((resolve, reject) => {
-    const postData = `client_id=${IGDB_CLIENT_ID}&client_secret=${IGDB_CLIENT_SECRET}&grant_type=client_credentials`;
+    const postData = `client_id=${TWITCH_CLIENT_ID}&client_secret=${TWITCH_CLIENT_SECRET}&grant_type=client_credentials`;
 
     const options = {
       hostname: "id.twitch.tv",
@@ -303,7 +301,7 @@ app.get("/igdb/search", requireToken, async (req, res) => {
       path: "/v4/games",
       method: "POST",
       headers: {
-        "Client-ID": IGDB_CLIENT_ID,
+        "Client-ID": TWITCH_CLIENT_ID,
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "text/plain",
         "Content-Length": Buffer.byteLength(postData),
@@ -418,9 +416,7 @@ function validateEnvironment() {
   const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
   const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
   const API_BASE = process.env.API_BASE;
-  const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID;
-  const IGDB_CLIENT_SECRET = process.env.IGDB_CLIENT_SECRET;
-  
+ 
   // Check if Twitch OAuth is configured (all or nothing)
   const hasTwitchClientId = !!TWITCH_CLIENT_ID;
   const hasTwitchClientSecret = !!TWITCH_CLIENT_SECRET;
@@ -439,11 +435,11 @@ function validateEnvironment() {
   }
   
   // Check if IGDB is configured (both or neither)
-  const hasIgdbClientId = !!IGDB_CLIENT_ID;
-  const hasIgdbClientSecret = !!IGDB_CLIENT_SECRET;
+  const hasIgdbClientId = !!TWITCH_CLIENT_ID;
+  const hasIgdbClientSecret = !!TWITCH_CLIENT_SECRET;
   
   if (hasIgdbClientId !== hasIgdbClientSecret) {
-    errors.push("Both IGDB_CLIENT_ID and IGDB_CLIENT_SECRET must be set together, or both omitted");
+    errors.push("Both TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET must be set together, or both omitted");
   }
   
   if (errors.length > 0) {

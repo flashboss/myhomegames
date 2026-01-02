@@ -41,8 +41,6 @@ Then edit `.env` and configure all required variables (Twitch OAuth credentials,
 - `TWITCH_CLIENT_ID` - Twitch OAuth client ID for user authentication
 - `TWITCH_CLIENT_SECRET` - Twitch OAuth client secret for user authentication
 - `API_BASE` - Base URL of the API server (used for OAuth redirects, required if using Twitch OAuth)
-- `IGDB_CLIENT_ID` - IGDB API client ID for game search functionality
-- `IGDB_CLIENT_SECRET` - IGDB API client secret for game search functionality
 - `METADATA_PATH` - Path where game metadata (covers, descriptions, etc.) are stored
 
 ### Metadata Path
