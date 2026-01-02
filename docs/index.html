@@ -229,7 +229,7 @@
             <h1>🎮 MyHomeGames</h1>
             <p class="subtitle">Personal video game collection management system</p>
             <div style="margin-top: 2rem;">
-                <a href="#" id="webapp-link" class="cta-button">
+                <a href="/app/" id="webapp-link" class="cta-button">
                     🌐 Access Web App
                 </a>
             </div>
@@ -329,7 +329,7 @@
                     <a href="https://github.com/flashboss/myhomegames" target="_blank" rel="noopener noreferrer" class="button">
                         📦 GitHub Repository
                     </a>
-                    <a href="#" id="webapp-link-footer" class="button button-secondary">
+                    <a href="/app/" id="webapp-link-footer" class="button button-secondary">
                         🌐 Access Web App
                     </a>
                 </div>
@@ -338,9 +338,9 @@
             <section class="section">
                 <h2>📚 Documentation</h2>
                 <ul>
-                    <li><a href="../DEVELOPMENT.md">Development Guide</a> - Development environment setup</li>
-                    <li><a href="../myhomegames-server/README.md">Server Documentation</a> - API and backend configuration</li>
-                    <li><a href="../myhomegames-web/README.md">Web App Documentation</a> - Frontend and build</li>
+                    <li><a href="https://github.com/flashboss/myhomegames/blob/main/DEVELOPMENT.md">Development Guide</a> - Development environment setup</li>
+                    <li><a href="https://github.com/flashboss/myhomegames/blob/main/myhomegames-server/README.md">Server Documentation</a> - API and backend configuration</li>
+                    <li><a href="https://github.com/flashboss/myhomegames/blob/main/myhomegames-web/README.md">Web App Documentation</a> - Frontend and build</li>
                 </ul>
             </section>
 
@@ -348,7 +348,7 @@
                 <h2>📄 License</h2>
                 <p>
                     This project is released under the <strong>Apache License 2.0</strong>. 
-                    See the <a href="../LICENSE">LICENSE</a> file for details.
+                    See the <a href="https://github.com/flashboss/myhomegames/blob/main/LICENSE">LICENSE</a> file for details.
                 </p>
             </section>
         </div>
@@ -362,12 +362,10 @@
     </div>
 
     <script>
-        // Update web app link when available
-        // Example: const webappUrl = 'https://app.myhomegames.com';
-        // if (webappUrl) {
-        //     document.getElementById('webapp-link').href = webappUrl;
-        //     document.getElementById('webapp-link-footer').href = webappUrl;
-        // }
+        // Set web app link to /app/
+        const webappUrl = '/app/';
+        document.getElementById('webapp-link').href = webappUrl;
+        document.getElementById('webapp-link-footer').href = webappUrl;
     </script>
 </body>
 </html>

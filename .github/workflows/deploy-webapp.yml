@@ -1,0 +1,57 @@
+name: Deploy Web App
+
+on:
+  push:
+    branches:
+      - main
+      - 0.X.X-SNAPSHOT
+    paths:
+      - 'myhomegames-web/**'
+      - '.github/workflows/deploy-webapp.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: myhomegames-web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./myhomegames-web
+        run: npm ci
+
+      - name: Build web app
+        working-directory: ./myhomegames-web
+        env:
+          VITE_API_BASE: ${{ secrets.VITE_API_BASE || 'https://api.example.com' }}
+        run: npm run build
+
+      - name: Deploy to main branch (app folder)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout main
+          
+          # Remove app folder if it exists, keep everything else
+          rm -rf app
+          mkdir -p app
+          
+          # Copy bundle to app folder
+          cp -r myhomegames-web/dist/* app/
+          
+          # Commit and push
+          git add app/
+          git commit -m "Deploy webapp to app/ folder [skip ci]" || exit 0
+          git push origin main
+
