@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MyHomeGames - Sistema di gestione personale per la tua collezione di videogiochi">
+    <title>MyHomeGames - Gestisci la tua collezione di videogiochi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            padding: 3rem 0;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-top: 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: #764ba2;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0.5rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .button-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .button-secondary:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-block code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #0dcaf0;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .content {
+                padding: 1.5rem;
+            }
+
+            .button {
+                display: block;
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 MyHomeGames</h1>
+            <p class="subtitle">Sistema di gestione personale per la tua collezione di videogiochi</p>
+        </header>
+
+        <div class="content">
+            <section class="section">
+                <h2>📖 Informazioni sul Progetto</h2>
+                <p>
+                    MyHomeGames è un'applicazione web moderna per gestire la tua collezione personale di videogiochi. 
+                    Organizza i tuoi giochi, crea collezioni personalizzate, aggiungi valutazioni e molto altro.
+                </p>
+
+                <div class="feature-list">
+                    <div class="feature-card">
+                        <h4>📚 Gestione Libreria</h4>
+                        <p>Organizza tutti i tuoi videogiochi in un'unica libreria centralizzata</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🏷️ Categorie e Collezioni</h4>
+                        <p>Crea categorie e collezioni personalizzate per organizzare i tuoi giochi</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⭐ Valutazioni</h4>
+                        <p>Valuta i tuoi giochi con un sistema a stelle e aggiungi valutazioni della critica</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔍 Ricerca Avanzata</h4>
+                        <p>Cerca giochi per nome, anno, genere e molto altro</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🌐 Multi-lingua</h4>
+                        <p>Supporto per più lingue: Italiano, Inglese, Spagnolo, Francese, Tedesco, Portoghese, Giapponese, Cinese</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔐 Autenticazione Twitch</h4>
+                        <p>Accedi in modo sicuro utilizzando il tuo account Twitch</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>🚀 Come Iniziare</h2>
+                <p>
+                    Per utilizzare MyHomeGames, devi prima registrare un'applicazione Twitch per ottenere le credenziali OAuth.
+                </p>
+
+                <h3>1. Registra un'applicazione Twitch</h3>
+                <ol>
+                    <li>Vai su <a href="https://dev.twitch.tv/console/apps" target="_blank" rel="noopener noreferrer">Twitch Developer Console</a></li>
+                    <li>Clicca su <strong>"Register Your Application"</strong></li>
+                    <li>Compila il modulo:
+                        <ul>
+                            <li><strong>Name:</strong> MyHomeGames (o un nome a tua scelta)</li>
+                            <li><strong>OAuth Redirect URLs:</strong> Aggiungi l'URL del tuo server API seguito da <code>/auth/twitch/callback</code>
+                                <div class="code-block">
+                                    <code>https://tuo-dominio-api.com/auth/twitch/callback</code>
+                                </div>
+                            </li>
+                            <li><strong>Category:</strong> Scegli "Website Integration" o "Desktop Application"</li>
+                        </ul>
+                    </li>
+                    <li>Clicca su <strong>"Create"</strong></li>
+                    <li>Dopo la creazione, copia il <strong>Client ID</strong> e genera un <strong>Client Secret</strong></li>
+                </ol>
+
+                <div class="button-container">
+                    <a href="https://dev.twitch.tv/console/apps" target="_blank" rel="noopener noreferrer" class="button">
+                        📝 Registra Applicazione Twitch
+                    </a>
+                </div>
+
+                <h3>2. Configura il Server</h3>
+                <p>
+                    Una volta ottenute le credenziali Twitch, configura il server aggiungendo le seguenti variabili d'ambiente:
+                </p>
+                <div class="code-block">
+                    <code>
+TWITCH_CLIENT_ID=il_tuo_client_id<br>
+TWITCH_CLIENT_SECRET=il_tuo_client_secret<br>
+API_BASE=https://tuo-dominio-api.com<br>
+FRONTEND_URL=https://tuo-dominio-webapp.com
+                    </code>
+                </div>
+
+                <div class="info">
+                    <strong>💡 Nota:</strong> Per lo sviluppo locale, puoi usare <code>http://localhost:4000</code> come <code>API_BASE</code> 
+                    e <code>http://localhost:5173</code> come <code>FRONTEND_URL</code>.
+                </div>
+
+                <h3>3. Configura la Web App</h3>
+                <p>
+                    Nella cartella <code>myhomegames-web</code>, crea un file <code>.env</code> con:
+                </p>
+                <div class="code-block">
+                    <code>
+VITE_API_BASE=https://tuo-dominio-api.com
+                    </code>
+                </div>
+
+                <div class="warning">
+                    <strong>⚠️ Importante:</strong> Non impostare <code>VITE_API_TOKEN</code> in produzione. 
+                    L'applicazione userà l'autenticazione Twitch OAuth.
+                </div>
+
+                <h3>4. Build e Deploy</h3>
+                <ol>
+                    <li>Esegui il build della webapp:
+                        <div class="code-block">
+                            <code>cd myhomegames-web<br>npm run build</code>
+                        </div>
+                    </li>
+                    <li>I file di produzione saranno nella cartella <code>dist/</code></li>
+                    <li>Carica i file dalla cartella <code>dist/</code> sul tuo server web</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>🔗 Link Utili</h2>
+                <div class="button-container">
+                    <a href="https://github.com/flashboss/myhomegames" target="_blank" rel="noopener noreferrer" class="button">
+                        📦 Repository GitHub
+                    </a>
+                    <a href="#" id="webapp-link" class="button button-secondary">
+                        🌐 Accedi alla Web App
+                    </a>
+                </div>
+                <p style="text-align: center; margin-top: 1rem;">
+                    <em>Nota: Il link alla web app verrà configurato dopo il deploy in produzione.</em>
+                </p>
+            </section>
+
+            <section class="section">
+                <h2>📚 Documentazione</h2>
+                <ul>
+                    <li><a href="../DEVELOPMENT.md">Guida allo Sviluppo</a> - Setup dell'ambiente di sviluppo</li>
+                    <li><a href="../myhomegames-server/README.md">Documentazione Server</a> - API e configurazione del backend</li>
+                    <li><a href="../myhomegames-web/README.md">Documentazione Web App</a> - Frontend e build</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>📄 Licenza</h2>
+                <p>
+                    Questo progetto è rilasciato sotto la licenza <strong>Apache License 2.0</strong>. 
+                    Vedi il file <a href="../LICENSE">LICENSE</a> per i dettagli.
+                </p>
+            </section>
+        </div>
+
+        <footer>
+            <p>© 2024 MyHomeGames - Gestisci la tua collezione di videogiochi</p>
+            <p style="margin-top: 0.5rem; opacity: 0.8;">
+                Sviluppato con ❤️ utilizzando React, TypeScript, Express.js e Twitch OAuth
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Aggiorna il link della web app quando sarà disponibile
+        // Per ora, lascia un placeholder o commenta questa parte
+        // document.getElementById('webapp-link').href = 'https://tuo-dominio-webapp.com';
+        
+        // Esempio: se vuoi che il link sia dinamico basato su una variabile
+        // const webappUrl = 'https://tuo-dominio-webapp.com';
+        // if (webappUrl) {
+        //     document.getElementById('webapp-link').href = webappUrl;
+        // }
+    </script>
+</body>
+</html>
+
