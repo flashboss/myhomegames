@@ -167,20 +167,20 @@ export default function ProfileDropdown({
             className="profile-dropdown-item"
             onClick={handleViewProfile}
           >
-            {t("profile.viewProfile", "Visualizza profilo")}
+            {t("profile.viewProfile", "View Profile")}
           </button>
           <div className="profile-dropdown-separator"></div>
           <button
             className="profile-dropdown-item"
             onClick={handleChangeUser}
           >
-            {t("profile.changeUser", "Cambia utente")}
+            {t("profile.changeUser", "Change User")}
           </button>
           <button
             className="profile-dropdown-item profile-dropdown-item-danger"
             onClick={handleLogout}
           >
-            {t("profile.logout", "Esci")}
+            {t("profile.logout", "Logout")}
           </button>
         </div>
       )}

@@ -77,7 +77,7 @@ export default function RecommendedSection({
     }
   };
 
-  // Ripristina posizione quando cambia route o sezione
+  // Restore position when route or section changes
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -90,17 +90,17 @@ export default function RecommendedSection({
       return;
     }
 
-    // Verifica quando il contenuto è pronto
+    // Check when content is ready
     const restoreScroll = (attempt = 0) => {
       if (!container) {
         setIsRestoring(false);
         return;
       }
 
-      // Verifica che il contenuto sia renderizzato (scrollWidth > clientWidth)
+      // Check that content is rendered (scrollWidth > clientWidth)
       if (container.scrollWidth <= container.clientWidth) {
         if (attempt < 20) {
-          // Riprova dopo un frame
+          // Retry after a frame
           requestAnimationFrame(() => restoreScroll(attempt + 1));
         } else {
           setIsRestoring(false);
@@ -108,13 +108,13 @@ export default function RecommendedSection({
         return;
       }
 
-      // Il contenuto è pronto, ripristina la posizione
+      // Content is ready, restore position
       container.scrollLeft = savedPosition;
       updateScrollButtons();
       setIsRestoring(false);
     };
 
-    // Inizia il ripristino dopo un breve delay per assicurarsi che il DOM sia pronto
+    // Start restoration after a brief delay to ensure DOM is ready
     const timer = setTimeout(() => {
       restoreScroll();
     }, 100);
@@ -125,7 +125,7 @@ export default function RecommendedSection({
     };
   }, [location.pathname, sectionId, storageKey, games.length]);
 
-  // Salva posizione durante lo scroll
+  // Save position during scroll
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -137,7 +137,7 @@ export default function RecommendedSection({
       updateScrollButtons();
     };
 
-    // Previeni navigazione browser durante scroll orizzontale
+    // Prevent browser navigation during horizontal scroll
     const handleWheel = (e: WheelEvent) => {
       const rect = container.getBoundingClientRect();
       const isOverContainer = 
@@ -174,7 +174,7 @@ export default function RecommendedSection({
     return () => {
       container.removeEventListener('scroll', handleScroll);
       container.removeEventListener('wheel', handleWheel);
-      // Salva posizione finale quando il componente viene smontato
+      // Save final position when component is unmounted
       const finalPosition = container.scrollLeft;
       if (finalPosition > 0 && !isRestoring) {
         setScrollPosition(storageKey, finalPosition);
@@ -182,7 +182,7 @@ export default function RecommendedSection({
     };
   }, [sectionId, storageKey, isRestoring]);
 
-  // Aggiorna bottoni quando cambia contenuto
+  // Update buttons when content changes
   useEffect(() => {
     updateScrollButtons();
     const timer = setTimeout(updateScrollButtons, 200);

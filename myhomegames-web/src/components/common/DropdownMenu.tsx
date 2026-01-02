@@ -145,7 +145,7 @@ export default function DropdownMenu({
     e.stopPropagation();
     setIsOpen(false);
     
-    // Se abbiamo le props per gestire la cancellazione internamente (game o collection)
+    // If we have props to handle deletion internally (game or collection)
     const apiToken = getApiToken();
     if (apiToken && ((gameId && gameTitle) || (collectionId && collectionTitle))) {
       if (onModalOpen) {
@@ -153,7 +153,7 @@ export default function DropdownMenu({
       }
       setShowConfirmModal(true);
     } else if (onDelete) {
-      // Fallback al comportamento precedente
+      // Fallback to previous behavior
       onDelete();
     }
   };
@@ -163,10 +163,10 @@ export default function DropdownMenu({
     e.preventDefault();
     setIsOpen(false);
     
-    // Se c'è un gameId o collectionId, esegui direttamente il reload (singolo elemento)
+    // If there's a gameId or collectionId, execute reload directly (single element)
     if (gameId || collectionId) {
       if (onReload) {
-        // Se c'è una callback personalizzata, usala
+        // If there's a custom callback, use it
         onReload();
       } else {
         executeReload();
@@ -174,8 +174,8 @@ export default function DropdownMenu({
       return;
     }
     
-    // Altrimenti mostra il modal di conferma per il reload globale
-    // Usa setTimeout per assicurarsi che il dropdown sia chiuso prima di aprire il modal
+    // Otherwise show confirmation modal for global reload
+    // Use setTimeout to ensure dropdown is closed before opening modal
     setTimeout(() => {
       if (onModalOpen) {
         onModalOpen();
@@ -197,13 +197,13 @@ export default function DropdownMenu({
     try {
       let url: string;
       
-      // Se c'è un gameId o collectionId, ricarica solo quell'elemento
+      // If there's a gameId or collectionId, reload only that element
       if (gameId) {
         url = buildApiUrl(API_BASE, `/games/${gameId}/reload`);
       } else if (collectionId) {
         url = buildApiUrl(API_BASE, `/collections/${collectionId}/reload`);
       } else {
-        // Altrimenti ricarica tutti i metadati
+        // Otherwise reload all metadata
         url = buildApiUrl(API_BASE, "/reload-games");
       }
       
@@ -217,10 +217,10 @@ export default function DropdownMenu({
       if (response.ok) {
         const data = await response.json();
         
-        // Se c'è un gameId o collectionId, aggiorna solo i dati senza ricaricare la pagina
+        // If there's a gameId or collectionId, update only data without reloading page
         if (gameId) {
           if (onGameUpdate && data.game) {
-            // Converti i dati del gioco nel formato GameItem
+            // Convert game data to GameItem format
             const updatedGame = {
               ratingKey: data.game.id,
               title: data.game.title,
@@ -235,15 +235,15 @@ export default function DropdownMenu({
             };
             onGameUpdate(updatedGame);
             setIsReloading(false);
-            return; // Esci dalla funzione senza ricaricare
+            return; // Exit function without reloading
           } else {
-            // Se non c'è callback o dati mancanti, non ricaricare comunque la pagina
+            // If there's no callback or missing data, don't reload page anyway
             setIsReloading(false);
-            return; // Non ricaricare la pagina anche se manca la callback
+            return; // Don't reload page even if callback is missing
           }
         } else if (collectionId) {
           if (onCollectionUpdate && data.collection) {
-            // Mappa i dati della collection nel formato CollectionInfo
+            // Map collection data to CollectionInfo format
             const updatedCollection = {
               id: data.collection.id,
               title: data.collection.title,
@@ -253,15 +253,15 @@ export default function DropdownMenu({
             };
             onCollectionUpdate(updatedCollection);
             setIsReloading(false);
-            return; // Esci dalla funzione senza ricaricare
+            return; // Exit function without reloading
           } else {
-            // Se non c'è callback, non fare nulla (o mostra un errore)
+            // If there's no callback, do nothing (or show error)
             console.warn("onCollectionUpdate callback not provided or collection data missing");
             setIsReloading(false);
             return;
           }
         } else {
-          // Per il reload globale, ricarica la pagina
+          // For global reload, reload the page
           window.location.reload();
         }
       } else {
@@ -277,7 +277,7 @@ export default function DropdownMenu({
   };
 
   const handleConfirmReload = () => {
-    // Se c'è una callback personalizzata, usala dopo la conferma
+    // If there's a custom callback, use it after confirmation
     if (onReload) {
       onReload();
     } else {
@@ -303,7 +303,7 @@ export default function DropdownMenu({
     try {
       let url: string;
 
-      // Determina se stiamo cancellando un game o una collection
+      // Determine if we're deleting a game or a collection
       if (gameId) {
         url = buildApiUrl(API_BASE, `/games/${gameId}`);
       } else if (collectionId) {

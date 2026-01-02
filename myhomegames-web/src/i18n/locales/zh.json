@@ -10,7 +10,12 @@
     "recently_installed": "最近安装",
     "best_western": "最佳西部游戏",
     "recommended": "推荐",
-    "oldest": "最旧的"
+    "oldest": "最旧的",
+    "new_releases": "新发布",
+    "top_rated": "最高评分",
+    "action_games": "动作游戏",
+    "indie_gems": "独立游戏",
+    "classics": "经典游戏"
   },
   "settings": {
     "title": "设置",

@@ -70,7 +70,7 @@ function CollectionListItem({
           }
         } : undefined}
         onCollectionUpdate={onCollectionUpdate ? (updatedCollection) => {
-          // Converti CollectionInfo in CollectionItem
+          // Convert CollectionInfo to CollectionItem
           const updatedItem: CollectionItem = {
             ratingKey: updatedCollection.id,
             title: updatedCollection.title,
