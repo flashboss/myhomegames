@@ -24,6 +24,8 @@ export default function SearchResultsPage({
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
+  const [gamesState, setGamesState] = useState<GameItem[]>([]);
+  const [collectionsState, setCollectionsState] = useState<CollectionItem[]>([]);
   
   // Restore scroll position
   useScrollRestoration(scrollContainerRef);
@@ -31,6 +33,54 @@ export default function SearchResultsPage({
   // Retrieve data from location state
   const { searchQuery, games, collections } =
     (location.state as { searchQuery?: string; games?: GameItem[]; collections?: CollectionItem[] }) || {};
+
+  // Sync state with location state
+  useLayoutEffect(() => {
+    if (games) {
+      setGamesState(games);
+    }
+    if (collections) {
+      setCollectionsState(collections);
+    }
+  }, [games, collections]);
+
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    setGamesState((prevGames) =>
+      prevGames.map((game) =>
+        game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+      )
+    );
+    // Update location state as well
+    if (location.state && typeof location.state === 'object') {
+      const currentState = location.state as { games?: GameItem[]; collections?: CollectionItem[]; searchQuery?: string };
+      const updatedGames = (currentState.games || []).map((game) =>
+        game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+      );
+      navigate(location.pathname, {
+        state: { ...currentState, games: updatedGames },
+        replace: true,
+      });
+    }
+  };
+
+  const handleCollectionUpdate = (updatedCollection: CollectionItem) => {
+    setCollectionsState((prevCollections) =>
+      prevCollections.map((collection) =>
+        collection.ratingKey === updatedCollection.ratingKey ? updatedCollection : collection
+      )
+    );
+    // Update location state as well
+    if (location.state && typeof location.state === 'object') {
+      const currentState = location.state as { games?: GameItem[]; collections?: CollectionItem[]; searchQuery?: string };
+      const updatedCollections = (currentState.collections || []).map((collection) =>
+        collection.ratingKey === updatedCollection.ratingKey ? updatedCollection : collection
+      );
+      navigate(location.pathname, {
+        state: { ...currentState, collections: updatedCollections },
+        replace: true,
+      });
+    }
+  };
 
   // Check if we came from game detail page and should redirect
   useLayoutEffect(() => {
@@ -45,7 +95,7 @@ export default function SearchResultsPage({
 
   // Hide content until fully rendered
   useLayoutEffect(() => {
-    if ((games && games.length > 0) || (collections && collections.length > 0)) {
+    if ((gamesState.length > 0) || (collectionsState.length > 0)) {
       // Wait for next frame to ensure DOM is ready
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -55,7 +105,7 @@ export default function SearchResultsPage({
     } else {
       setIsReady(false);
     }
-  }, [games, collections]);
+  }, [gamesState, collectionsState]);
 
   if (!searchQuery) {
     return (
@@ -67,7 +117,7 @@ export default function SearchResultsPage({
     );
   }
 
-  const totalResults = (games?.length || 0) + (collections?.length || 0);
+  const totalResults = gamesState.length + collectionsState.length;
   if (totalResults === 0) {
     return (
       <div className="bg-[#1a1a1a] text-white search-results-page">
@@ -140,11 +190,13 @@ export default function SearchResultsPage({
       <div ref={scrollContainerRef} className="search-results-content">
         <div className="search-results-content-inner">
           <SearchResultsList
-            games={games || []}
-            collections={collections || []}
+            games={gamesState}
+            collections={collectionsState}
             onGameClick={onGameClick}
             buildCoverUrl={buildCoverUrl}
             onPlay={onPlay}
+            onGameUpdate={handleGameUpdate}
+            onCollectionUpdate={handleCollectionUpdate}
           />
         </div>
       </div>

@@ -11,7 +11,7 @@ export default function ProfilePage() {
       <div className="profile-page">
         <div className="profile-container">
           <div className="profile-header">
-            <h1 className="profile-title">{t("profile.title", "Profilo")}</h1>
+            <h1 className="profile-title">{t("profile.title", "Profile")}</h1>
             <p className="profile-subtitle">{t("profile.notLoggedIn", "Non sei autenticato")}</p>
           </div>
         </div>

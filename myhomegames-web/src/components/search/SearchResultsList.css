@@ -120,13 +120,8 @@
 .search-result-actions {
   display: flex;
   align-items: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.search-results-list-item:hover .search-result-actions,
-.search-dropdown-item:hover .search-result-actions {
   opacity: 1;
+  transition: opacity 0.2s ease;
 }
 
 .search-result-dropdown-menu {

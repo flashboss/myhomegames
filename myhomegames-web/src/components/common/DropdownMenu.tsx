@@ -407,7 +407,7 @@ export default function DropdownMenu({
               <span>{t("common.edit", "Edit")}</span>
             </button>
           )}
-          {(onReload || gameId || collectionId || (!gameId && !collectionId && !onEdit && !onDelete)) && (
+          {(onReload || (gameId && onGameUpdate) || (collectionId && onCollectionUpdate) || (!gameId && !collectionId && !onEdit && !onDelete)) && (
             <button
               onClick={handleReload}
               className="dropdown-menu-item"

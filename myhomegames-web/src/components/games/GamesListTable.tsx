@@ -493,6 +493,11 @@ export default function GamesListTable({
                             onGameDelete(deletedGame);
                           }
                         } : undefined}
+                        onGameUpdate={onGameUpdate ? (updatedGame) => {
+                          if (updatedGame.ratingKey === it.ratingKey) {
+                            handleGameUpdate(updatedGame);
+                          }
+                        } : undefined}
                         className="games-table-dropdown-menu"
                       />
                     </div>

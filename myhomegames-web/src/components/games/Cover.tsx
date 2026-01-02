@@ -17,9 +17,11 @@ type CoverProps = {
   gameId?: string;
   gameTitle?: string;
   onGameDelete?: (gameId: string) => void;
+  onGameUpdate?: (game: any) => void;
   collectionId?: string;
   collectionTitle?: string;
   onCollectionDelete?: (collectionId: string) => void;
+  onCollectionUpdate?: (collection: any) => void;
   showTitle?: boolean;
   subtitle?: string | number | null;
   detail?: boolean;
@@ -45,9 +47,11 @@ export default function Cover({
   gameId,
   gameTitle,
   onGameDelete,
+  onGameUpdate,
   collectionId,
   collectionTitle,
   onCollectionDelete,
+  onCollectionUpdate,
   showTitle = false,
   subtitle,
   detail = true,
@@ -220,9 +224,11 @@ export default function Cover({
               gameId={gameId}
               gameTitle={gameTitle}
               onGameDelete={onGameDelete}
+              onGameUpdate={onGameUpdate}
               collectionId={collectionId}
               collectionTitle={collectionTitle}
               onCollectionDelete={onCollectionDelete}
+              onCollectionUpdate={onCollectionUpdate}
               className="games-list-dropdown-menu"
             />
           </div>
