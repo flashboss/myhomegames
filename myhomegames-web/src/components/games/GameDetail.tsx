@@ -13,6 +13,7 @@ import type { GameItem } from "../../types";
 import { formatGameDate } from "../../utils/date";
 import { buildApiUrl } from "../../utils/api";
 import { API_BASE, getApiToken } from "../../config";
+import { useLoading } from "../../contexts/LoadingContext";
 import "./GameDetail.css";
 
 type GameDetailProps = {
@@ -33,6 +34,7 @@ export default function GameDetail({
   onGameDelete,
 }: GameDetailProps) {
   const { t } = useTranslation();
+  const { setLoading } = useLoading();
   const [localGame, setLocalGame] = useState<GameItem>(game);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
@@ -52,6 +54,7 @@ export default function GameDetail({
   const rating = localGame.stars ? localGame.stars / 2 : null;
 
   const handleRatingChange = async (newStars: number) => {
+    setLoading(true);
     try {
       const url = buildApiUrl(API_BASE, `/games/${localGame.ratingKey}`);
       const response = await fetch(url, {
@@ -77,6 +80,8 @@ export default function GameDetail({
       }
     } catch (error) {
       console.error('Error updating rating:', error);
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { API_BASE, API_TOKEN } from "../../config";
+import { useLoading } from "../../contexts/LoadingContext";
 import type { CollectionInfo } from "../../types";
 import { buildApiUrl } from "../../utils/api";
 import "./EditCollectionModal.css";
@@ -20,6 +21,7 @@ export default function EditCollectionModal({
   onCollectionUpdate,
 }: EditCollectionModalProps) {
   const { t } = useTranslation();
+  const { setLoading } = useLoading();
   const [title, setTitle] = useState(collection.title);
   const [summary, setSummary] = useState(collection.summary || "");
   const [saving, setSaving] = useState(false);
@@ -55,6 +57,7 @@ export default function EditCollectionModal({
   const handleSave = async () => {
     setSaving(true);
     setError(null);
+    setLoading(true);
 
     try {
       const updates: any = {};
@@ -97,6 +100,7 @@ export default function EditCollectionModal({
       setError(String(err.message || err));
     } finally {
       setSaving(false);
+      setLoading(false);
     }
   };
 

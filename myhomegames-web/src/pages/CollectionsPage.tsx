@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import CollectionsList from "../components/lists/CollectionsList";
 import AlphabetNavigator from "../components/ui/AlphabetNavigator";
 import { compareTitles } from "../utils/stringUtils";
@@ -17,6 +18,7 @@ export default function CollectionsPage({
   onPlay,
   coverSize,
 }: CollectionsPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const navigate = useNavigate();
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,6 +75,7 @@ export default function CollectionsPage({
       console.error("Error fetching collections:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 

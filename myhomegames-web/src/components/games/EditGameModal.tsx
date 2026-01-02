@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { API_BASE, API_TOKEN } from "../../config";
+import { useLoading } from "../../contexts/LoadingContext";
 import TagEditor from "../common/TagEditor";
 import type { GameItem } from "../../types";
 import { buildApiUrl } from "../../utils/api";
@@ -21,6 +22,7 @@ export default function EditGameModal({
   onGameUpdate,
 }: EditGameModalProps) {
   const { t } = useTranslation();
+  const { setLoading } = useLoading();
   const [title, setTitle] = useState(game.title);
   const [summary, setSummary] = useState(game.summary || "");
   const [year, setYear] = useState(game.year?.toString() || "");
@@ -68,6 +70,7 @@ export default function EditGameModal({
   const handleSave = async () => {
     setSaving(true);
     setError(null);
+    setLoading(true);
 
     try {
       const updates: any = {};
@@ -137,6 +140,7 @@ export default function EditGameModal({
       setError(String(err.message || err));
     } finally {
       setSaving(false);
+      setLoading(false);
     }
   };
 

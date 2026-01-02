@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import GamesList from "../components/games/GamesList";
 import GamesListDetail from "../components/games/GamesListDetail";
 import GamesListTable from "../components/games/GamesListTable";
@@ -27,6 +28,7 @@ export default function LibraryPage({
   coverSize,
   viewMode,
 }: LibraryPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -271,6 +273,7 @@ export default function LibraryPage({
       console.error("Error fetching library games:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 

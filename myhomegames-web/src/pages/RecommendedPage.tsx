@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import RecommendedSection from "../components/recommended/RecommendedSection";
 import type { GameItem } from "../types";
 import { API_BASE, getApiToken } from "../config";
@@ -23,6 +24,7 @@ export default function RecommendedPage({
   onPlay,
   coverSize,
 }: RecommendedPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const [sections, setSections] = useState<RecommendedSection[]>([]);
   const [loading, setLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -99,6 +101,7 @@ export default function RecommendedPage({
       console.error("Error fetching recommended sections:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 

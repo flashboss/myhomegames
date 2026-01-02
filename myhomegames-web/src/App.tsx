@@ -370,6 +370,7 @@ function GameDetailPage({
   onPlay: (game: GameItem) => void;
 }) {
   const { t } = useTranslation();
+  const { setLoading: setGlobalLoading } = useLoading();
   const { gameId } = useParams<{ gameId: string }>();
   const [game, setGame] = useState<GameItem | null>(null);
   const [loading, setLoading] = useState(false);
@@ -383,6 +384,7 @@ function GameDetailPage({
 
   async function fetchGame(gameId: string) {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       // Fetch single game from dedicated endpoint
         const url = buildApiUrlWithBase(`/games/${gameId}`);
@@ -423,6 +425,7 @@ function GameDetailPage({
       setGame(null);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 

@@ -484,7 +484,6 @@ export default function GamesListTable({
                         </svg>
                       </button>
                       <DropdownMenu
-                        onEdit={() => handleEditClick(it)}
                         gameId={it.ratingKey}
                         gameTitle={it.title}
                         onGameDelete={onGameDelete ? (gameId: string) => {

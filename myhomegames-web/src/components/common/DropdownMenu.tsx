@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
 import { API_BASE, getApiToken } from "../../config";
 import { buildApiUrl } from "../../utils/api";
+import { useLoading } from "../../contexts/LoadingContext";
 import Tooltip from "./Tooltip";
 import "./DropdownMenu.css";
 
@@ -44,6 +45,7 @@ export default function DropdownMenu({
   toolTipDelay = 0,
 }: DropdownMenuProps) {
   const { t } = useTranslation();
+  const { setLoading } = useLoading();
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showReloadConfirmModal, setShowReloadConfirmModal] = useState(false);
@@ -196,6 +198,7 @@ export default function DropdownMenu({
     
     setIsReloading(true);
     setReloadError(null);
+    setLoading(true);
     
     try {
       let url: string;
@@ -238,10 +241,12 @@ export default function DropdownMenu({
             };
             onGameUpdate(updatedGame);
             setIsReloading(false);
+            setLoading(false);
             return; // Exit function without reloading
           } else {
             // If there's no callback or missing data, don't reload page anyway
             setIsReloading(false);
+            setLoading(false);
             return; // Don't reload page even if callback is missing
           }
         } else if (collectionId) {
@@ -256,11 +261,13 @@ export default function DropdownMenu({
             };
             onCollectionUpdate(updatedCollection);
             setIsReloading(false);
+            setLoading(false);
             return; // Exit function without reloading
           } else {
             // If there's no callback, do nothing (or show error)
             console.warn("onCollectionUpdate callback not provided or collection data missing");
             setIsReloading(false);
+            setLoading(false);
             return;
           }
         } else {
@@ -271,11 +278,13 @@ export default function DropdownMenu({
         console.error("Failed to reload metadata");
         setReloadError(t("common.reloadError", "Failed to reload metadata"));
         setIsReloading(false);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error reloading metadata:", error);
       setReloadError(t("common.reloadError", "Failed to reload metadata"));
       setIsReloading(false);
+      setLoading(false);
     }
   };
 
@@ -302,6 +311,7 @@ export default function DropdownMenu({
 
     setIsDeleting(true);
     setDeleteError(null);
+    setLoading(true);
 
     try {
       let url: string;
@@ -340,6 +350,7 @@ export default function DropdownMenu({
       setDeleteError(t("common.deleteError"));
     } finally {
       setIsDeleting(false);
+      setLoading(false);
     }
   };
 

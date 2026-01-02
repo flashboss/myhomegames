@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import CategoriesList from "../components/lists/CategoriesList";
 import type { CategoryItem, GameItem } from "../types";
 import { API_BASE, getApiToken } from "../config";
@@ -12,6 +13,7 @@ type CategoriesPageProps = {
 export default function CategoriesPage({
   coverSize,
 }: CategoriesPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const [allCategories, setAllCategories] = useState<CategoryItem[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [games, setGames] = useState<GameItem[]>([]);
@@ -126,6 +128,7 @@ export default function CategoriesPage({
       console.error("Error fetching library games:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 

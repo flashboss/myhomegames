@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import GamesList from "../components/games/GamesList";
 import GamesListDetail from "../components/games/GamesListDetail";
 import GamesListTable from "../components/games/GamesListTable";
@@ -24,6 +25,7 @@ export default function CategoryPage({
   onGamesLoaded,
   onPlay,
 }: CategoryPageProps) {
+  const { setLoading: setGlobalLoading } = useLoading();
   const { categoryId } = useParams<{ categoryId: string }>();
   const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -167,6 +169,7 @@ export default function CategoryPage({
 
   async function fetchLibraryGames() {
     setLoading(true);
+    setGlobalLoading(true);
     try {
       const url = buildApiUrl(API_BASE, `/libraries/library/games`, {
         sort: "title",
@@ -198,6 +201,7 @@ export default function CategoryPage({
       console.error("Error fetching library games:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 
@@ -329,6 +333,20 @@ export default function CategoryPage({
     return filtered;
   }, [games, filterField, selectedYear, selectedDecade, selectedGenre, selectedCollection, sortField, sortAscending, availableGenres, collectionGameIds]);
 
+  const handleGameUpdate = (updatedGame: GameItem) => {
+    setGames((prevGames) =>
+      prevGames.map((game) =>
+        game.ratingKey === updatedGame.ratingKey ? updatedGame : game
+      )
+    );
+  };
+
+  const handleGameDelete = (deletedGame: GameItem) => {
+    setGames((prevGames) =>
+      prevGames.filter((game) => game.ratingKey !== deletedGame.ratingKey)
+    );
+  };
+
   return (
     <>
       <LibrariesBar
@@ -388,6 +406,8 @@ export default function CategoryPage({
                   games={filteredAndSortedGames}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
+                  onGameUpdate={handleGameUpdate}
+                  onGameDelete={handleGameDelete}
                   buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
                   coverSize={coverSize}
                   itemRefs={itemRefs}
@@ -399,6 +419,8 @@ export default function CategoryPage({
                   games={filteredAndSortedGames}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
+                  onGameUpdate={handleGameUpdate}
+                  onGameDelete={handleGameDelete}
                   buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
                   itemRefs={itemRefs}
                 />
@@ -408,6 +430,8 @@ export default function CategoryPage({
                   games={filteredAndSortedGames}
                   onGameClick={onGameClick}
                   onPlay={onPlay}
+                  onGameUpdate={handleGameUpdate}
+                  onGameDelete={handleGameDelete}
                   itemRefs={itemRefs}
                   scrollContainerRef={tableScrollRef}
                   sortField={sortField}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
+import { useLoading } from "../contexts/LoadingContext";
 import GamesList from "../components/games/GamesList";
 import Cover from "../components/games/Cover";
 import LibrariesBar from "../components/layout/LibrariesBar";
@@ -29,6 +30,7 @@ export default function CollectionDetail({
   onPlay,
 }: CollectionDetailProps) {
   const { t } = useTranslation();
+  const { setLoading: setGlobalLoading } = useLoading();
   const { collectionId } = useParams<{ collectionId: string }>();
   const [collection, setCollection] = useState<CollectionInfo | null>(null);
   const [games, setGames] = useState<GameItem[]>([]);
@@ -158,6 +160,7 @@ export default function CollectionDetail({
       console.error("Error fetching collection games:", errorMessage);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   }
 
