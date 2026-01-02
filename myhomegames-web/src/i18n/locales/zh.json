@@ -56,6 +56,11 @@
     "accountType": "账户类型",
     "developmentAccount": "开发账户"
   },
+  "login": {
+    "title": "欢迎使用 MyHomeGames",
+    "subtitle": "请登录以继续",
+    "button": "使用 Twitch 登录"
+  },
   "search": {
     "noResults": "未找到术语 \"{{query}}\" 的结果",
     "viewAllResults": "查看所有结果 ({{count}})",

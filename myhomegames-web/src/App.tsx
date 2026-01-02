@@ -17,9 +17,11 @@ import AddGamePage from "./pages/AddGamePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import CollectionDetail from "./pages/CollectionDetail";
 import CategoryPage from "./pages/CategoryPage";
+import LoginPage from "./pages/LoginPage";
 import AddGame from "./components/common/AddGame";
 import GameDetail from "./components/games/GameDetail";
 import LaunchModal from "./components/common/LaunchModal";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 import type { GameItem, CollectionItem } from "./types";
 import { buildApiUrl, buildCoverUrl, buildBackgroundUrl } from "./utils/api";
@@ -243,103 +245,195 @@ function AppContent() {
           flexDirection: "column",
         }}
       >
-        <Header
-          onPlay={openLauncher}
-          allGames={allGames}
-          allCollections={allCollections}
-          onGameSelect={handleGameSelect}
-          onHomeClick={() => navigate("/")}
-          onSettingsClick={() => navigate("/settings")}
-          onAddGameClick={() => setAddGameOpen(true)}
-        />
-
         <Routes>
+          {/* Login page - public, no header */}
+          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Protected routes - require authentication (unless VITE_API_TOKEN is set) */}
           <Route
             path="/"
             element={
-              <HomePage
-                onGameClick={handleGameClick}
-                onPlay={openLauncher}
-                onGamesLoaded={(games) => {
-                  setAllGames((prev: GameItem[]) => {
-                    const existingIds = new Set(
-                      prev.map((g: GameItem) => g.ratingKey)
-                    );
-                    const newGames = games.filter(
-                      (g: GameItem) => !existingIds.has(g.ratingKey)
-                    );
-                    return [...prev, ...newGames];
-                  });
-                }}
-              />
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <HomePage
+                  onGameClick={handleGameClick}
+                  onPlay={openLauncher}
+                  onGamesLoaded={(games) => {
+                    setAllGames((prev: GameItem[]) => {
+                      const existingIds = new Set(
+                        prev.map((g: GameItem) => g.ratingKey)
+                      );
+                      const newGames = games.filter(
+                        (g: GameItem) => !existingIds.has(g.ratingKey)
+                      );
+                      return [...prev, ...newGames];
+                    });
+                  }}
+                />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/game/:gameId"
             element={
-              <GameDetailPage onPlay={openLauncher} />
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <GameDetailPage onPlay={openLauncher} />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/collections/:collectionId"
             element={
-              <CollectionDetail
-                onGameClick={handleGameClick}
-                onGamesLoaded={(games) => {
-                  setAllGames((prev: GameItem[]) => {
-                    const existingIds = new Set(
-                      prev.map((g: GameItem) => g.ratingKey)
-                    );
-                    const newGames = games.filter(
-                      (g: GameItem) => !existingIds.has(g.ratingKey)
-                    );
-                    return [...prev, ...newGames];
-                  });
-                }}
-                onPlay={openLauncher}
-              />
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <CollectionDetail
+                  onGameClick={handleGameClick}
+                  onGamesLoaded={(games) => {
+                    setAllGames((prev: GameItem[]) => {
+                      const existingIds = new Set(
+                        prev.map((g: GameItem) => g.ratingKey)
+                      );
+                      const newGames = games.filter(
+                        (g: GameItem) => !existingIds.has(g.ratingKey)
+                      );
+                      return [...prev, ...newGames];
+                    });
+                  }}
+                  onPlay={openLauncher}
+                />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/category/:categoryId"
             element={
-              <CategoryPage
-                onGameClick={handleGameClick}
-                onGamesLoaded={(games) => {
-                  setAllGames((prev: GameItem[]) => {
-                    const existingIds = new Set(
-                      prev.map((g: GameItem) => g.ratingKey)
-                    );
-                    const newGames = games.filter(
-                      (g: GameItem) => !existingIds.has(g.ratingKey)
-                    );
-                    return [...prev, ...newGames];
-                  });
-                }}
-                onPlay={openLauncher}
-              />
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <CategoryPage
+                  onGameClick={handleGameClick}
+                  onGamesLoaded={(games) => {
+                    setAllGames((prev: GameItem[]) => {
+                      const existingIds = new Set(
+                        prev.map((g: GameItem) => g.ratingKey)
+                      );
+                      const newGames = games.filter(
+                        (g: GameItem) => !existingIds.has(g.ratingKey)
+                      );
+                      return [...prev, ...newGames];
+                    });
+                  }}
+                  onPlay={openLauncher}
+                />
+              </ProtectedRoute>
             }
           />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/add-game"
             element={
-              <AddGamePage
-                onGameSelected={(game) => {
-                  console.log("Game selected from IGDB:", game);
-                  // TODO: Implement game addition logic
-                }}
-              />
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <AddGamePage
+                  onGameSelected={(game) => {
+                    console.log("Game selected from IGDB:", game);
+                    // TODO: Implement game addition logic
+                  }}
+                />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/search-results"
             element={
-              <SearchResultsPage
-                onPlay={openLauncher}
-                onGameClick={handleGameClick}
-              />
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <SearchResultsPage
+                  onPlay={openLauncher}
+                  onGameClick={handleGameClick}
+                />
+              </ProtectedRoute>
             }
           />
         </Routes>

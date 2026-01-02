@@ -56,6 +56,11 @@
     "accountType": "Tipo de conta",
     "developmentAccount": "Conta de desenvolvimento"
   },
+  "login": {
+    "title": "Bem-vindo ao MyHomeGames",
+    "subtitle": "Por favor, faça login para continuar",
+    "button": "Entrar com Twitch"
+  },
   "search": {
     "noResults": "Nenhum resultado encontrado para o termo \"{{query}}\"",
     "viewAllResults": "Ver todos os resultados ({{count}})",

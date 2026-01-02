@@ -56,6 +56,11 @@
     "accountType": "アカウントタイプ",
     "developmentAccount": "開発アカウント"
   },
+  "login": {
+    "title": "MyHomeGamesへようこそ",
+    "subtitle": "続行するにはログインしてください",
+    "button": "Twitchでログイン"
+  },
   "search": {
     "noResults": "用語 \"{{query}}\" の結果が見つかりません",
     "viewAllResults": "すべての結果を表示 ({{count}})",

@@ -4,7 +4,6 @@ import { useLocation } from "react-router-dom";
 import GamesList from "../games/GamesList";
 import RecommendedSectionNav from "./RecommendedSectionNav";
 import type { GameItem } from "../../types";
-import { API_BASE } from "../../config";
 import { buildCoverUrl } from "../../utils/api";
 import "./RecommendedSection.css";
 

@@ -4,8 +4,6 @@ import { useTranslation } from "react-i18next";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import SearchResultsList from "../components/search/SearchResultsList";
 import type { GameItem, CollectionItem } from "../types";
-import { buildCoverUrl } from "../utils/api";
-import { API_BASE } from "../config";
 import "./SearchResultsPage.css";
 
 type SearchResultsPageProps = {

@@ -10,6 +10,7 @@ const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 const https = require("https");
+const http = require("http");
 
 // Import route modules
 const libraryRoutes = require("./routes/library");
@@ -456,12 +457,52 @@ function validateEnvironment() {
 // Only start listening if not in test environment
 if (process.env.NODE_ENV !== 'test') {
   validateEnvironment();
-  app.listen(PORT, () => {
-    console.log(`MyHomeGames server listening on :${PORT}`);
-    if (!API_TOKEN && !TWITCH_CLIENT_ID) {
-      console.warn("Warning: No authentication configured. Set either API_TOKEN (for dev) or TWITCH_CLIENT_ID/TWITCH_CLIENT_SECRET (for production).");
-    }
+  
+  // HTTP server (always available)
+  const HTTP_PORT = process.env.HTTP_PORT || PORT;
+  const httpServer = http.createServer(app);
+  httpServer.listen(HTTP_PORT, () => {
+    console.log(`MyHomeGames server listening on http://localhost:${HTTP_PORT}`);
   });
+  
+  // HTTPS server (optional)
+  const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true';
+  const HTTPS_PORT = process.env.HTTPS_PORT || 4443; // Default HTTPS port different from HTTP
+  
+  if (HTTPS_ENABLED) {
+    // Default paths: look for certs in project root (one level up from server directory)
+    const defaultKeyPath = path.join(__dirname, '..', 'certs', 'key.pem');
+    const defaultCertPath = path.join(__dirname, '..', 'certs', 'cert.pem');
+    
+    // Use environment variables if set, otherwise use defaults
+    const keyPath = process.env.SSL_KEY_PATH 
+      ? (path.isAbsolute(process.env.SSL_KEY_PATH) 
+          ? process.env.SSL_KEY_PATH 
+          : path.join(__dirname, '..', process.env.SSL_KEY_PATH))
+      : defaultKeyPath;
+    const certPath = process.env.SSL_CERT_PATH
+      ? (path.isAbsolute(process.env.SSL_CERT_PATH)
+          ? process.env.SSL_CERT_PATH
+          : path.join(__dirname, '..', process.env.SSL_CERT_PATH))
+      : defaultCertPath;
+    
+    try {
+      const key = fs.readFileSync(keyPath);
+      const cert = fs.readFileSync(certPath);
+      
+      const httpsServer = https.createServer({ key, cert }, app);
+      httpsServer.listen(HTTPS_PORT, () => {
+        console.log(`MyHomeGames server listening on https://localhost:${HTTPS_PORT}`);
+      });
+    } catch (error) {
+      console.error("Error loading SSL certificates:", error.message);
+      console.error("HTTPS server not started. Only HTTP available.");
+    }
+  }
+  
+  if (!API_TOKEN && !TWITCH_CLIENT_ID) {
+    console.warn("Warning: No authentication configured. Set either API_TOKEN (for dev) or TWITCH_CLIENT_ID/TWITCH_CLIENT_SECRET (for production).");
+  }
 }
 
 // Export app for testing
