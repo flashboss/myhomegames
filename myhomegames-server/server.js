@@ -75,7 +75,7 @@ libraryRoutes.loadLibraryGames(METADATA_GAMES_DIR, allGames);
 authRoutes.registerAuthRoutes(app, METADATA_PATH);
 libraryRoutes.registerLibraryRoutes(app, requireToken, METADATA_GAMES_DIR, allGames);
 recommendedRoutes.registerRecommendedRoutes(app, requireToken, METADATA_GAMES_DIR, allGames);
-categoriesRoutes.registerCategoriesRoutes(app, requireToken, METADATA_PATH, METADATA_GAMES_DIR);
+categoriesRoutes.registerCategoriesRoutes(app, requireToken, METADATA_PATH, METADATA_GAMES_DIR, allGames);
 const collectionsHandler = collectionsRoutes.registerCollectionsRoutes(
   app,
   requireToken,

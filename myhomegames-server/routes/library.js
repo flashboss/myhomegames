@@ -131,6 +131,9 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       
       fs.writeFileSync(filePath, JSON.stringify(allLibraryGames, null, 2), "utf8");
       
+      // Update allGames cache to ensure it's in sync
+      Object.assign(allGames[gameId], filteredUpdates);
+      
       // Return updated game data
       const updatedGame = allLibraryGames[gameIndex];
       const gameData = {

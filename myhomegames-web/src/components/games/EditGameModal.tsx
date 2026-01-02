@@ -134,6 +134,38 @@ export default function EditGameModal({
         genre: result.game.genre,
       };
 
+      // Check if any genres were removed and delete unused categories
+      if (updates.genre !== undefined) {
+        const oldGenres = Array.isArray(game.genre) ? game.genre : game.genre ? [game.genre] : [];
+        const newGenres = Array.isArray(updatedGame.genre) ? updatedGame.genre : updatedGame.genre ? [updatedGame.genre] : [];
+        const removedGenres = oldGenres.filter((g) => !newGenres.includes(g));
+        
+        // Try to delete each removed genre if it's not used by other games
+        for (const removedGenre of removedGenres) {
+          try {
+            const deleteUrl = buildApiUrl(API_BASE, `/categories/${encodeURIComponent(removedGenre)}`);
+            const deleteRes = await fetch(deleteUrl, {
+              method: "DELETE",
+              headers: {
+                Accept: "application/json",
+                "X-Auth-Token": API_TOKEN,
+              },
+            });
+            
+            if (deleteRes.ok) {
+              // Category was deleted successfully
+              console.log(`Category ${removedGenre} was deleted as it's no longer in use`);
+            } else if (deleteRes.status === 409) {
+              // Category is still in use, that's fine
+              console.log(`Category ${removedGenre} is still in use by other games`);
+            }
+          } catch (err: any) {
+            // Silently fail - category removal is not critical
+            console.warn(`Error deleting category ${removedGenre}:`, err);
+          }
+        }
+      }
+
       onGameUpdate(updatedGame);
       onClose();
     } catch (err: any) {
