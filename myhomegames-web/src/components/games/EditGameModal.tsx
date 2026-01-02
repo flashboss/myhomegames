@@ -67,6 +67,30 @@ export default function EditGameModal({
     };
   }, [isOpen, onClose]);
 
+  // Check if there are any changes
+  const hasChanges = () => {
+    if (title !== game.title) return true;
+    if (summary !== (game.summary || "")) return true;
+    if (year !== (game.year?.toString() || "")) return true;
+    if (month !== (game.month?.toString() || "")) return true;
+    if (day !== (game.day?.toString() || "")) return true;
+
+    // Check if genres changed
+    const currentGenre = Array.isArray(game.genre)
+      ? game.genre
+      : game.genre
+      ? [game.genre]
+      : [];
+    if (
+      JSON.stringify(selectedGenres.sort()) !==
+      JSON.stringify(currentGenre.sort())
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setError(null);
@@ -309,7 +333,7 @@ export default function EditGameModal({
           <button
             className="edit-game-modal-save"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || !hasChanges()}
           >
             {saving ? t("common.saving", "Saving...") : t("common.save", "Save")}
           </button>
