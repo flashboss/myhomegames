@@ -130,7 +130,10 @@
     "confirmDelete": "Möchten Sie \"{{title}}\" wirklich löschen?",
     "deleteError": "Fehler beim Löschen des Spiels",
     "reloadMetadata": "Alle Metadaten neu laden",
-    "reloadingMetadata": "Metadaten werden neu geladen..."
+    "reloadSingleMetadata": "Metadaten neu laden",
+    "reloadingMetadata": "Metadaten werden neu geladen...",
+    "confirmReload": "Möchten Sie wirklich alle Metadaten neu laden? Dies aktualisiert alle Spiele, Sammlungen und Kategorien.",
+    "reloadError": "Fehler beim Neuladen der Metadaten"
   },
   "launch": {
     "launching": "Spiel wird gestartet...",

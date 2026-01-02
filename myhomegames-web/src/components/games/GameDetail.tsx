@@ -119,6 +119,12 @@ export default function GameDetail({
             onGameUpdate(updatedGame);
           }
         }}
+        onGameReload={(updatedGame) => {
+          setLocalGame(updatedGame);
+          if (onGameUpdate) {
+            onGameUpdate(updatedGame);
+          }
+        }}
         onGameDelete={onGameDelete}
         t={t}
       />
@@ -141,6 +147,7 @@ function GameDetailContent({
   onEditModalOpen,
   onEditModalClose,
   onGameUpdate,
+  onGameReload,
   onGameDelete,
   t,
 }: {
@@ -158,6 +165,7 @@ function GameDetailContent({
   onEditModalOpen: () => void;
   onEditModalClose: () => void;
   onGameUpdate: (updatedGame: GameItem) => void;
+  onGameReload: (updatedGame: GameItem) => void;
   onGameDelete?: (game: GameItem) => void;
   t: (key: string) => string;
 }) {
@@ -181,7 +189,7 @@ function GameDetailContent({
   
   return (
     <>
-      <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 2 }}>
+      <div className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
         <LibrariesBar
           libraries={[]}
           activeLibrary={{ key: "game", type: "game" }}
@@ -406,6 +414,7 @@ function GameDetailContent({
                       onGameDelete(game);
                     }
                   } : undefined}
+                  onGameUpdate={onGameReload}
                   horizontal={true}
                   className="game-detail-dropdown-menu"
                   toolTipDelay={200}

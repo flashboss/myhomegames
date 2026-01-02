@@ -13,9 +13,11 @@ type DropdownMenuProps = {
   gameId?: string;
   gameTitle?: string;
   onGameDelete?: (gameId: string) => void;
+  onGameUpdate?: (game: any) => void;
   collectionId?: string;
   collectionTitle?: string;
   onCollectionDelete?: (collectionId: string) => void;
+  onCollectionUpdate?: (collection: any) => void;
   className?: string;
   horizontal?: boolean;
   onModalOpen?: () => void;
@@ -30,9 +32,11 @@ export default function DropdownMenu({
   gameId,
   gameTitle,
   onGameDelete,
+  onGameUpdate,
   collectionId,
   collectionTitle,
   onCollectionDelete,
+  onCollectionUpdate,
   className = "",
   horizontal = false,
   onModalOpen,
@@ -42,9 +46,11 @@ export default function DropdownMenu({
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showReloadConfirmModal, setShowReloadConfirmModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [reloadError, setReloadError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -86,7 +92,7 @@ export default function DropdownMenu({
 
   // Block body scroll when modal is open
   useEffect(() => {
-    if (showConfirmModal) {
+    if (showConfirmModal || showReloadConfirmModal) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -94,16 +100,22 @@ export default function DropdownMenu({
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showConfirmModal]);
+  }, [showConfirmModal, showReloadConfirmModal]);
 
   // Handle ESC key to close modal
   useEffect(() => {
-    if (!showConfirmModal) return;
+    if (!showConfirmModal && !showReloadConfirmModal) return;
     
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setShowConfirmModal(false);
-        setDeleteError(null);
+        if (showConfirmModal) {
+          setShowConfirmModal(false);
+          setDeleteError(null);
+        }
+        if (showReloadConfirmModal) {
+          setShowReloadConfirmModal(false);
+          setReloadError(null);
+        }
       }
     }
     
@@ -111,7 +123,7 @@ export default function DropdownMenu({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showConfirmModal]);
+  }, [showConfirmModal, showReloadConfirmModal]);
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -146,17 +158,33 @@ export default function DropdownMenu({
     }
   };
 
-  const handleReload = async (e: React.MouseEvent) => {
+  const handleReload = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     setIsOpen(false);
     
-    if (onReload) {
-      // Se c'è una callback personalizzata, usala
-      onReload();
+    // Se c'è un gameId o collectionId, esegui direttamente il reload (singolo elemento)
+    if (gameId || collectionId) {
+      if (onReload) {
+        // Se c'è una callback personalizzata, usala
+        onReload();
+      } else {
+        executeReload();
+      }
       return;
     }
     
-    // Altrimenti gestisci il reload internamente
+    // Altrimenti mostra il modal di conferma per il reload globale
+    // Usa setTimeout per assicurarsi che il dropdown sia chiuso prima di aprire il modal
+    setTimeout(() => {
+      if (onModalOpen) {
+        onModalOpen();
+      }
+      setShowReloadConfirmModal(true);
+    }, 0);
+  };
+
+  const executeReload = async () => {
     const apiToken = getApiToken();
     if (!API_BASE || !apiToken) {
       console.error("API_BASE or API_TOKEN not available");
@@ -164,9 +192,20 @@ export default function DropdownMenu({
     }
     
     setIsReloading(true);
+    setReloadError(null);
     
     try {
-      const url = buildApiUrl(API_BASE, "/reload-games");
+      let url: string;
+      
+      // Se c'è un gameId o collectionId, ricarica solo quell'elemento
+      if (gameId) {
+        url = buildApiUrl(API_BASE, `/games/${gameId}/reload`);
+      } else if (collectionId) {
+        url = buildApiUrl(API_BASE, `/collections/${collectionId}/reload`);
+      } else {
+        // Altrimenti ricarica tutti i metadati
+        url = buildApiUrl(API_BASE, "/reload-games");
+      }
       
       const response = await fetch(url, {
         method: "POST",
@@ -176,15 +215,81 @@ export default function DropdownMenu({
       });
 
       if (response.ok) {
-        // Reload the page to show updated data
-        window.location.reload();
+        const data = await response.json();
+        
+        // Se c'è un gameId o collectionId, aggiorna solo i dati senza ricaricare la pagina
+        if (gameId) {
+          if (onGameUpdate && data.game) {
+            // Converti i dati del gioco nel formato GameItem
+            const updatedGame = {
+              ratingKey: data.game.id,
+              title: data.game.title,
+              summary: data.game.summary || "",
+              cover: data.game.cover,
+              background: data.game.background,
+              day: data.game.day || null,
+              month: data.game.month || null,
+              year: data.game.year || null,
+              stars: data.game.stars || null,
+              genre: data.game.genre || null,
+            };
+            onGameUpdate(updatedGame);
+            setIsReloading(false);
+            return; // Esci dalla funzione senza ricaricare
+          } else {
+            // Se non c'è callback o dati mancanti, non ricaricare comunque la pagina
+            setIsReloading(false);
+            return; // Non ricaricare la pagina anche se manca la callback
+          }
+        } else if (collectionId) {
+          if (onCollectionUpdate && data.collection) {
+            // Mappa i dati della collection nel formato CollectionInfo
+            const updatedCollection = {
+              id: data.collection.id,
+              title: data.collection.title,
+              summary: data.collection.summary || "",
+              cover: data.collection.cover,
+              background: data.collection.background,
+            };
+            onCollectionUpdate(updatedCollection);
+            setIsReloading(false);
+            return; // Esci dalla funzione senza ricaricare
+          } else {
+            // Se non c'è callback, non fare nulla (o mostra un errore)
+            console.warn("onCollectionUpdate callback not provided or collection data missing");
+            setIsReloading(false);
+            return;
+          }
+        } else {
+          // Per il reload globale, ricarica la pagina
+          window.location.reload();
+        }
       } else {
         console.error("Failed to reload metadata");
+        setReloadError(t("common.reloadError", "Failed to reload metadata"));
         setIsReloading(false);
       }
     } catch (error) {
       console.error("Error reloading metadata:", error);
+      setReloadError(t("common.reloadError", "Failed to reload metadata"));
       setIsReloading(false);
+    }
+  };
+
+  const handleConfirmReload = () => {
+    // Se c'è una callback personalizzata, usala dopo la conferma
+    if (onReload) {
+      onReload();
+    } else {
+      executeReload();
+    }
+  };
+
+  const handleCancelReload = () => {
+    setShowReloadConfirmModal(false);
+    setReloadError(null);
+    if (onModalClose) {
+      onModalClose();
     }
   };
 
@@ -302,13 +407,20 @@ export default function DropdownMenu({
               <span>{t("common.edit", "Edit")}</span>
             </button>
           )}
-          {onReload && (
+          {(onReload || gameId || collectionId || (!gameId && !collectionId && !onEdit && !onDelete)) && (
             <button
               onClick={handleReload}
               className="dropdown-menu-item"
               disabled={isReloading}
             >
-              <span>{isReloading ? t("common.reloadingMetadata", "Reloading metadata...") : t("common.reloadMetadata", "Reload all metadata")}</span>
+              <span>
+                {isReloading 
+                  ? t("common.reloadingMetadata", "Reloading metadata...")
+                  : (gameId || collectionId)
+                    ? t("common.reloadSingleMetadata", "Reload metadata")
+                    : t("common.reloadMetadata", "Reload all metadata")
+                }
+              </span>
             </button>
           )}
           {(onDelete || (getApiToken() && (gameId || collectionId))) && (
@@ -322,7 +434,66 @@ export default function DropdownMenu({
         </div>
       )}
 
-      {/* Confirmation Modal */}
+      {/* Reload Confirmation Modal */}
+      {showReloadConfirmModal && createPortal(
+        <div className="dropdown-menu-confirm-overlay" onClick={handleCancelReload}>
+          <div className="dropdown-menu-confirm-container" onClick={(e) => e.stopPropagation()}>
+            <div className="dropdown-menu-confirm-header">
+              <h2>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                >
+                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                  <path d="M21 3v5h-5" />
+                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                  <path d="M3 21v-5h5" />
+                </svg>
+                {t("common.reloadMetadata", "Reload all metadata")}
+              </h2>
+              <button
+                className="dropdown-menu-confirm-close"
+                onClick={handleCancelReload}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="dropdown-menu-confirm-content">
+              <p>{t("common.confirmReload", "Are you sure you want to reload all metadata? This will refresh all games, collections, and categories.")}</p>
+              {reloadError && (
+                <div className="dropdown-menu-confirm-error">{reloadError}</div>
+              )}
+            </div>
+            <div className="dropdown-menu-confirm-footer">
+              <button
+                className="dropdown-menu-confirm-cancel"
+                onClick={handleCancelReload}
+                disabled={isReloading}
+              >
+                {t("common.cancel", "Cancel")}
+              </button>
+              <button
+                className="dropdown-menu-confirm-reload"
+                onClick={handleConfirmReload}
+                disabled={isReloading}
+              >
+                {isReloading ? t("common.reloadingMetadata", "Reloading metadata...") : t("common.reloadMetadata", "Reload all metadata")}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Delete Confirmation Modal */}
       {showConfirmModal && createPortal(
         <div className="dropdown-menu-confirm-overlay" onClick={handleCancelDelete}>
           <div className="dropdown-menu-confirm-container" onClick={(e) => e.stopPropagation()}>

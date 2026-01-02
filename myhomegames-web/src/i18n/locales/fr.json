@@ -130,7 +130,10 @@
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer \"{{title}}\"?",
     "deleteError": "Échec de la suppression du jeu",
     "reloadMetadata": "Recharger tous les métadonnées",
-    "reloadingMetadata": "Rechargement des métadonnées..."
+    "reloadSingleMetadata": "Recharger métadonnées",
+    "reloadingMetadata": "Rechargement des métadonnées...",
+    "confirmReload": "Êtes-vous sûr de vouloir recharger tous les métadonnées ? Cela actualisera tous les jeux, collections et catégories.",
+    "reloadError": "Échec du rechargement des métadonnées"
   },
   "launch": {
     "launching": "Lancement du jeu...",

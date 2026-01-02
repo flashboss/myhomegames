@@ -130,7 +130,10 @@
     "confirmDelete": "您确定要删除\"{{title}}\"吗？",
     "deleteError": "删除游戏失败",
     "reloadMetadata": "重新加载所有元数据",
-    "reloadingMetadata": "正在重新加载元数据..."
+    "reloadSingleMetadata": "重新加载元数据",
+    "reloadingMetadata": "正在重新加载元数据...",
+    "confirmReload": "您确定要重新加载所有元数据吗？这将刷新所有游戏、收藏和类别。",
+    "reloadError": "重新加载元数据失败"
   },
   "launch": {
     "launching": "正在启动游戏...",

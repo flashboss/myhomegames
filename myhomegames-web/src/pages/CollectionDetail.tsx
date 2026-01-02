@@ -558,6 +558,7 @@ function CollectionDetailContent({
                                 window.history.back();
                               }
                             }}
+                            onCollectionUpdate={onCollectionUpdate}
                             horizontal={true}
                             className="collection-detail-dropdown-menu"
                             toolTipDelay={200}
