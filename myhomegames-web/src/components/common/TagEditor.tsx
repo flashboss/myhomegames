@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { API_BASE, API_TOKEN } from "../../config";
+import { API_BASE, getApiToken } from "../../config";
 import { buildApiUrl } from "../../utils/api";
+import { useLoading } from "../../contexts/LoadingContext";
 import "./TagEditor.css";
 
 type Category = {
@@ -23,8 +24,10 @@ export default function TagEditor({
   placeholder,
 }: TagEditorProps) {
   const { t } = useTranslation();
+  const { setLoading } = useLoading();
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const [tagSearch, setTagSearch] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -36,7 +39,7 @@ export default function TagEditor({
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": API_TOKEN,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -45,6 +48,46 @@ export default function TagEditor({
       setAvailableCategories(items);
     } catch (err: any) {
       console.error("Error fetching categories:", err);
+    }
+  }
+
+  async function createCategory(title: string): Promise<Category | null> {
+    try {
+      setLoading(true);
+      setIsCreating(true);
+      const url = buildApiUrl(API_BASE, "/categories");
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-Auth-Token": getApiToken(),
+        },
+        body: JSON.stringify({ title }),
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `HTTP ${res.status}`);
+      }
+      
+      const json = await res.json();
+      const newCategory = json.category as Category;
+      
+      // Add to available categories
+      setAvailableCategories((prev) => {
+        const updated = [...prev, newCategory];
+        updated.sort((a, b) => a.title.localeCompare(b.title));
+        return updated;
+      });
+      
+      return newCategory;
+    } catch (err: any) {
+      console.error("Error creating category:", err);
+      return null;
+    } finally {
+      setLoading(false);
+      setIsCreating(false);
     }
   }
 
@@ -59,25 +102,48 @@ export default function TagEditor({
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && tagSearch.trim()) {
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && tagSearch.trim() && !isCreating) {
       e.preventDefault();
+      const searchTerm = tagSearch.trim().toLowerCase();
+      
+      // First, try to find existing category
       const category = availableCategories.find(
-        (c) =>
-          c.id.toLowerCase() === tagSearch.trim().toLowerCase() ||
-          c.title.toLowerCase() === tagSearch.trim().toLowerCase()
+        (c) => {
+          const translatedName = t(`genre.${c.title}`, c.title).toLowerCase();
+          return (
+            c.id.toLowerCase() === searchTerm ||
+            c.title.toLowerCase() === searchTerm ||
+            translatedName === searchTerm ||
+            translatedName.includes(searchTerm)
+          );
+        }
       );
+      
       if (category && !selectedTags.includes(category.id)) {
         handleAddTag(category.id);
+        return;
+      }
+      
+      // If not found, create new category
+      const newCategory = await createCategory(tagSearch.trim());
+      if (newCategory && !selectedTags.includes(newCategory.id)) {
+        handleAddTag(newCategory.id);
       }
     }
   };
 
   const filteredSuggestions = availableCategories.filter(
-    (c) =>
-      !selectedTags.includes(c.id) &&
-      (c.id.toLowerCase().includes(tagSearch.toLowerCase()) ||
-        c.title.toLowerCase().includes(tagSearch.toLowerCase()))
+    (c) => {
+      if (selectedTags.includes(c.id)) return false;
+      const searchTerm = tagSearch.toLowerCase();
+      const translatedName = t(`genre.${c.title}`, c.title).toLowerCase();
+      return (
+        c.id.toLowerCase().includes(searchTerm) ||
+        c.title.toLowerCase().includes(searchTerm) ||
+        translatedName.includes(searchTerm)
+      );
+    }
   );
 
   return (

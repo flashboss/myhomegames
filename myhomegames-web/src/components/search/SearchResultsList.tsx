@@ -303,37 +303,33 @@ export default function SearchResultsList({
           />
         ))}
       </div>
-      {(selectedGame || selectedCollection) && (
-        <>
-          {selectedGame && (
-            <EditGameModal
-              isOpen={isEditGameModalOpen}
-              onClose={() => {
-                setIsEditGameModalOpen(false);
-                setSelectedGame(null);
-                if (onModalClose) {
-                  onModalClose();
-                }
-              }}
-              game={selectedGame}
-              onGameUpdate={handleGameUpdate}
-            />
-          )}
-          {selectedCollection && (
-            <EditCollectionModal
-              isOpen={isEditCollectionModalOpen}
-              onClose={() => {
-                setIsEditCollectionModalOpen(false);
-                setSelectedCollection(null);
-                if (onModalClose) {
-                  onModalClose();
-                }
-              }}
-              collection={selectedCollection}
-              onCollectionUpdate={handleCollectionUpdate}
-            />
-          )}
-        </>
+      {selectedGame && (
+        <EditGameModal
+          isOpen={isEditGameModalOpen}
+          onClose={() => {
+            setIsEditGameModalOpen(false);
+            setSelectedGame(null);
+            if (onModalClose) {
+              onModalClose();
+            }
+          }}
+          game={selectedGame}
+          onGameUpdate={handleGameUpdate}
+        />
+      )}
+      {selectedCollection && (
+        <EditCollectionModal
+          isOpen={isEditCollectionModalOpen}
+          onClose={() => {
+            setIsEditCollectionModalOpen(false);
+            setSelectedCollection(null);
+            if (onModalClose) {
+              onModalClose();
+            }
+          }}
+          collection={selectedCollection}
+          onCollectionUpdate={handleCollectionUpdate}
+        />
       )}
     </>
   );
