@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import GamesList from "../games/GamesList";
 import RecommendedSectionNav from "./RecommendedSectionNav";
 import type { GameItem } from "../../types";
+import { API_BASE } from "../../config";
+import { buildCoverUrl } from "../../utils/api";
 import "./RecommendedSection.css";
 
 // Helper per sessionStorage
@@ -30,7 +32,6 @@ type RecommendedSectionProps = {
   onGameClick: (game: GameItem) => void;
   onPlay?: (game: GameItem) => void;
   onGameUpdate?: (updatedGame: GameItem) => void;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
 };
 
@@ -40,7 +41,6 @@ export default function RecommendedSection({
   onGameClick,
   onPlay,
   onGameUpdate,
-  buildCoverUrl,
   coverSize,
 }: RecommendedSectionProps) {
   const { t } = useTranslation();
@@ -192,6 +192,7 @@ export default function RecommendedSection({
   if (games.length === 0) {
     return null;
   }
+
 
   return (
     <div className="recommended-section">
