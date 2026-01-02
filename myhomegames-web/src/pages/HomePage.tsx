@@ -6,7 +6,6 @@ import RecommendedPage from "./RecommendedPage";
 import CollectionsPage from "./CollectionsPage";
 import CategoriesPage from "./CategoriesPage";
 import type { GameItem, CategoryItem } from "../types";
-import { buildApiUrl, buildCoverUrl } from "../utils/api";
 import "./HomePage.css";
 
 type GameLibrarySection = {
@@ -18,16 +17,12 @@ type GameLibrarySection = {
 export type { GameItem, CategoryItem };
 
 type HomePageProps = {
-  apiBase: string;
-  apiToken: string;
   onGameClick: (game: GameItem) => void;
   onGamesLoaded: (games: GameItem[]) => void;
   onPlay?: (game: GameItem) => void;
 };
 
 export default function HomePage({
-  apiBase,
-  apiToken,
   onGameClick,
   onGamesLoaded,
   onPlay,
@@ -153,45 +148,29 @@ export default function HomePage({
           <>
             {activeLibrary.key === "library" && (
               <LibraryPage
-                apiBase={apiBase}
-                apiToken={apiToken}
                 onGameClick={handleGameClick}
                 onGamesLoaded={handleGamesLoaded}
                 onPlay={onPlay}
-                buildApiUrl={buildApiUrl}
-                buildCoverUrl={buildCoverUrl}
                 coverSize={coverSize}
                 viewMode={viewMode}
               />
             )}
             {activeLibrary.key === "recommended" && (
               <RecommendedPage
-                apiBase={apiBase}
-                apiToken={apiToken}
                 onGameClick={handleGameClick}
                 onGamesLoaded={handleGamesLoaded}
                 onPlay={onPlay}
-                buildApiUrl={buildApiUrl}
-                buildCoverUrl={buildCoverUrl}
                 coverSize={coverSize}
               />
             )}
             {activeLibrary.key === "collections" && (
               <CollectionsPage
-                apiBase={apiBase}
-                apiToken={apiToken}
                 onPlay={onPlay}
-                buildApiUrl={buildApiUrl}
-                buildCoverUrl={buildCoverUrl}
                 coverSize={coverSize}
               />
             )}
             {activeLibrary.key === "categories" && (
               <CategoriesPage
-                apiBase={apiBase}
-                apiToken={apiToken}
-                buildApiUrl={buildApiUrl}
-                buildCoverUrl={buildCoverUrl}
                 coverSize={coverSize}
               />
             )}

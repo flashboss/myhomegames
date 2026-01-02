@@ -12,28 +12,21 @@ import DropdownMenu from "../components/common/DropdownMenu";
 import Tooltip from "../components/common/Tooltip";
 import BackgroundManager, { useBackground } from "../components/common/BackgroundManager";
 import { compareTitles } from "../utils/stringUtils";
-import { buildBackgroundUrl } from "../utils/api";
+import { buildApiUrl, buildCoverUrl, buildBackgroundUrl } from "../utils/api";
+import { API_BASE, getApiToken } from "../config";
 import type { GameItem, CollectionInfo } from "../types";
 import "./CollectionDetail.css";
 
 type CollectionDetailProps = {
-  apiBase: string;
-  apiToken: string;
   onGameClick: (game: GameItem) => void;
   onGamesLoaded: (games: GameItem[]) => void;
   onPlay?: (game: GameItem) => void;
-  buildApiUrl: (apiBase: string, path: string, params?: Record<string, string | number | boolean>) => string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
 };
 
 export default function CollectionDetail({
-  apiBase,
-  apiToken,
   onGameClick,
   onGamesLoaded,
   onPlay,
-  buildApiUrl,
-  buildCoverUrl,
 }: CollectionDetailProps) {
   const { t } = useTranslation();
   const { collectionId } = useParams<{ collectionId: string }>();
@@ -83,11 +76,11 @@ export default function CollectionDetail({
 
   async function fetchCollectionInfo(collectionId: string) {
     try {
-      const url = buildApiUrl(apiBase, "/collections");
+      const url = buildApiUrl(API_BASE, "/collections");
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -112,11 +105,11 @@ export default function CollectionDetail({
   async function fetchCollectionGames(collectionId: string) {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, `/collections/${collectionId}/games`);
+      const url = buildApiUrl(API_BASE, `/collections/${collectionId}/games`);
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -217,12 +210,12 @@ export default function CollectionDetail({
     // Save to backend
     if (collectionId) {
       try {
-        const url = buildApiUrl(apiBase, `/collections/${collectionId}/games/order`);
+        const url = buildApiUrl(API_BASE, `/collections/${collectionId}/games/order`);
         const res = await fetch(url, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'X-Auth-Token': apiToken,
+            'X-Auth-Token': getApiToken(),
           },
           body: JSON.stringify({ gameIds: newOrder }),
         });
@@ -285,11 +278,11 @@ export default function CollectionDetail({
     );
   }
 
-  const collectionCoverUrl = collection?.cover ? buildCoverUrl(apiBase, collection.cover) : "";
+  const collectionCoverUrl = collection?.cover ? buildCoverUrl(API_BASE, collection.cover) : "";
   const collectionCoverWidth = 240;
   const collectionCoverHeight = 360; // 2:3 aspect ratio (vertical like games)
   
-  const backgroundUrl = buildBackgroundUrl(apiBase, collection?.background);
+  const backgroundUrl = buildBackgroundUrl(API_BASE, collection?.background);
   const hasBackground = Boolean(backgroundUrl && backgroundUrl.trim() !== "");
 
   return (
@@ -309,7 +302,7 @@ export default function CollectionDetail({
         sortedGames={sortedGames}
         loading={loading}
         onGameClick={onGameClick}
-        buildCoverUrl={buildCoverUrl}
+        buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
         coverSize={coverSize}
         handleCoverSizeChange={handleCoverSizeChange}
         viewMode={viewMode}
@@ -607,7 +600,7 @@ function CollectionDetailContent({
                     games={sortedGames}
                     onGameClick={onGameClick}
                     onPlay={onPlay}
-                    buildCoverUrl={buildCoverUrl}
+                    buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
                     coverSize={coverSize}
                     itemRefs={itemRefs}
                     draggable={true}

@@ -4,18 +4,16 @@ import { useTranslation } from "react-i18next";
 import { useScrollRestoration } from "../hooks/useScrollRestoration";
 import SearchResultsList from "../components/search/SearchResultsList";
 import type { GameItem, CollectionItem } from "../types";
+import { buildCoverUrl } from "../utils/api";
+import { API_BASE } from "../config";
 import "./SearchResultsPage.css";
 
 type SearchResultsPageProps = {
-  apiBase: string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   onGameClick: (game: GameItem) => void;
   onPlay?: (item: GameItem | CollectionItem) => void;
 };
 
 export default function SearchResultsPage({
-  apiBase,
-  buildCoverUrl,
   onGameClick,
   onPlay,
 }: SearchResultsPageProps) {
@@ -193,7 +191,7 @@ export default function SearchResultsPage({
             games={gamesState}
             collections={collectionsState}
             onGameClick={onGameClick}
-            buildCoverUrl={buildCoverUrl}
+            buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
             onPlay={onPlay}
             onGameUpdate={handleGameUpdate}
             onCollectionUpdate={handleCollectionUpdate}

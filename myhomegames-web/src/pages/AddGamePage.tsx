@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { API_BASE, getApiToken } from "../config";
 
 type IGDBGame = {
   id: number;
@@ -11,14 +12,10 @@ type IGDBGame = {
 };
 
 type AddGamePageProps = {
-  apiBase: string;
-  apiToken: string;
   onGameSelected: (game: IGDBGame) => void;
 };
 
 export default function AddGamePage({
-  apiBase,
-  apiToken,
   onGameSelected,
 }: AddGamePageProps) {
   const { t } = useTranslation();
@@ -55,14 +52,14 @@ export default function AddGamePage({
     setLoading(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const url = new URL("/igdb/search", apiBase);
+        const url = new URL("/igdb/search", API_BASE);
 
         const res = await fetch(url.toString(), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "X-Auth-Token": apiToken,
+            "X-Auth-Token": getApiToken(),
           },
           body: JSON.stringify({ query: searchQuery.trim() }),
         });
@@ -87,7 +84,7 @@ export default function AddGamePage({
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [searchQuery, apiBase, apiToken]);
+  }, [searchQuery]);
 
   function handleGameSelect(game: IGDBGame) {
     onGameSelected(game);

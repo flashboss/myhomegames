@@ -12,6 +12,7 @@ import LibrariesBar from "../layout/LibrariesBar";
 import type { GameItem } from "../../types";
 import { formatGameDate } from "../../utils/date";
 import { buildApiUrl } from "../../utils/api";
+import { API_BASE, getApiToken } from "../../config";
 import "./GameDetail.css";
 
 type GameDetailProps = {
@@ -19,8 +20,6 @@ type GameDetailProps = {
   coverUrl: string;
   backgroundUrl: string;
   onPlay: (game: GameItem) => void;
-  apiBase: string;
-  apiToken: string;
   onGameUpdate?: (updatedGame: GameItem) => void;
   onGameDelete?: (game: GameItem) => void;
 };
@@ -30,8 +29,6 @@ export default function GameDetail({
   coverUrl,
   backgroundUrl,
   onPlay,
-  apiBase,
-  apiToken,
   onGameUpdate,
   onGameDelete,
 }: GameDetailProps) {
@@ -56,12 +53,12 @@ export default function GameDetail({
 
   const handleRatingChange = async (newStars: number) => {
     try {
-      const url = buildApiUrl(apiBase, `/games/${localGame.ratingKey}`);
+      const url = buildApiUrl(API_BASE, `/games/${localGame.ratingKey}`);
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Auth-Token': apiToken,
+          'X-Auth-Token': getApiToken(),
         },
         body: JSON.stringify({ stars: newStars }),
       });

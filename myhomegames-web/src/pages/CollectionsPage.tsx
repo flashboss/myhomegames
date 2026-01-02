@@ -5,22 +5,16 @@ import CollectionsList from "../components/lists/CollectionsList";
 import AlphabetNavigator from "../components/ui/AlphabetNavigator";
 import { compareTitles } from "../utils/stringUtils";
 import type { CollectionItem } from "../types";
+import { API_BASE, getApiToken } from "../config";
+import { buildApiUrl, buildCoverUrl } from "../utils/api";
 
 type CollectionsPageProps = {
-  apiBase: string;
-  apiToken: string;
   onPlay?: (game: any) => void;
-  buildApiUrl: (apiBase: string, path: string, params?: Record<string, string | number | boolean>) => string;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   coverSize: number;
 };
 
 export default function CollectionsPage({
-  apiBase,
-  apiToken,
   onPlay,
-  buildApiUrl,
-  buildCoverUrl,
   coverSize,
 }: CollectionsPageProps) {
   const navigate = useNavigate();
@@ -56,11 +50,11 @@ export default function CollectionsPage({
   async function fetchCollections() {
     setLoading(true);
     try {
-      const url = buildApiUrl(apiBase, "/collections");
+      const url = buildApiUrl(API_BASE, "/collections");
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
-          "X-Auth-Token": apiToken,
+          "X-Auth-Token": getApiToken(),
         },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
