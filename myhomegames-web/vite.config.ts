@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
   const HTTPS_ENABLED = env.VITE_HTTPS_ENABLED === 'true';
   
   return {
+    base: '/app/',
     plugins: [react()],
     define: {
       __APP_VERSION__: JSON.stringify(packageJson.version),

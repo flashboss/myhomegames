@@ -569,7 +569,7 @@ function GameDetailPage({
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/app">
       <AppContent />
     </BrowserRouter>
   );
