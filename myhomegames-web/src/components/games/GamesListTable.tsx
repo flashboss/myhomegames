@@ -18,9 +18,9 @@ type GamesListTableProps = {
   onGameDelete?: (deletedGame: GameItem) => void;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
-  sortField?: "title" | "year" | "stars" | "releaseDate" | "criticRating";
+  sortField?: "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating";
   sortAscending?: boolean;
-  onSortChange?: (field: "title" | "year" | "stars" | "releaseDate" | "criticRating") => void;
+  onSortChange?: (field: "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating") => void;
   onSortDirectionChange?: (ascending: boolean) => void;
 };
 
