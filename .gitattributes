@@ -1,0 +1,3 @@
+# Mantieni sempre la versione locale di .gitignore durante i merge
+.gitignore merge=ours
+
