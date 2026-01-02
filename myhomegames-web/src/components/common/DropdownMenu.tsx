@@ -6,7 +6,7 @@ import Tooltip from "./Tooltip";
 import "./DropdownMenu.css";
 
 type DropdownMenuProps = {
-  onEdit: () => void;
+  onEdit?: () => void;
   onDelete?: () => void;
   gameId?: string;
   gameTitle?: string;
@@ -120,7 +120,9 @@ export default function DropdownMenu({
     if (onModalOpen) {
       onModalOpen();
     }
-    onEdit();
+    if (onEdit) {
+      onEdit();
+    }
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -245,12 +247,14 @@ export default function DropdownMenu({
       )}
       {isOpen && (
         <div ref={popupRef} className="dropdown-menu-popup">
-          <button
-            onClick={handleEdit}
-            className="dropdown-menu-item"
-          >
-            <span>{t("common.edit", "Edit")}</span>
-          </button>
+          {onEdit && (
+            <button
+              onClick={handleEdit}
+              className="dropdown-menu-item"
+            >
+              <span>{t("common.edit", "Edit")}</span>
+            </button>
+          )}
           {(onDelete || (API_TOKEN && (gameId || collectionId))) && (
             <button
               onClick={handleDeleteClick}
