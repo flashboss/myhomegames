@@ -16,3 +16,6 @@ certs/*.pem
 .env
 .env.local
 .env.*.local
+
+.github
+docs
