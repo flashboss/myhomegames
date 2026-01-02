@@ -274,8 +274,7 @@ function GameDetailContent({
                             lineHeight: 'var(--font-body-2-line-height)',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '8px',
-                            cursor: 'help'
+                            gap: '8px'
                           }}
                         >
                           <svg
@@ -306,8 +305,7 @@ function GameDetailContent({
                             lineHeight: 'var(--font-body-2-line-height)',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '8px',
-                            cursor: 'help'
+                            gap: '8px'
                           }}
                         >
                           <svg
