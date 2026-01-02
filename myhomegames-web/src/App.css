@@ -88,6 +88,30 @@
   color: rgba(255, 255, 255, 1);
 }
 
+/* Activity spinner */
+.mhg-activity-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+.mhg-spinner-icon {
+  animation: mhg-spin 1s linear infinite;
+}
+
+@keyframes mhg-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Dim header components when a modal is open */
 body:has(.edit-game-modal-overlay),
 body:has(.edit-collection-modal-overlay),

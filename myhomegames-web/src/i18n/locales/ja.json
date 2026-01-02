@@ -40,7 +40,8 @@
     "addGame": "ゲームを追加",
     "settings": "設定",
     "account": "アカウント",
-    "profile": "プロフィール"
+    "profile": "プロフィール",
+    "loading": "読み込み中"
   },
   "profile": {
     "viewProfile": "プロフィールを表示",

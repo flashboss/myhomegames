@@ -40,7 +40,8 @@
     "addGame": "Add Game",
     "settings": "Settings",
     "account": "Account",
-    "profile": "Profile"
+    "profile": "Profile",
+    "loading": "Loading"
   },
   "profile": {
     "viewProfile": "View Profile",

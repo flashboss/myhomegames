@@ -40,7 +40,8 @@
     "addGame": "添加游戏",
     "settings": "设置",
     "account": "账户",
-    "profile": "个人资料"
+    "profile": "个人资料",
+    "loading": "加载中"
   },
   "profile": {
     "viewProfile": "查看个人资料",

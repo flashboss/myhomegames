@@ -40,7 +40,8 @@
     "addGame": "Ajouter un Jeu",
     "settings": "Paramètres",
     "account": "Compte",
-    "profile": "Profil"
+    "profile": "Profil",
+    "loading": "Chargement"
   },
   "profile": {
     "viewProfile": "Voir le profil",
