@@ -37,21 +37,24 @@ jobs:
           VITE_API_BASE: ${{ secrets.VITE_API_BASE || 'https://api.example.com' }}
         run: npm run build
 
-      - name: Deploy to main branch (app folder)
+      - name: Deploy to main branch (docs/app folder)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout main
           
-          # Remove app folder if it exists, keep everything else
-          rm -rf app
-          mkdir -p app
+          # Remove docs/app folder if it exists, keep everything else
+          rm -rf docs/app
+          mkdir -p docs/app
           
-          # Copy bundle to app folder
-          cp -r myhomegames-web/dist/* app/
+          # Copy bundle to docs/app folder
+          cp -r myhomegames-web/dist/* docs/app/
+          
+          # Create 404.html for SPA routing support (if using React Router)
+          cp docs/app/index.html docs/app/404.html
           
           # Commit and push
-          git add app/
-          git commit -m "Deploy webapp to app/ folder [skip ci]" || exit 0
+          git add docs/app/
+          git commit -m "Deploy webapp to docs/app/ folder [skip ci]" || exit 0
           git push origin main
 
