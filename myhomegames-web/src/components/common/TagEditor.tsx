@@ -109,9 +109,15 @@ export default function TagEditor({
       
       // First, try to find existing category
       const category = availableCategories.find(
-        (c) =>
-          c.id.toLowerCase() === searchTerm ||
-          c.title.toLowerCase() === searchTerm
+        (c) => {
+          const translatedName = t(`genre.${c.title}`, c.title).toLowerCase();
+          return (
+            c.id.toLowerCase() === searchTerm ||
+            c.title.toLowerCase() === searchTerm ||
+            translatedName === searchTerm ||
+            translatedName.includes(searchTerm)
+          );
+        }
       );
       
       if (category && !selectedTags.includes(category.id)) {
@@ -128,10 +134,16 @@ export default function TagEditor({
   };
 
   const filteredSuggestions = availableCategories.filter(
-    (c) =>
-      !selectedTags.includes(c.id) &&
-      (c.id.toLowerCase().includes(tagSearch.toLowerCase()) ||
-        c.title.toLowerCase().includes(tagSearch.toLowerCase()))
+    (c) => {
+      if (selectedTags.includes(c.id)) return false;
+      const searchTerm = tagSearch.toLowerCase();
+      const translatedName = t(`genre.${c.title}`, c.title).toLowerCase();
+      return (
+        c.id.toLowerCase().includes(searchTerm) ||
+        c.title.toLowerCase().includes(searchTerm) ||
+        translatedName.includes(searchTerm)
+      );
+    }
   );
 
   return (
