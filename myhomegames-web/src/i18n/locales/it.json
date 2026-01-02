@@ -102,6 +102,7 @@
     "releaseDate": "Data di Rilascio",
     "year": "Anno",
     "stars": "Valutazione",
+    "criticRating": "Valutazione della critica",
     "noGames": "Nessun gioco trovato"
   },
   "gameDetail": {
@@ -172,7 +173,9 @@
       "title": "Titolo",
       "year": "Anno",
       "stars": "Valutazione",
-      "releaseDate": "Data di rilascio"
+      "releaseDate": "Data di rilascio",
+      "criticRating": "Valutazione della critica",
+      "userRating": "Valutazione del pubblico"
     },
     "gamesCount_one": "{{count}} gioco visualizzato",
     "gamesCount_other": "{{count}} giochi visualizzati"

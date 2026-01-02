@@ -102,6 +102,7 @@
     "releaseDate": "リリース日",
     "year": "年",
     "stars": "評価",
+    "criticRating": "批評家評価",
     "noGames": "ゲームが見つかりません"
   },
   "gameDetail": {
@@ -172,7 +173,9 @@
       "title": "タイトル",
       "year": "年",
       "stars": "評価",
-      "releaseDate": "リリース日"
+      "releaseDate": "リリース日",
+      "criticRating": "批評家評価",
+      "userRating": "ユーザー評価"
     },
     "gamesCount_one": "{{count}} 件のゲームを表示",
     "gamesCount_other": "{{count}} 件のゲームを表示"

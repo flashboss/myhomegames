@@ -18,9 +18,9 @@ type GamesListTableProps = {
   onGameDelete?: (deletedGame: GameItem) => void;
   itemRefs?: React.RefObject<Map<string, HTMLElement>>;
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
-  sortField?: "title" | "year" | "stars" | "releaseDate";
+  sortField?: "title" | "year" | "stars" | "releaseDate" | "criticRating";
   sortAscending?: boolean;
-  onSortChange?: (field: "title" | "year" | "stars" | "releaseDate") => void;
+  onSortChange?: (field: "title" | "year" | "stars" | "releaseDate" | "criticRating") => void;
   onSortDirectionChange?: (ascending: boolean) => void;
 };
 
@@ -29,6 +29,7 @@ type ColumnVisibility = {
   releaseDate: boolean;
   year: boolean;
   stars: boolean;
+  criticRating: boolean;
 };
 
 export default function GamesListTable({
@@ -121,10 +122,11 @@ export default function GamesListTable({
             releaseDate: true,
             year: false,
             stars: false,
+            criticRating: false,
           };
         }
       }
-      return { title: true, releaseDate: true };
+      return { title: true, releaseDate: true, criticRating: false };
     }
   );
   const [showColumnMenu, setShowColumnMenu] = useState(false);
@@ -151,7 +153,7 @@ export default function GamesListTable({
     );
   }, [columnVisibility]);
 
-  const handleSort = (field: "title" | "year" | "stars" | "releaseDate") => {
+  const handleSort = (field: "title" | "year" | "stars" | "releaseDate" | "criticRating") => {
     if (!onSortChange || !onSortDirectionChange) return;
     
     // Map releaseDate to year for sorting
@@ -165,6 +167,19 @@ export default function GamesListTable({
       onSortChange(sortFieldMapped);
       onSortDirectionChange(true);
     }
+  };
+
+  // Helper function to format rating value (0-10 float)
+  const formatRating = (value: number | null | undefined): string | null => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return null;
+    }
+    const numValue = Number(value);
+    if (numValue < 0 || numValue > 10) {
+      return null;
+    }
+    // Format to show decimal only if present (e.g., 8.5 instead of 8.50, but 8 instead of 8.0)
+    return numValue % 1 === 0 ? numValue.toString() : numValue.toFixed(1);
   };
 
   // Column definitions with translations
@@ -186,6 +201,10 @@ export default function GamesListTable({
         key: "stars" as keyof ColumnVisibility,
         label: t("table.stars"),
       },
+      {
+        key: "criticRating" as keyof ColumnVisibility,
+        label: t("table.criticRating"),
+      },
     ],
     [t, i18n.language]
   );
@@ -194,7 +213,7 @@ export default function GamesListTable({
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
-  const getSortIcon = (field: "title" | "year" | "stars" | "releaseDate") => {
+  const getSortIcon = (field: "title" | "year" | "stars" | "releaseDate" | "criticRating") => {
     // Map releaseDate to year for comparison
     const fieldMapped = field === "releaseDate" ? "releaseDate" : field;
     if (sortField !== fieldMapped) return "";
@@ -297,6 +316,8 @@ export default function GamesListTable({
                   ? "stars"
                   : columnVisibility.year
                   ? "year"
+                  : columnVisibility.criticRating
+                  ? "criticRating"
                   : null;
 
                 return (
@@ -337,6 +358,15 @@ export default function GamesListTable({
                         <span className="sort-indicator">{getSortIcon("year")}</span>
                       </th>
                     )}
+                    {columnVisibility.criticRating && (
+                      <th
+                        onClick={() => handleSort("criticRating")}
+                        className={`has-border-right ${firstVisibleColumn === "criticRating" ? "first-visible-cell" : ""}`}
+                      >
+                        <span>{t("table.criticRating")}</span>
+                        <span className="sort-indicator">{getSortIcon("criticRating")}</span>
+                      </th>
+                    )}
                     <th className="games-table-edit-header"></th>
                   </>
                 );
@@ -357,6 +387,8 @@ export default function GamesListTable({
                 ? "stars"
                 : columnVisibility.year
                 ? "year"
+                : columnVisibility.criticRating
+                ? "criticRating"
                 : null;
 
               const PlayIcon = () => {
@@ -415,7 +447,7 @@ export default function GamesListTable({
                   {columnVisibility.releaseDate && (
                     <td
                       className={`date-cell ${rowClass} ${
-                        columnVisibility.stars || columnVisibility.year
+                        columnVisibility.stars || columnVisibility.year || columnVisibility.criticRating
                           ? "has-border-right"
                           : ""
                       } ${firstVisibleColumn === "releaseDate" ? "first-visible-cell" : ""}`}
@@ -457,6 +489,91 @@ export default function GamesListTable({
                           ? it.year.toString()
                           : "-"}
                       </span>
+                    </td>
+                  )}
+                  {columnVisibility.criticRating && (
+                    <td className={`critic-rating-cell ${rowClass} has-border-right ${firstVisibleColumn === "criticRating" ? "first-visible-cell" : ""}`}>
+                      {firstVisibleColumn === "criticRating" && onPlay && <PlayIcon />}
+                      <div className={firstVisibleColumn === "criticRating" ? "first-cell-text" : ""} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                        {(() => {
+                          const criticRating = formatRating(it.criticratings);
+                          const userRating = formatRating(it.userratings);
+                          
+                          if (criticRating === null && userRating === null) {
+                            return <span>-</span>;
+                          }
+                          
+                          return (
+                            <>
+                              {criticRating !== null && (
+                                <Tooltip text={t("gameDetail.criticRating")}>
+                                  <div 
+                                    className="text-white" 
+                                    style={{ 
+                                      opacity: 0.8,
+                                      fontFamily: 'var(--font-body-2-font-family)',
+                                      fontSize: 'var(--font-body-2-font-size)',
+                                      lineHeight: 'var(--font-body-2-line-height)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px'
+                                    }}
+                                  >
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 24 24"
+                                      fill="#FFD700"
+                                      stroke="#FFA500"
+                                      strokeWidth="1.5"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      style={{ flexShrink: 0 }}
+                                    >
+                                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                                    </svg>
+                                    {criticRating}
+                                  </div>
+                                </Tooltip>
+                              )}
+                              {userRating !== null && (
+                                <Tooltip text={t("gameDetail.userRating")}>
+                                  <div 
+                                    className="text-white" 
+                                    style={{ 
+                                      opacity: 0.8,
+                                      fontFamily: 'var(--font-body-2-font-family)',
+                                      fontSize: 'var(--font-body-2-font-size)',
+                                      lineHeight: 'var(--font-body-2-line-height)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px'
+                                    }}
+                                  >
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 24 24"
+                                      fill="#4CAF50"
+                                      stroke="#2E7D32"
+                                      strokeWidth="1.5"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      style={{ flexShrink: 0 }}
+                                    >
+                                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                      <circle cx="9" cy="7" r="4" />
+                                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                    </svg>
+                                    {userRating}
+                                  </div>
+                                </Tooltip>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
                     </td>
                   )}
                   <td className={`games-table-edit-cell ${rowClass}`}>

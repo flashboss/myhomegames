@@ -102,6 +102,7 @@
     "releaseDate": "Release Date",
     "year": "Year",
     "stars": "Rating",
+    "criticRating": "Critic Rating",
     "noGames": "No games found"
   },
   "gameDetail": {
@@ -172,7 +173,9 @@
       "title": "Title",
       "year": "Year",
       "stars": "Rating",
-      "releaseDate": "Release Date"
+      "releaseDate": "Release Date",
+      "criticRating": "Critic Rating",
+      "userRating": "User Rating"
     },
     "gamesCount_one": "{{count}} game displayed",
     "gamesCount_other": "{{count}} games displayed"

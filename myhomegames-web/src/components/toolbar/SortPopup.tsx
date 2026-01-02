@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import "./SortPopup.css";
 
-type SortField = "title" | "year" | "stars" | "releaseDate";
+type SortField = "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating";
 
 type SortPopupProps = {
   isOpen: boolean;
@@ -61,6 +61,8 @@ export default function SortPopup({
     { value: "year", label: t("gamesListToolbar.sort.year") },
     { value: "stars", label: t("gamesListToolbar.sort.stars") },
     { value: "releaseDate", label: t("gamesListToolbar.sort.releaseDate") },
+    { value: "criticRating", label: t("gamesListToolbar.sort.criticRating") },
+    { value: "userRating", label: t("gamesListToolbar.sort.userRating") },
   ];
 
   const handleSortSelect = (field: SortField) => {
