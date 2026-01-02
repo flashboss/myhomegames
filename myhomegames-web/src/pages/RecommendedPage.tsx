@@ -128,7 +128,6 @@ export default function RecommendedPage({
               onGameClick={onGameClick}
               onPlay={onPlay}
               onGameUpdate={handleGameUpdate}
-              buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
               coverSize={coverSize}
             />
           ))}

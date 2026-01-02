@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "../../config";
+import { buildCoverUrl } from "../../utils/api";
 import Cover from "../games/Cover";
 import DropdownMenu from "../common/DropdownMenu";
 import EditGameModal from "../games/EditGameModal";
@@ -13,7 +14,6 @@ type SearchResultsListProps = {
   games: GameItem[];
   collections: CollectionItem[];
   onGameClick: (game: GameItem) => void;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   variant?: "popup" | "page"; // "popup" for dropdown, "page" for full page
   coverSize?: number; // Cover width (default: 100 for page, 60 for popup games, 40 for popup collections)
   onPlay?: (item: GameItem | CollectionItem) => void; // Play handler
@@ -33,7 +33,6 @@ const POPUP_COVER_SIZE = 60;
 type SearchResultItemProps = {
   item: GameItem | CollectionItem;
   onGameClick: (game: GameItem) => void;
-  buildCoverUrl: (apiBase: string, cover?: string) => string;
   variant?: "popup" | "page";
   coverSize?: number;
   onPlay?: (item: GameItem | CollectionItem) => void;
@@ -51,7 +50,6 @@ type SearchResultItemProps = {
 function SearchResultItem({
   item,
   onGameClick,
-  buildCoverUrl,
   variant = "page",
   coverSize,
   onPlay,
@@ -206,7 +204,6 @@ export default function SearchResultsList({
   games,
   collections,
   onGameClick,
-  buildCoverUrl,
   variant = "page",
   coverSize,
   onPlay,
@@ -291,7 +288,6 @@ export default function SearchResultsList({
             key={item.ratingKey}
             item={item}
             onGameClick={onGameClick}
-            buildCoverUrl={buildCoverUrl}
             variant={variant}
             coverSize={coverSize}
             onPlay={onPlay}

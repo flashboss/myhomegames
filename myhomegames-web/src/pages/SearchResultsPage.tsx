@@ -191,7 +191,6 @@ export default function SearchResultsPage({
             games={gamesState}
             collections={collectionsState}
             onGameClick={onGameClick}
-            buildCoverUrl={(cover?: string) => buildCoverUrl(API_BASE, cover)}
             onPlay={onPlay}
             onGameUpdate={handleGameUpdate}
             onCollectionUpdate={handleCollectionUpdate}
