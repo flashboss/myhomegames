@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cover from "../components/games/Cover";
@@ -22,15 +22,7 @@ export default function IGDBGameDetailPage() {
   const [loading, setLoading] = useState(false);
   const [markingAsOwned, setMarkingAsOwned] = useState(false);
 
-  useEffect(() => {
-    // Always fetch game details with high-res cover from dedicated endpoint
-    // This ensures we get the high-resolution cover even if game data was passed via state
-    if (igdbId) {
-      fetchIGDBGame(parseInt(igdbId, 10));
-    }
-  }, [igdbId]);
-
-  async function fetchIGDBGame(gameId: number) {
+  const fetchIGDBGame = useCallback(async (gameId: number) => {
     setLoading(true);
     setGlobalLoading(true);
     try {
@@ -67,7 +59,15 @@ export default function IGDBGameDetailPage() {
       setLoading(false);
       setGlobalLoading(false);
     }
-  }
+  }, [setGlobalLoading]);
+
+  useEffect(() => {
+    // Always fetch game details with high-res cover from dedicated endpoint
+    // This ensures we get the high-resolution cover even if game data was passed via state
+    if (igdbId) {
+      fetchIGDBGame(parseInt(igdbId, 10));
+    }
+  }, [igdbId, fetchIGDBGame]);
 
   async function handleMarkAsOwned() {
     if (!game) return;
@@ -219,8 +219,15 @@ function IGDBGameDetailContent({
     return null;
   };
 
+  // Normalize genres to lowercase (same normalization as categories)
+  const normalizedGenres = game && game.genres && Array.isArray(game.genres) && game.genres.length > 0
+    ? game.genres
+        .filter((g) => g && typeof g === "string" && g.trim())
+        .map((g) => g.trim().toLowerCase())
+    : null;
+
   // Create a temporary GameItem for GameCategories component
-  const gameItemForCategories: GameItem | null = game && game.genres && game.genres.length > 0
+  const gameItemForCategories: GameItem | null = normalizedGenres && normalizedGenres.length > 0
     ? {
         ratingKey: `igdb-${game.id}`,
         title: game.name,
@@ -231,7 +238,7 @@ function IGDBGameDetailContent({
         month: game.releaseDateFull?.month || null,
         year: game.releaseDateFull?.year || game.releaseDate || null,
         stars: null,
-        genre: game.genres,
+        genre: normalizedGenres,
         criticratings: game.criticRating || null,
         userratings: game.userRating || null,
         command: null,

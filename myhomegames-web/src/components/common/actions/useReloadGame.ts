@@ -54,7 +54,7 @@ export function useReloadGame({
       } else if (collectionId) {
         url = buildApiUrl(API_BASE, `/collections/${collectionId}/reload`);
       } else {
-        url = buildApiUrl(API_BASE, `/reload`);
+        url = buildApiUrl(API_BASE, `/reload-games`);
       }
 
       const response = await fetch(url, {

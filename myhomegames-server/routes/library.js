@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
+const { ensureCategoryExists, normalizeGenres } = require("./categories");
 
 /**
  * Library routes module
@@ -27,22 +28,55 @@ function downloadImage(imageUrl, filePath, gameId, imageType = "image") {
     try {
       const https = require('https');
       const file = fs.createWriteStream(filePath);
+      let requestCompleted = false;
       
-      https.get(imageUrl, (response) => {
+      const cleanup = () => {
+        if (!requestCompleted) {
+          requestCompleted = true;
+          if (fs.existsSync(filePath)) {
+            try {
+              fs.unlinkSync(filePath);
+            } catch (e) {
+              // Ignore cleanup errors
+            }
+          }
+        }
+      };
+      
+      const req = https.get(imageUrl, (response) => {
         if (response.statusCode === 200) {
           response.pipe(file);
           file.on('finish', () => {
             file.close();
-            resolve(true);
+            if (!requestCompleted) {
+              requestCompleted = true;
+              resolve(true);
+            }
+          });
+          file.on('error', (err) => {
+            file.close();
+            cleanup();
+            console.warn(`Failed to save ${imageType} file for game ${gameId}:`, err.message);
+            resolve(false);
           });
         } else {
+          response.resume(); // Consume response to free up memory
           file.close();
-          fs.unlinkSync(filePath); // Delete the file on error
+          cleanup();
           resolve(false);
         }
-      }).on('error', (err) => {
-        fs.unlinkSync(filePath); // Delete the file on error
+      });
+      
+      req.on('error', (err) => {
+        cleanup();
         console.warn(`Failed to download ${imageType} for game ${gameId}:`, err.message);
+        resolve(false);
+      });
+      
+      req.setTimeout(30000, () => {
+        req.destroy();
+        cleanup();
+        console.warn(`Timeout downloading ${imageType} for game ${gameId}`);
         resolve(false);
       });
     } catch (error) {
@@ -68,6 +102,7 @@ function loadLibraryGames(metadataGamesDir, allGames) {
     return [];
   }
 }
+
 
 function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
   // Get metadata path (parent of metadataGamesDir)
@@ -485,6 +520,9 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         }
       }
 
+      // Normalize genres to lowercase (same normalization as categories)
+      const normalizedGenres = normalizeGenres(genres);
+
       // Create game object
       const newGame = {
         id: gameId,
@@ -493,7 +531,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         year: year,
         month: month || null,
         day: day || null,
-        genre: genres && genres.length > 0 ? genres : null,
+        genre: normalizedGenres && normalizedGenres.length > 0 ? normalizedGenres : null,
         criticratings: criticRating !== undefined && criticRating !== null ? criticRating / 10 : null, // Convert from 0-100 to 0-10
         userratings: userRating !== undefined && userRating !== null ? userRating / 10 : null, // Convert from 0-100 to 0-10
       };
@@ -514,6 +552,15 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       if (background) {
         const backgroundPath = path.join(gameContentDir, "background.webp");
         await downloadImage(background, backgroundPath, gameId, "background");
+      }
+
+      // Create missing categories from genres (use normalized genres)
+      if (normalizedGenres && normalizedGenres.length > 0) {
+        for (const genre of normalizedGenres) {
+          if (genre && typeof genre === "string") {
+            ensureCategoryExists(metadataGamesDir, genre);
+          }
+        }
       }
 
       // Add game to games-library.json (allLibraryGames already loaded above)

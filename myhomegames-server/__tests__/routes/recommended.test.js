@@ -12,6 +12,16 @@ beforeAll(() => {
   app = require('../../server.js');
 });
 
+afterAll(async () => {
+  // Give time for any pending async operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Force garbage collection if available (helps with cleanup)
+  if (global.gc) {
+    global.gc();
+  }
+});
+
 describe('GET /recommended', () => {
   test('should return recommended sections', async () => {
     const response = await request(app)

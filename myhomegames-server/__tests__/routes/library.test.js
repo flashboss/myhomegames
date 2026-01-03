@@ -12,6 +12,16 @@ beforeAll(() => {
   app = require('../../server.js');
 });
 
+afterAll(async () => {
+  // Give time for any pending async operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Force garbage collection if available (helps with cleanup)
+  if (global.gc) {
+    global.gc();
+  }
+});
+
 describe('GET /libraries/library/games', () => {
   test('should return games for library', async () => {
     const response = await request(app)
@@ -930,6 +940,252 @@ describe('DELETE /games/:gameId', () => {
       
       expect(getResponseAfter.body).toHaveProperty('error', 'Game not found');
     }
+  });
+});
+
+describe('POST /games/add-from-igdb', () => {
+  test('should add game from IGDB and create missing categories', async () => {
+    // Get initial categories count
+    const categoriesBefore = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const initialCategoriesCount = categoriesBefore.body.categories.length;
+    
+    // Add a game with new genres
+    const response = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        igdbId: 999999,
+        name: 'Test Game from IGDB',
+        summary: 'Test summary',
+        cover: 'https://images.igdb.com/igdb/image/upload/t_cover_big/test.jpg',
+        background: 'https://images.igdb.com/igdb/image/upload/t_1080p/test.jpg',
+        releaseDate: 1609459200, // 2021-01-01 timestamp
+        genres: ['New Genre 1', 'New Genre 2'],
+        criticRating: 85,
+        userRating: 80
+      })
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body).toHaveProperty('game');
+    expect(response.body).toHaveProperty('gameId', 999999);
+    expect(response.body.game).toHaveProperty('id', 999999);
+    expect(response.body.game).toHaveProperty('title', 'Test Game from IGDB');
+    expect(response.body.game).toHaveProperty('genre');
+    expect(Array.isArray(response.body.game.genre)).toBe(true);
+    // Genres should be normalized to lowercase
+    expect(response.body.game.genre).toContain('new genre 1');
+    expect(response.body.game.genre).toContain('new genre 2');
+    
+    // Verify categories were created
+    const categoriesAfter = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(categoriesAfter.body.categories.length).toBe(initialCategoriesCount + 2);
+    
+    const newGenre1 = categoriesAfter.body.categories.find(c => c.title === 'new genre 1');
+    const newGenre2 = categoriesAfter.body.categories.find(c => c.title === 'new genre 2');
+    
+    expect(newGenre1).toBeDefined();
+    expect(newGenre2).toBeDefined();
+    expect(newGenre1.id).toBe('genre_new_genre_1');
+    expect(newGenre2.id).toBe('genre_new_genre_2');
+    
+    // Cleanup: delete the test game
+    await request(app)
+      .delete(`/games/${999999}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+  });
+
+  test('should not create duplicate categories if they already exist', async () => {
+    // First create a category manually
+    const createCategoryResponse = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'Existing Genre' })
+      .expect(200);
+    
+    const existingCategoryId = createCategoryResponse.body.category.id;
+    
+    // Get categories count before adding game
+    const categoriesBefore = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const initialCategoriesCount = categoriesBefore.body.categories.length;
+    
+    // Add a game with the same genre
+    const response = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        igdbId: 999998,
+        name: 'Test Game with Existing Genre',
+        summary: 'Test summary',
+        releaseDate: 1609459200,
+        genres: ['Existing Genre'],
+        criticRating: 75,
+        userRating: 70
+      })
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('status', 'success');
+    
+    // Verify genre was normalized to lowercase
+    expect(response.body.game).toHaveProperty('genre');
+    expect(Array.isArray(response.body.game.genre)).toBe(true);
+    expect(response.body.game.genre).toContain('existing genre');
+    
+    // Verify category count didn't increase
+    const categoriesAfter = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(categoriesAfter.body.categories.length).toBe(initialCategoriesCount);
+    
+    // Verify the existing category still exists
+    const existingCategory = categoriesAfter.body.categories.find(c => c.id === existingCategoryId);
+    expect(existingCategory).toBeDefined();
+    
+    // Cleanup: delete the test game
+    await request(app)
+      .delete(`/games/${999998}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+  });
+
+  test('should return 400 if required fields are missing', async () => {
+    const response = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        name: 'Test Game'
+        // Missing igdbId
+      })
+      .expect(400);
+    
+    expect(response.body).toHaveProperty('error', 'Missing required fields: igdbId and name');
+  });
+
+  test('should return 409 if game already exists', async () => {
+    // First get an existing game ID
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const existingGameId = libraryResponse.body.games[0].id;
+      
+      // Try to add the same game again
+      const response = await request(app)
+        .post('/games/add-from-igdb')
+        .set('X-Auth-Token', 'test-token')
+        .send({
+          igdbId: existingGameId,
+          name: 'Duplicate Game',
+          summary: 'Test summary'
+        })
+        .expect(409);
+      
+      expect(response.body).toHaveProperty('error', 'Game already exists');
+      expect(response.body).toHaveProperty('gameId', existingGameId);
+    }
+  });
+
+  test('should handle games without genres', async () => {
+    const response = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        igdbId: 999997,
+        name: 'Test Game Without Genres',
+        summary: 'Test summary',
+        releaseDate: 1609459200
+      })
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body.game).toHaveProperty('genre');
+    expect(response.body.game.genre).toBeNull();
+    
+    // Cleanup: delete the test game
+    await request(app)
+      .delete(`/games/${999997}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+  });
+
+  test('should require authentication', async () => {
+    const response = await request(app)
+      .post('/games/add-from-igdb')
+      .send({
+        igdbId: 999996,
+        name: 'Test Game'
+      })
+      .expect(401);
+    
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
+  });
+
+  test('should normalize genres to lowercase', async () => {
+    // Add a game with uppercase genres
+    const response = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        igdbId: 999995,
+        name: 'Test Game with Uppercase Genres',
+        summary: 'Test summary',
+        releaseDate: 1609459200,
+        genres: ['ACTION', 'ADVENTURE', 'RPG'],
+        criticRating: 90,
+        userRating: 85
+      })
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('status', 'success');
+    expect(response.body.game).toHaveProperty('genre');
+    expect(Array.isArray(response.body.game.genre)).toBe(true);
+    
+    // Verify genres are normalized to lowercase
+    expect(response.body.game.genre).toContain('action');
+    expect(response.body.game.genre).toContain('adventure');
+    expect(response.body.game.genre).toContain('rpg');
+    
+    // Verify no uppercase genres exist
+    expect(response.body.game.genre).not.toContain('ACTION');
+    expect(response.body.game.genre).not.toContain('ADVENTURE');
+    expect(response.body.game.genre).not.toContain('RPG');
+    
+    // Verify categories were created with lowercase titles
+    const categoriesResponse = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const actionCategory = categoriesResponse.body.categories.find(c => c.title === 'action');
+    const adventureCategory = categoriesResponse.body.categories.find(c => c.title === 'adventure');
+    const rpgCategory = categoriesResponse.body.categories.find(c => c.title === 'rpg');
+    
+    expect(actionCategory).toBeDefined();
+    expect(adventureCategory).toBeDefined();
+    expect(rpgCategory).toBeDefined();
+    
+    // Cleanup: delete the test game
+    await request(app)
+      .delete(`/games/${999995}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
   });
 });
 

@@ -32,6 +32,16 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
+afterAll(async () => {
+  // Give time for any pending async operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Force garbage collection if available (helps with cleanup)
+  if (global.gc) {
+    global.gc();
+  }
+});
+
 describe('GET /auth/twitch', () => {
   test('should return auth URL when Twitch client ID is configured', async () => {
     const response = await request(app)

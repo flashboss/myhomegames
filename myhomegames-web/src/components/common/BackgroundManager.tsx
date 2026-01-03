@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, useCallback, useMemo, createContext, useContext } from "react";
 
 type BackgroundContextType = {
   hasBackground: boolean;
@@ -68,16 +68,16 @@ export default function BackgroundManager({
     }
   }, [hasBackground, elementId]);
 
-  const handleVisibilityChange = (visible: boolean) => {
+  const handleVisibilityChange = useCallback((visible: boolean) => {
     setIsBackgroundVisible(visible);
     saveBackgroundState(elementId, visible);
-  };
+  }, [elementId]);
 
-  const contextValue: BackgroundContextType = {
+  const contextValue: BackgroundContextType = useMemo(() => ({
     hasBackground,
     isBackgroundVisible,
     setBackgroundVisible: handleVisibilityChange,
-  };
+  }), [hasBackground, isBackgroundVisible, handleVisibilityChange]);
 
   return (
     <BackgroundContext.Provider value={contextValue}>

@@ -550,7 +550,7 @@ function GameDetailPage({
     return (
       <div
         className="bg-[#1a1a1a] text-white flex items-center justify-center"
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%", paddingTop: "64px" }}
       >
         <div className="text-center">
           <div className="text-gray-400">{t("gameDetail.notFound")}</div>
