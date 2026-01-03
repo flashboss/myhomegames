@@ -509,3 +509,270 @@ describe('POST /games/:gameId/reload', () => {
   });
 });
 
+describe('POST /games/:gameId/upload-executable', () => {
+  test('should upload a .sh file successfully', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('#!/bin/bash\necho "Hello World"');
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .attach('file', fileContent, 'test-script.sh')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'success');
+      expect(response.body).toHaveProperty('game');
+      expect(response.body.game).toHaveProperty('command', 'sh');
+      expect(response.body.game).toHaveProperty('id', gameId);
+      
+      // Verify the file was saved
+      const { testMetadataPath } = require('../setup');
+      const fs = require('fs');
+      const path = require('path');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.sh');
+      expect(fs.existsSync(scriptPath)).toBe(true);
+      
+      // Verify file content
+      const savedContent = fs.readFileSync(scriptPath);
+      expect(savedContent.toString()).toBe(fileContent.toString());
+      
+      // Verify command field was updated in JSON
+      const gameResponse = await request(app)
+        .get(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(gameResponse.body).toHaveProperty('command', 'sh');
+    }
+  });
+
+  test('should upload a .bat file successfully', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('@echo off\necho Hello World');
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .attach('file', fileContent, 'test-script.bat')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'success');
+      expect(response.body.game).toHaveProperty('command', 'bat');
+      
+      // Verify the file was saved as script.bat
+      const { testMetadataPath } = require('../setup');
+      const fs = require('fs');
+      const path = require('path');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.bat');
+      expect(fs.existsSync(scriptPath)).toBe(true);
+      
+      // Verify file content
+      const savedContent = fs.readFileSync(scriptPath);
+      expect(savedContent.toString()).toBe(fileContent.toString());
+    }
+  });
+
+  test('should reject files with invalid extensions', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('some content');
+      
+      // Try uploading a .txt file
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .attach('file', fileContent, 'test-file.txt')
+        .expect(400);
+      
+      expect(response.body).toHaveProperty('error', 'Only .sh and .bat files are allowed');
+    }
+  });
+
+  test('should reject request without file', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(400);
+      
+      expect(response.body).toHaveProperty('error', 'No file uploaded');
+    }
+  });
+
+  test('should return 404 for non-existent game', async () => {
+    const fileContent = Buffer.from('#!/bin/bash\necho "test"');
+    
+    const response = await request(app)
+      .post('/games/non-existent-game-id/upload-executable')
+      .set('X-Auth-Token', 'test-token')
+      .attach('file', fileContent, 'test-script.sh')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Game not found');
+  });
+
+  test('should require authentication', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('#!/bin/bash\necho "test"');
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .attach('file', fileContent, 'test-script.sh')
+        .expect(401);
+      
+      expect(response.body).toHaveProperty('error', 'Unauthorized');
+    }
+  });
+
+  test('should rename file to script.sh regardless of original name', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('#!/bin/bash\necho "renamed test"');
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .attach('file', fileContent, 'my-custom-name.sh')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'success');
+      
+      // Verify the file was saved as script.sh (not my-custom-name.sh)
+      const { testMetadataPath } = require('../setup');
+      const fs = require('fs');
+      const path = require('path');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.sh');
+      const customPath = path.join(testMetadataPath, 'content', 'games', gameId, 'my-custom-name.sh');
+      
+      expect(fs.existsSync(scriptPath)).toBe(true);
+      expect(fs.existsSync(customPath)).toBe(false);
+    }
+  });
+
+  test('should rename file to script.bat regardless of original name', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('@echo off\necho "renamed test"');
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .attach('file', fileContent, 'my-custom-name.bat')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'success');
+      
+      // Verify the file was saved as script.bat (not my-custom-name.bat)
+      const { testMetadataPath } = require('../setup');
+      const fs = require('fs');
+      const path = require('path');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.bat');
+      const customPath = path.join(testMetadataPath, 'content', 'games', gameId, 'my-custom-name.bat');
+      
+      expect(fs.existsSync(scriptPath)).toBe(true);
+      expect(fs.existsSync(customPath)).toBe(false);
+    }
+  });
+
+  test('should return updated game data with command field', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('#!/bin/bash\necho "test"');
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .attach('file', fileContent, 'test-script.sh')
+        .expect(200);
+      
+      const game = response.body.game;
+      expect(game).toHaveProperty('id', gameId);
+      expect(game).toHaveProperty('title');
+      expect(game).toHaveProperty('summary');
+      expect(game).toHaveProperty('cover');
+      expect(game).toHaveProperty('command', 'sh');
+      expect(game).toHaveProperty('day');
+      expect(game).toHaveProperty('month');
+      expect(game).toHaveProperty('year');
+      expect(game).toHaveProperty('stars');
+      expect(game).toHaveProperty('genre');
+      expect(game).toHaveProperty('criticratings');
+      expect(game).toHaveProperty('userratings');
+    }
+  });
+
+  test('should reject .exe files', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const fileContent = Buffer.from('fake exe content');
+      
+      const response = await request(app)
+        .post(`/games/${gameId}/upload-executable`)
+        .set('X-Auth-Token', 'test-token')
+        .attach('file', fileContent, 'test.exe')
+        .expect(400);
+      
+      expect(response.body).toHaveProperty('error', 'Only .sh and .bat files are allowed');
+    }
+  });
+});
+
