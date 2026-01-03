@@ -941,6 +941,145 @@ describe('DELETE /games/:gameId', () => {
       expect(getResponseAfter.body).toHaveProperty('error', 'Game not found');
     }
   });
+
+  test('should delete orphaned categories when deleting a game', async () => {
+    // Create a category
+    const createCategoryResponse = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'orphanedcategory' })
+      .expect(200);
+    
+    const categoryId = createCategoryResponse.body.category.id;
+    
+    // Verify category exists
+    const categoriesBefore = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const categoryExistsBefore = categoriesBefore.body.categories.some(c => c.id === categoryId);
+    expect(categoryExistsBefore).toBe(true);
+    
+    // Add a game with this category
+    const addGameResponse = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        igdbId: 999994,
+        name: 'Test Game with Orphaned Category',
+        summary: 'Test summary',
+        releaseDate: 1609459200,
+        genres: ['orphanedcategory'],
+        criticRating: 80,
+        userRating: 75
+      })
+      .expect(200);
+    
+    const gameId = addGameResponse.body.gameId;
+    
+    // Verify game has the category
+    const gameResponse = await request(app)
+      .get(`/games/${gameId}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(gameResponse.body.genre).toContain('orphanedcategory');
+    
+    // Delete the game
+    const deleteResponse = await request(app)
+      .delete(`/games/${gameId}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(deleteResponse.body).toHaveProperty('status', 'success');
+    
+    // Verify category was deleted (orphaned)
+    const categoriesAfter = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const categoryExistsAfter = categoriesAfter.body.categories.some(c => c.id === categoryId);
+    expect(categoryExistsAfter).toBe(false);
+  });
+
+  test('should not delete categories that are still used by other games', async () => {
+    // Create a category
+    const createCategoryResponse = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'sharedcategory' })
+      .expect(200);
+    
+    const categoryId = createCategoryResponse.body.category.id;
+    
+    // Add first game with this category
+    const addGame1Response = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        igdbId: 999993,
+        name: 'Test Game 1 with Shared Category',
+        summary: 'Test summary',
+        releaseDate: 1609459200,
+        genres: ['sharedcategory'],
+        criticRating: 80,
+        userRating: 75
+      })
+      .expect(200);
+    
+    const gameId1 = addGame1Response.body.gameId;
+    
+    // Add second game with the same category
+    const addGame2Response = await request(app)
+      .post('/games/add-from-igdb')
+      .set('X-Auth-Token', 'test-token')
+      .send({
+        igdbId: 999992,
+        name: 'Test Game 2 with Shared Category',
+        summary: 'Test summary',
+        releaseDate: 1609459200,
+        genres: ['sharedcategory'],
+        criticRating: 85,
+        userRating: 80
+      })
+      .expect(200);
+    
+    const gameId2 = addGame2Response.body.gameId;
+    
+    // Delete first game
+    const deleteResponse = await request(app)
+      .delete(`/games/${gameId1}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(deleteResponse.body).toHaveProperty('status', 'success');
+    
+    // Verify category still exists (used by second game)
+    const categoriesAfter = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const categoryExistsAfter = categoriesAfter.body.categories.some(c => c.id === categoryId);
+    expect(categoryExistsAfter).toBe(true);
+    
+    // Cleanup: delete second game
+    await request(app)
+      .delete(`/games/${gameId2}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    // Now category should be deleted (orphaned)
+    const categoriesFinal = await request(app)
+      .get('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    const categoryExistsFinal = categoriesFinal.body.categories.some(c => c.id === categoryId);
+    expect(categoryExistsFinal).toBe(false);
+  });
 });
 
 describe('POST /games/add-from-igdb', () => {

@@ -243,6 +243,44 @@ describe('DELETE /categories/:categoryId', () => {
     
     expect(response.body).toHaveProperty('error', 'Unauthorized');
   });
+
+  test('should delete category content directory', async () => {
+    // First create a category
+    const createResponse = await request(app)
+      .post('/categories')
+      .set('X-Auth-Token', 'test-token')
+      .send({ title: 'testcategoryfordeletion' })
+      .expect(200);
+    
+    const categoryId = createResponse.body.category.id;
+    const { testMetadataPath } = require('../setup');
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Create a test content directory for the category
+    const categoryContentDir = path.join(testMetadataPath, 'content', 'categories', categoryId);
+    if (!fs.existsSync(categoryContentDir)) {
+      fs.mkdirSync(categoryContentDir, { recursive: true });
+    }
+    
+    // Create a test file in the directory
+    const testFile = path.join(categoryContentDir, 'test.txt');
+    fs.writeFileSync(testFile, 'test content');
+    
+    // Verify the directory exists before deletion
+    expect(fs.existsSync(categoryContentDir)).toBe(true);
+    
+    // Delete the category
+    const response = await request(app)
+      .delete(`/categories/${categoryId}`)
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('status', 'success');
+    
+    // Verify the directory was deleted
+    expect(fs.existsSync(categoryContentDir)).toBe(false);
+  });
 });
 
 describe('Game update with category creation and deletion', () => {

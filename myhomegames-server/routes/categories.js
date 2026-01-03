@@ -239,6 +239,18 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
     const filePath = path.join(metadataGamesDir, fileName);
     try {
       fs.writeFileSync(filePath, JSON.stringify(categories, null, 2), "utf8");
+      
+      // Delete category content directory (cover, etc.)
+      const categoryContentDir = path.join(metadataPath, "content", "categories", categoryId);
+      if (fs.existsSync(categoryContentDir)) {
+        try {
+          fs.rmSync(categoryContentDir, { recursive: true, force: true });
+        } catch (rmError) {
+          console.warn(`Failed to delete category content directory for ${categoryId}:`, rmError.message);
+          // Continue anyway, the category was removed from the library
+        }
+      }
+      
       res.json({ status: "success", message: "Category deleted" });
     } catch (e) {
       console.error(`Failed to save ${fileName}:`, e.message);
@@ -247,11 +259,82 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
   });
 }
 
+/**
+ * Delete a category if it's not used by any game
+ * @param {string} metadataPath - Path to metadata directory
+ * @param {string} metadataGamesDir - Path to metadata/games directory
+ * @param {string} categoryId - Category ID to delete
+ * @param {Object} allGamesFromFile - Object with all games (gameId -> game object)
+ * @returns {boolean} - True if category was deleted, false if it's still in use
+ */
+function deleteCategoryIfUnused(metadataPath, metadataGamesDir, categoryId, allGamesFromFile) {
+  const categories = loadCategories(metadataGamesDir);
+  
+  // Find the category
+  const categoryIndex = categories.findIndex((c) => c.id === categoryId);
+  if (categoryIndex === -1) {
+    return false; // Category not found
+  }
+
+  const category = categories[categoryIndex];
+  const categoryIdToCheck = category.id;
+  const categoryTitleToCheck = category.title;
+
+  // Check if category is used by any game (check both ID and title)
+  const isUsed = Object.values(allGamesFromFile).some((game) => {
+    if (!game.genre) return false;
+    if (Array.isArray(game.genre)) {
+      return game.genre.some((g) => 
+        g === categoryIdToCheck || 
+        g === categoryTitleToCheck ||
+        g.toLowerCase() === categoryIdToCheck.toLowerCase() ||
+        g.toLowerCase() === categoryTitleToCheck.toLowerCase()
+      );
+    }
+    const genreStr = String(game.genre);
+    return genreStr === categoryIdToCheck || 
+           genreStr === categoryTitleToCheck ||
+           genreStr.toLowerCase() === categoryIdToCheck.toLowerCase() ||
+           genreStr.toLowerCase() === categoryTitleToCheck.toLowerCase();
+  });
+
+  if (isUsed) {
+    return false; // Category is still in use
+  }
+
+  // Remove category
+  categories.splice(categoryIndex, 1);
+
+  // Save to file
+  const fileName = "games-categories.json";
+  const filePath = path.join(metadataGamesDir, fileName);
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(categories, null, 2), "utf8");
+    
+    // Delete category content directory (cover, etc.)
+    const categoryContentDir = path.join(metadataPath, "content", "categories", categoryId);
+    if (fs.existsSync(categoryContentDir)) {
+      try {
+        fs.rmSync(categoryContentDir, { recursive: true, force: true });
+      } catch (rmError) {
+        console.warn(`Failed to delete category content directory for ${categoryId}:`, rmError.message);
+        // Continue anyway, the category was removed from the library
+      }
+    }
+    
+    return true; // Category was deleted
+  } catch (e) {
+    console.error(`Failed to save ${fileName}:`, e.message);
+    return false; // Failed to delete
+  }
+}
+
 module.exports = {
   loadCategories,
   normalizeGenre,
   normalizeGenres,
   ensureCategoryExists,
+  deleteCategoryIfUnused,
   registerCategoriesRoutes,
 };
 
