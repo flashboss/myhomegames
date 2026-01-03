@@ -1,0 +1,7 @@
+/* Styles for IGDB Game Detail Page */
+.mark-as-owned-button:hover:not(:disabled) {
+  background-color: #FFC107 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 179, 0, 0.3);
+}
+

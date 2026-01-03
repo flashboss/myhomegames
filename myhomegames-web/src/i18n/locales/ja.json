@@ -88,7 +88,8 @@
     "loading": "検索中...",
     "noResults": "ゲームが見つかりません",
     "typeToSearch": "検索するには少なくとも2文字入力してください",
-    "error": "ゲームの検索中にエラーが発生しました"
+    "error": "ゲームの検索中にエラーが発生しました",
+    "new": "新規"
   },
   "viewMode": {
     "grid": "グリッド表示",
@@ -123,6 +124,12 @@
     "unlinkExecutable": "実行ファイルのリンクを解除",
     "unlinkingExecutable": "解除中...",
     "invalidFileType": ".sh と .bat ファイルのみが許可されています"
+  },
+  "igdbGameDetail": {
+    "notFound": "ゲームが見つかりません",
+    "add": "追加",
+    "adding": "追加中...",
+    "errorAdding": "ライブラリにゲームを追加する際にエラーが発生しました"
   },
   "common": {
     "loading": "読み込み中...",

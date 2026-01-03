@@ -322,7 +322,7 @@ app.get("/igdb/search", requireToken, async (req, res) => {
   try {
     const accessToken = await getIGDBAccessToken();
 
-    const postData = `search "${query}"; fields id,name,summary,cover.url,first_release_date; limit 20;`;
+    const postData = `search "${query}"; fields id,name,summary,cover.url,first_release_date,genres.name,rating,aggregated_rating; limit 20;`;
 
     const options = {
       hostname: "api.igdb.com",
@@ -345,17 +345,30 @@ app.get("/igdb/search", requireToken, async (req, res) => {
         try {
           const games = JSON.parse(data);
           // Transform cover URLs to full URLs
-          const transformed = games.map((game) => ({
-            id: game.id,
-            name: game.name,
-            summary: game.summary || "",
-            cover: game.cover
-              ? `https:${game.cover.url.replace("t_thumb", "t_cover_big")}`
-              : null,
-            releaseDate: game.first_release_date
-              ? new Date(game.first_release_date * 1000).getFullYear()
-              : null,
-          }));
+          const transformed = games.map((game) => {
+            const releaseDate = game.first_release_date
+              ? new Date(game.first_release_date * 1000)
+              : null;
+            
+            return {
+              id: game.id,
+              name: game.name,
+              summary: game.summary || "",
+              cover: game.cover
+                ? `https:${game.cover.url.replace("t_thumb", "t_cover_big")}`
+                : null,
+              releaseDate: releaseDate ? releaseDate.getFullYear() : null,
+              releaseDateFull: releaseDate ? {
+                year: releaseDate.getFullYear(),
+                month: releaseDate.getMonth() + 1,
+                day: releaseDate.getDate(),
+                timestamp: game.first_release_date
+              } : null,
+              genres: game.genres ? game.genres.map((g) => g.name || g).filter(Boolean) : [],
+              criticRating: game.rating !== undefined && game.rating !== null ? game.rating : null,
+              userRating: game.aggregated_rating !== undefined && game.aggregated_rating !== null ? game.aggregated_rating : null,
+            };
+          });
           res.setHeader('Content-Type', 'application/json');
           res.json({ games: transformed });
         } catch (e) {

@@ -88,7 +88,8 @@
     "loading": "搜索中...",
     "noResults": "未找到游戏",
     "typeToSearch": "至少输入 2 个字符进行搜索",
-    "error": "搜索游戏时出错"
+    "error": "搜索游戏时出错",
+    "new": "新"
   },
   "viewMode": {
     "grid": "网格视图",
@@ -123,6 +124,12 @@
     "unlinkExecutable": "取消链接可执行文件",
     "unlinkingExecutable": "取消链接中...",
     "invalidFileType": "仅允许 .sh 和 .bat 文件"
+  },
+  "igdbGameDetail": {
+    "notFound": "未找到游戏",
+    "add": "添加",
+    "adding": "添加中...",
+    "errorAdding": "添加游戏到库时出错"
   },
   "common": {
     "loading": "加载中...",

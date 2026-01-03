@@ -18,6 +18,7 @@ import SearchResultsPage from "./pages/SearchResultsPage";
 import CollectionDetail from "./pages/CollectionDetail";
 import CategoryPage from "./pages/CategoryPage";
 import LoginPage from "./pages/LoginPage";
+import IGDBGameDetailPage from "./pages/IGDBGameDetailPage";
 import AddGame from "./components/common/AddGame";
 import GameDetail from "./components/games/GameDetail";
 import LaunchModal from "./components/common/LaunchModal";
@@ -438,6 +439,23 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/igdb-game/:igdbId"
+            element={
+              <ProtectedRoute>
+                <Header
+                  onPlay={openLauncher}
+                  allGames={allGames}
+                  allCollections={allCollections}
+                  onGameSelect={handleGameSelect}
+                  onHomeClick={() => navigate("/")}
+                  onSettingsClick={() => navigate("/settings")}
+                  onAddGameClick={() => setAddGameOpen(true)}
+                />
+                <IGDBGameDetailPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
 
         {/* Add Game Modal */}
@@ -446,8 +464,9 @@ function AppContent() {
           onClose={() => setAddGameOpen(false)}
           onGameSelected={(game) => {
             console.log("Game selected from IGDB:", game);
-            // TODO: Implement game addition logic
+            // Navigation is handled inside AddGame component
           }}
+          allGames={allGames}
         />
 
         {/* Launch Modal - handles both loading and error states */}

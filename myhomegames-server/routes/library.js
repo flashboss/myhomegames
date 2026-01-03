@@ -383,6 +383,125 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       res.status(500).json({ error: "Failed to save executable file" });
     }
   });
+
+  // Endpoint: add game from IGDB to library
+  app.post("/games/add-from-igdb", requireToken, async (req, res) => {
+    const { igdbId, name, summary, cover, releaseDate } = req.body;
+    
+    if (!igdbId || !name) {
+      return res.status(400).json({ error: "Missing required fields: igdbId and name" });
+    }
+
+    try {
+      // Generate a new game ID
+      const gameId = `game_${Date.now()}`;
+      
+      // Parse release date
+      let year = null;
+      let month = null;
+      let day = null;
+      if (releaseDate) {
+        if (typeof releaseDate === 'number') {
+          // If it's just a year number
+          year = releaseDate;
+        } else {
+          const date = new Date(releaseDate);
+          if (!isNaN(date.getTime())) {
+            year = date.getFullYear();
+            month = date.getMonth() + 1; // JavaScript months are 0-indexed
+            day = date.getDate();
+          }
+        }
+      }
+
+      // Create game object
+      const newGame = {
+        id: gameId,
+        title: name,
+        summary: summary || "",
+        year: year,
+        month: month || null,
+        day: day || null,
+      };
+
+      // Download cover image if provided
+      if (cover) {
+        try {
+          const https = require('https');
+          const gameContentDir = path.join(metadataPath, "content", "games", gameId);
+          if (!fs.existsSync(gameContentDir)) {
+            fs.mkdirSync(gameContentDir, { recursive: true });
+          }
+          
+          const coverPath = path.join(gameContentDir, "cover.jpg");
+          const file = fs.createWriteStream(coverPath);
+          
+          https.get(cover, (response) => {
+            if (response.statusCode === 200) {
+              response.pipe(file);
+              file.on('finish', () => {
+                file.close();
+              });
+            } else {
+              file.close();
+              fs.unlinkSync(coverPath); // Delete the file on error
+            }
+          }).on('error', (err) => {
+            fs.unlinkSync(coverPath); // Delete the file on error
+            console.warn(`Failed to download cover for game ${gameId}:`, err.message);
+          });
+        } catch (coverError) {
+          console.warn(`Failed to download cover for game ${gameId}:`, coverError.message);
+          // Continue without cover
+        }
+      }
+
+      // Add game to games-library.json
+      const fileName = "games-library.json";
+      const filePath = path.join(metadataGamesDir, fileName);
+      let allLibraryGames = [];
+      
+      try {
+        const txt = fs.readFileSync(filePath, "utf8");
+        allLibraryGames = JSON.parse(txt);
+      } catch (e) {
+        // File doesn't exist or is invalid, start with empty array
+        console.warn(`Failed to load ${fileName}, starting with empty array:`, e.message);
+      }
+
+      // Add new game
+      allLibraryGames.push(newGame);
+      fs.writeFileSync(filePath, JSON.stringify(allLibraryGames, null, 2), "utf8");
+
+      // Add to allGames cache
+      allGames[gameId] = newGame;
+
+      // Return the new game data
+      const gameData = {
+        id: newGame.id,
+        title: newGame.title,
+        summary: newGame.summary || "",
+        cover: `/covers/${encodeURIComponent(newGame.id)}`,
+        day: newGame.day || null,
+        month: newGame.month || null,
+        year: newGame.year || null,
+        stars: newGame.stars || null,
+        genre: newGame.genre || null,
+        criticratings: newGame.criticratings || null,
+        userratings: newGame.userratings || null,
+        command: newGame.command || null,
+      };
+      const background = getBackgroundPath(metadataPath, newGame.id);
+      if (background) {
+        gameData.background = background;
+      }
+
+      res.json({ status: "success", game: gameData, gameId: newGame.id });
+    } catch (error) {
+      console.error(`Failed to add game from IGDB:`, error);
+      res.status(500).json({ error: "Failed to add game to library", detail: error.message });
+    }
+  });
 }
 
 module.exports = {

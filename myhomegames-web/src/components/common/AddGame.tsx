@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { API_BASE, API_TOKEN } from "../../config";
+import type { GameItem } from "../../types";
 import "./AddGame.css";
 
 type IGDBGame = {
@@ -10,25 +12,44 @@ type IGDBGame = {
   summary: string;
   cover: string | null;
   releaseDate: number | null;
+  releaseDateFull?: {
+    year: number;
+    month: number;
+    day: number;
+    timestamp: number;
+  } | null;
+  genres?: string[];
+  criticRating?: number | null;
+  userRating?: number | null;
 };
 
 type AddGameProps = {
   isOpen: boolean;
   onClose: () => void;
   onGameSelected: (game: IGDBGame) => void;
+  allGames?: GameItem[];
 };
 
 export default function AddGame({
   isOpen,
   onClose,
   onGameSelected,
+  allGames = [],
 }: AddGameProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<IGDBGame[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Check if an IGDB game matches a local game (by title)
+  function findMatchingLocalGame(igdbGame: IGDBGame): GameItem | undefined {
+    return allGames.find(
+      (localGame) => localGame.title.toLowerCase().trim() === igdbGame.name.toLowerCase().trim()
+    );
+  }
 
   useEffect(() => {
     if (!isOpen) {
@@ -156,46 +177,67 @@ export default function AddGame({
               </div>
             ) : (
               <div className="add-game-results-list">
-                {results.map((game) => (
-                  <button
-                    key={game.id}
-                    onClick={() => {
-                      onGameSelected(game);
-                      onClose();
-                    }}
-                    className="add-game-result-item"
-                  >
-                    {game.cover ? (
-                      <img
-                        src={game.cover}
-                        alt={game.name}
-                        className="add-game-result-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div className="add-game-result-placeholder">
-                        🎮
-                      </div>
-                    )}
-                    <div className="add-game-result-content">
-                      <div className="add-game-result-title">
-                        {game.name}
-                      </div>
-                      {game.releaseDate && (
-                        <div className="add-game-result-date">
-                          {game.releaseDate}
+                {results.map((game) => {
+                  const matchingGame = findMatchingLocalGame(game);
+                  const isNew = !matchingGame;
+                  
+                  return (
+                    <button
+                      key={game.id}
+                      onClick={() => {
+                        if (matchingGame) {
+                          // Navigate to existing game detail
+                          navigate(`/game/${matchingGame.ratingKey}`);
+                          onClose();
+                        } else {
+                          // Navigate to IGDB game detail page with game data
+                          navigate(`/igdb-game/${game.id}`, {
+                            state: { gameData: game }
+                          });
+                          onClose();
+                        }
+                      }}
+                      className="add-game-result-item"
+                    >
+                      {game.cover ? (
+                        <img
+                          src={game.cover}
+                          alt={game.name}
+                          className="add-game-result-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="add-game-result-placeholder">
+                          🎮
                         </div>
                       )}
-                      {game.summary && (
-                        <div className="add-game-result-summary">
-                          {game.summary}
+                      <div className="add-game-result-content">
+                        <div className="add-game-result-title-row">
+                          <div className="add-game-result-title">
+                            {game.name}
+                          </div>
+                          {isNew && (
+                            <span className="add-game-result-new-label">
+                              {t("addGame.new")}
+                            </span>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </button>
-                ))}
+                        {game.releaseDate && (
+                          <div className="add-game-result-date">
+                            {game.releaseDate}
+                          </div>
+                        )}
+                        {game.summary && (
+                          <div className="add-game-result-summary">
+                            {game.summary}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

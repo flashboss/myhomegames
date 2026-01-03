@@ -88,7 +88,8 @@
     "loading": "Searching...",
     "noResults": "No games found",
     "typeToSearch": "Type at least 2 characters to search",
-    "error": "Error searching games"
+    "error": "Error searching games",
+    "new": "New"
   },
   "viewMode": {
     "grid": "Grid View",
@@ -123,6 +124,12 @@
     "unlinkExecutable": "Unlink Executable",
     "unlinkingExecutable": "Unlinking...",
     "invalidFileType": "Only .sh and .bat files are allowed"
+  },
+  "igdbGameDetail": {
+    "notFound": "Game not found",
+    "add": "Add",
+    "adding": "Adding...",
+    "errorAdding": "Error adding game to library"
   },
   "common": {
     "loading": "Loading...",

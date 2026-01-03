@@ -88,7 +88,8 @@
     "loading": "Suche...",
     "noResults": "Keine Spiele gefunden",
     "typeToSearch": "Geben Sie mindestens 2 Zeichen ein, um zu suchen",
-    "error": "Fehler beim Suchen von Spielen"
+    "error": "Fehler beim Suchen von Spielen",
+    "new": "Neu"
   },
   "viewMode": {
     "grid": "Rasteransicht",
@@ -123,6 +124,12 @@
     "unlinkExecutable": "Ausführbare Datei trennen",
     "unlinkingExecutable": "Trennen...",
     "invalidFileType": "Nur .sh- und .bat-Dateien sind erlaubt"
+  },
+  "igdbGameDetail": {
+    "notFound": "Spiel nicht gefunden",
+    "add": "Hinzufügen",
+    "adding": "Hinzufügen...",
+    "errorAdding": "Fehler beim Hinzufügen des Spiels zur Bibliothek"
   },
   "common": {
     "loading": "Lädt...",
