@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
 import LibrariesBar from "../components/layout/LibrariesBar";
-import type { ViewMode } from "../components/layout/LibrariesBar";
+import type { ViewMode } from "../types";
 import LibraryPage from "./LibraryPage";
 import RecommendedPage from "./RecommendedPage";
 import CollectionsPage from "./CollectionsPage";
 import CategoriesPage from "./CategoriesPage";
-import type { GameItem, CategoryItem } from "../types";
+import type { GameItem, CategoryItem, GameLibrarySection } from "../types";
 import "./HomePage.css";
-
-type GameLibrarySection = {
-  key: string;
-  title?: string; // Optional, will be translated using key
-  type: string;
-};
 
 export type { GameItem, CategoryItem };
 

@@ -3,9 +3,8 @@ import { useTranslation } from "react-i18next";
 import FilterPopup from "./filters/FilterPopup";
 import SortPopup from "./toolbar/SortPopup";
 import type { FilterField, GameItem } from "./filters/types";
+import type { SortField } from "../types";
 import "./GamesListToolbar.css";
-
-type SortField = "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating";
 
 type GamesListToolbarProps = {
   gamesCount: number;

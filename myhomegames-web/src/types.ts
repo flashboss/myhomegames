@@ -38,3 +38,31 @@ export type CollectionInfo = {
   background?: string;
 };
 
+export type IGDBGame = {
+  id: number;
+  name: string;
+  summary: string;
+  cover: string | null;
+  background?: string | null;
+  releaseDate: number | null;
+  releaseDateFull?: {
+    year: number;
+    month: number;
+    day: number;
+    timestamp: number;
+  } | null;
+  genres?: string[];
+  criticRating?: number | null;
+  userRating?: number | null;
+};
+
+export type SortField = "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating";
+
+export type ViewMode = "grid" | "detail" | "table";
+
+export type GameLibrarySection = {
+  key: string;
+  title?: string; // Optional, will be translated using key
+  type: string;
+};
+

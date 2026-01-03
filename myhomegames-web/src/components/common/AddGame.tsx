@@ -3,25 +3,8 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { API_BASE, API_TOKEN } from "../../config";
-import type { GameItem } from "../../types";
+import type { GameItem, IGDBGame } from "../../types";
 import "./AddGame.css";
-
-type IGDBGame = {
-  id: number;
-  name: string;
-  summary: string;
-  cover: string | null;
-  releaseDate: number | null;
-  releaseDateFull?: {
-    year: number;
-    month: number;
-    day: number;
-    timestamp: number;
-  } | null;
-  genres?: string[];
-  criticRating?: number | null;
-  userRating?: number | null;
-};
 
 type AddGameProps = {
   isOpen: boolean;

@@ -9,26 +9,8 @@ import Tooltip from "../components/common/Tooltip";
 import { buildApiUrl } from "../utils/api";
 import { API_BASE, getApiToken } from "../config";
 import { useLoading } from "../contexts/LoadingContext";
-import type { GameItem } from "../types";
+import type { GameItem, IGDBGame } from "../types";
 import "./IGDBGameDetailPage.css";
-
-type IGDBGame = {
-  id: number;
-  name: string;
-  summary: string;
-  cover: string | null;
-  background?: string | null;
-  releaseDate: number | null;
-  releaseDateFull?: {
-    year: number;
-    month: number;
-    day: number;
-    timestamp: number;
-  } | null;
-  genres?: string[];
-  criticRating?: number | null;
-  userRating?: number | null;
-};
 
 export default function IGDBGameDetailPage() {
   const { t } = useTranslation();

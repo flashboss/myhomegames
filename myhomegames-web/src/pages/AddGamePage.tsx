@@ -2,14 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { API_BASE, getApiToken } from "../config";
-
-type IGDBGame = {
-  id: number;
-  name: string;
-  summary: string;
-  cover: string | null;
-  releaseDate: number | null;
-};
+import type { IGDBGame } from "../types";
 
 type AddGamePageProps = {
   onGameSelected: (game: IGDBGame) => void;

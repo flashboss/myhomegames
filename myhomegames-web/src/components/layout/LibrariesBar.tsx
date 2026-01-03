@@ -6,15 +6,8 @@ import BackgroundToggle from "../ui/BackgroundToggle";
 import DropdownMenu from "../common/DropdownMenu";
 import { useBackground } from "../common/BackgroundManager";
 import { API_BASE, getApiToken } from "../../config";
+import type { ViewMode, GameLibrarySection } from "../../types";
 import "./LibrariesBar.css";
-
-type GameLibrarySection = {
-  key: string;
-  title?: string; // Optional, will be translated using key
-  type: string;
-};
-
-export type ViewMode = "grid" | "detail" | "table";
 
 type LibrariesBarProps = {
   libraries: GameLibrarySection[];

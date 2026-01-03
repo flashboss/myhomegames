@@ -6,10 +6,10 @@ import GamesListDetail from "../components/games/GamesListDetail";
 import GamesListTable from "../components/games/GamesListTable";
 import AlphabetNavigator from "../components/ui/AlphabetNavigator";
 import GamesListToolbar from "../components/games/GamesListToolbar";
-import type { ViewMode } from "../components/layout/LibrariesBar";
+import type { ViewMode } from "../types";
 import type { FilterField } from "../components/filters/types";
 import { compareTitles } from "../utils/stringUtils";
-import type { GameItem } from "../types";
+import type { GameItem, SortField } from "../types";
 import { API_BASE, getApiToken } from "../config";
 import { buildApiUrl, buildCoverUrl } from "../utils/api";
 
@@ -56,9 +56,9 @@ export default function LibraryPage({
   const [availableGenres, setAvailableGenres] = useState<Array<{ id: string; title: string }>>([]);
   const [availableCollections, setAvailableCollections] = useState<Array<{ id: string; title: string }>>([]);
   const [collectionGameIds, setCollectionGameIds] = useState<Map<string, string[]>>(new Map());
-  const [sortField, setSortField] = useState<"title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating">(() => {
+  const [sortField, setSortField] = useState<SortField>(() => {
     const saved = localStorage.getItem("librarySortField");
-    return (saved as "title" | "year" | "stars" | "releaseDate" | "criticRating" | "userRating") || "title";
+    return (saved as SortField) || "title";
   });
   const [sortAscending, setSortAscending] = useState<boolean>(() => {
     const saved = localStorage.getItem("librarySortAscending");

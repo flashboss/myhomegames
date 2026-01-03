@@ -2,15 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import CoverSizeSlider from "./ui/CoverSizeSlider";
 import ViewModeSelector from "./ui/ViewModeSelector";
+import type { ViewMode, GameLibrarySection } from "../types";
 import "./LibrariesBar.css";
-
-type GameLibrarySection = {
-  key: string;
-  title?: string; // Optional, will be translated using key
-  type: string;
-};
-
-export type ViewMode = "grid" | "detail" | "table";
 
 type LibrariesBarProps = {
   libraries: GameLibrarySection[];
