@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Cover from "../components/games/Cover";
 import Summary from "../components/common/Summary";
 import GameCategories from "../components/games/GameCategories";
+import BackgroundManager, { useBackground } from "../components/common/BackgroundManager";
 import LibrariesBar from "../components/layout/LibrariesBar";
 import Tooltip from "../components/common/Tooltip";
 import { buildApiUrl } from "../utils/api";
@@ -136,6 +137,8 @@ export default function IGDBGameDetailPage() {
   const coverWidth = 256;
   const coverHeight = 384;
   const coverUrl = game.cover || "";
+  const hasBackground = Boolean(game?.background && game.background.trim() !== "");
+  const backgroundUrl = game?.background || "";
 
   // Get coverSize from localStorage (same as GameDetail)
   const coverSize = (() => {
@@ -148,17 +151,23 @@ export default function IGDBGameDetailPage() {
   };
 
   return (
-    <IGDBGameDetailContent
-      game={game}
-      coverUrl={coverUrl}
-      coverWidth={coverWidth}
-      coverHeight={coverHeight}
-      coverSize={coverSize}
-      handleCoverSizeChange={handleCoverSizeChange}
-      markingAsOwned={markingAsOwned}
-      onMarkAsOwned={handleMarkAsOwned}
-      t={t as any}
-    />
+    <BackgroundManager 
+      backgroundUrl={backgroundUrl} 
+      hasBackground={hasBackground}
+      elementId={`igdb-${game.id}`}
+    >
+      <IGDBGameDetailContent
+        game={game}
+        coverUrl={coverUrl}
+        coverWidth={coverWidth}
+        coverHeight={coverHeight}
+        coverSize={coverSize}
+        handleCoverSizeChange={handleCoverSizeChange}
+        markingAsOwned={markingAsOwned}
+        onMarkAsOwned={handleMarkAsOwned}
+        t={t as any}
+      />
+    </BackgroundManager>
   );
 }
 
@@ -230,10 +239,14 @@ function IGDBGameDetailContent({
 
   const criticRatingFormatted = formatRating(game.criticRating);
   const userRatingFormatted = formatRating(game.userRating);
+  const { hasBackground, isBackgroundVisible } = useBackground();
 
   return (
     <>
-      <div style={{ position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
+      <div 
+        style={{ position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}
+        className={hasBackground && isBackgroundVisible ? 'game-detail-libraries-bar-transparent' : ''}
+      >
         <LibrariesBar
           libraries={[]}
           activeLibrary={{ key: "game", type: "game" }}
@@ -244,6 +257,7 @@ function IGDBGameDetailContent({
           onCoverSizeChange={handleCoverSizeChange}
           viewMode="grid"
           onViewModeChange={() => {}}
+          hideBackgroundToggle={true}
         />
       </div>
       <div style={{ position: 'relative', zIndex: 2, height: '100vh', display: 'flex', flexDirection: 'column' }}>

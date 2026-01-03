@@ -289,14 +289,16 @@ export default function DropdownMenu({
                 className="dropdown-menu-item"
                 disabled={reloadGame.isReloading}
               >
-                <span>
-                  {reloadGame.isReloading
-                    ? t("common.reloadingMetadata", "Reloading metadata...")
-                    : (gameId || collectionId)
+                {reloadGame.isReloading ? (
+                  <div className="button-spinner" />
+                ) : (
+                  <span>
+                    {(gameId || collectionId)
                       ? t("common.reloadSingleMetadata", "Reload metadata")
                       : t("common.reloadMetadata", "Reload all metadata")
-                  }
-                </span>
+                    }
+                  </span>
+                )}
               </button>
             )}
             {gameId && gameCommand && onGameUpdate && (
@@ -305,12 +307,13 @@ export default function DropdownMenu({
                 className="dropdown-menu-item"
                 disabled={unlinkExecutable.isUnlinking}
               >
-                <span>
-                  {unlinkExecutable.isUnlinking 
-                    ? t("gameDetail.unlinkingExecutable", "Unlinking...")
-                    : t("gameDetail.unlinkExecutable", "Unlink Executable")
-                  }
-                </span>
+                {unlinkExecutable.isUnlinking ? (
+                  <div className="button-spinner" />
+                ) : (
+                  <span>
+                    {t("gameDetail.unlinkExecutable", "Unlink Executable")}
+                  </span>
+                )}
               </button>
             )}
             {(onDelete || (getApiToken() && (gameId || collectionId))) && (
@@ -378,7 +381,11 @@ export default function DropdownMenu({
                 onClick={reloadGame.handleConfirmReload}
                 disabled={reloadGame.isReloading}
               >
-                {reloadGame.isReloading ? t("common.reloadingMetadata", "Reloading metadata...") : t("common.reloadMetadata", "Reload all metadata")}
+                {reloadGame.isReloading ? (
+                  <div className="button-spinner" />
+                ) : (
+                  t("common.reloadMetadata", "Reload all metadata")
+                )}
               </button>
             </div>
           </div>

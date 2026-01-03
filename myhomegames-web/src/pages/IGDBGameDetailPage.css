@@ -1,4 +1,8 @@
 /* Styles for IGDB Game Detail Page */
+.game-detail-libraries-bar-transparent .mhg-libraries-bar {
+  background-color: transparent !important;
+}
+
 .mark-as-owned-button:hover:not(:disabled) {
   background-color: #FFC107 !important;
   transform: translateY(-2px);

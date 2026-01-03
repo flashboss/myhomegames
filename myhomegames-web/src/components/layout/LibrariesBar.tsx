@@ -19,6 +19,7 @@ type LibrariesBarProps = {
   onCoverSizeChange?: (size: number) => void;
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
+  hideBackgroundToggle?: boolean;
 };
 
 export default function LibrariesBar({
@@ -31,6 +32,7 @@ export default function LibrariesBar({
   onCoverSizeChange,
   viewMode = "grid",
   onViewModeChange,
+  hideBackgroundToggle = false,
 }: LibrariesBarProps) {
   const { t } = useTranslation();
   const { hasBackground, isBackgroundVisible, setBackgroundVisible } = useBackground();
@@ -138,7 +140,7 @@ export default function LibrariesBar({
         )}
 
         <div className="mhg-libraries-actions" ref={actionsRef}>
-          {hasBackground && (
+          {hasBackground && !hideBackgroundToggle && (
             <div className="mhg-libraries-actions-background-toggle-container">
               <BackgroundToggle
                 isVisible={isBackgroundVisible}
