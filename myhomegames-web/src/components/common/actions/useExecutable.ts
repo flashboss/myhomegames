@@ -13,7 +13,7 @@ type UseExecutableProps = {
 type UseExecutableReturn = {
   isUploading: boolean;
   isUnlinking: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleFileSelect: (file: File) => Promise<void>;
   handleBrowseClick: () => void;
   handleUnlinkExecutable: () => Promise<void>;

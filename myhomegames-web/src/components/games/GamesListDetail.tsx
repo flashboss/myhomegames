@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "../../config";
 import Cover from "./Cover";

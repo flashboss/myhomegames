@@ -26,14 +26,12 @@ type IGDBGame = {
 type AddGameProps = {
   isOpen: boolean;
   onClose: () => void;
-  onGameSelected: (game: IGDBGame) => void;
   allGames?: GameItem[];
 };
 
 export default function AddGame({
   isOpen,
   onClose,
-  onGameSelected,
   allGames = [],
 }: AddGameProps) {
   const { t } = useTranslation();

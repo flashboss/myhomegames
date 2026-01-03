@@ -462,10 +462,6 @@ function AppContent() {
         <AddGame
           isOpen={addGameOpen}
           onClose={() => setAddGameOpen(false)}
-          onGameSelected={(game) => {
-            console.log("Game selected from IGDB:", game);
-            // Navigation is handled inside AddGame component
-          }}
           allGames={allGames}
         />
 

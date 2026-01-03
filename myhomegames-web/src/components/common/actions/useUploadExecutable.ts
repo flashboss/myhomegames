@@ -12,7 +12,7 @@ type UseUploadExecutableProps = {
 
 type UseUploadExecutableReturn = {
   isUploading: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleFileSelect: (file: File) => Promise<void>;
   handleBrowseClick: () => void;
 };
