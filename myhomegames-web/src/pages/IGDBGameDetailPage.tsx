@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cover from "../components/games/Cover";
 import Summary from "../components/common/Summary";
 import GameCategories from "../components/games/GameCategories";
 import BackgroundManager from "../components/common/BackgroundManager";
-import LibrariesBar from "../components/layout/LibrariesBar";
 import Tooltip from "../components/common/Tooltip";
 import { buildApiUrl } from "../utils/api";
 import { API_BASE, getApiToken } from "../config";
@@ -18,6 +17,7 @@ type IGDBGame = {
   name: string;
   summary: string;
   cover: string | null;
+  background?: string | null;
   releaseDate: number | null;
   releaseDateFull?: {
     year: number;
@@ -34,7 +34,6 @@ export default function IGDBGameDetailPage() {
   const { t } = useTranslation();
   const { igdbId } = useParams<{ igdbId: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
   const { setLoading: setGlobalLoading } = useLoading();
   const [game, setGame] = useState<IGDBGame | null>(null);
   const [loading, setLoading] = useState(false);
@@ -86,22 +85,19 @@ export default function IGDBGameDetailPage() {
     : null;
 
   useEffect(() => {
-    // Check if game data was passed via navigation state
-    const gameData = (location.state as any)?.gameData as IGDBGame | undefined;
-    if (gameData) {
-      setGame(gameData);
-    } else if (igdbId) {
-      // Fallback: fetch from API if not passed via state
+    // Always fetch game details with high-res cover from dedicated endpoint
+    // This ensures we get the high-resolution cover even if game data was passed via state
+    if (igdbId) {
       fetchIGDBGame(parseInt(igdbId, 10));
     }
-  }, [igdbId, location.state]);
+  }, [igdbId]);
 
   async function fetchIGDBGame(gameId: number) {
     setLoading(true);
     setGlobalLoading(true);
     try {
-      // Search for the game by ID in IGDB
-      const url = buildApiUrl(API_BASE, "/igdb/search", { q: gameId.toString() });
+      // Fetch game details with high-res cover from dedicated endpoint
+      const url = buildApiUrl(API_BASE, `/igdb/game/${gameId}`);
       const res = await fetch(url, {
         headers: {
           Accept: "application/json",
@@ -110,12 +106,14 @@ export default function IGDBGameDetailPage() {
       });
 
       if (!res.ok) {
+        if (res.status === 404) {
+          setGame(null);
+          return;
+        }
         throw new Error(`HTTP ${res.status}`);
       }
 
-      const json = await res.json();
-      const games = json.games || [];
-      const foundGame = games.find((g: IGDBGame) => g.id === gameId);
+      const foundGame = await res.json();
 
       if (!foundGame) {
         setGame(null);
@@ -207,37 +205,15 @@ export default function IGDBGameDetailPage() {
   const coverWidth = 256;
   const coverHeight = 384;
   const coverUrl = game.cover || "";
-  const hasBackground = false; // IGDB games don't have backgrounds
-
-  // Get coverSize from localStorage
-  const coverSize = (() => {
-    const saved = localStorage.getItem("coverSize");
-    return saved ? parseInt(saved, 10) : 150;
-  })();
-
-  const handleCoverSizeChange = (size: number) => {
-    localStorage.setItem("coverSize", size.toString());
-  };
+  const hasBackground = Boolean(game?.background && game.background.trim() !== "");
+  const backgroundUrl = game?.background || "";
 
   return (
     <BackgroundManager 
-      backgroundUrl={""} 
-      hasBackground={false}
+      backgroundUrl={backgroundUrl} 
+      hasBackground={hasBackground}
       elementId={`igdb-${game.id}`}
     >
-      <div className={hasBackground ? 'game-detail-libraries-bar-transparent' : ''} style={{ position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
-        <LibrariesBar
-          libraries={[]}
-          activeLibrary={{ key: "game", type: "game" }}
-          onSelectLibrary={() => {}}
-          loading={false}
-          error={null}
-          coverSize={coverSize}
-          onCoverSizeChange={handleCoverSizeChange}
-          viewMode="grid"
-          onViewModeChange={() => {}}
-        />
-      </div>
       <div style={{ position: 'relative', zIndex: 2, height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <div 
           className="home-page-main-container"

@@ -398,6 +398,102 @@ app.get("/igdb/search", requireToken, async (req, res) => {
   }
 });
 
+// Endpoint: get single IGDB game details with high-res cover
+app.get("/igdb/game/:igdbId", requireToken, async (req, res) => {
+  const igdbId = req.params.igdbId;
+  
+  if (!igdbId || isNaN(parseInt(igdbId, 10))) {
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(400).json({ error: "Invalid IGDB game ID" });
+  }
+
+  try {
+    const accessToken = await getIGDBAccessToken();
+
+    const postData = `fields id,name,summary,cover.url,first_release_date,genres.name,rating,aggregated_rating,artworks.image_id; where id = ${igdbId};`;
+
+    const options = {
+      hostname: "api.igdb.com",
+      path: "/v4/games",
+      method: "POST",
+      headers: {
+        "Client-ID": TWITCH_CLIENT_ID,
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "text/plain",
+        "Content-Length": Buffer.byteLength(postData),
+      },
+    };
+
+    const igdbReq = https.request(options, (igdbRes) => {
+      let data = "";
+      igdbRes.on("data", (chunk) => {
+        data += chunk;
+      });
+      igdbRes.on("end", () => {
+        try {
+          const games = JSON.parse(data);
+          
+          if (games.length === 0) {
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(404).json({ error: "IGDB game not found" });
+          }
+
+          const game = games[0];
+          const releaseDate = game.first_release_date
+            ? new Date(game.first_release_date * 1000)
+            : null;
+          
+          // Build background URL from artworks (use first artwork if available)
+          let backgroundUrl = null;
+          if (game.artworks && game.artworks.length > 0 && game.artworks[0].image_id) {
+            backgroundUrl = `https://images.igdb.com/igdb/image/upload/t_1080p/${game.artworks[0].image_id}.jpg`;
+          }
+          
+          const gameData = {
+            id: game.id,
+            name: game.name,
+            summary: game.summary || "",
+            cover: game.cover
+              ? `https:${game.cover.url.replace("t_thumb", "t_1080p").replace("t_cover_big", "t_1080p")}`
+              : null,
+            background: backgroundUrl,
+            releaseDate: releaseDate ? releaseDate.getFullYear() : null,
+            releaseDateFull: releaseDate ? {
+              year: releaseDate.getFullYear(),
+              month: releaseDate.getMonth() + 1,
+              day: releaseDate.getDate(),
+              timestamp: game.first_release_date
+            } : null,
+            genres: game.genres ? game.genres.map((g) => g.name || g).filter(Boolean) : [],
+            criticRating: game.rating !== undefined && game.rating !== null ? game.rating : null,
+            userRating: game.aggregated_rating !== undefined && game.aggregated_rating !== null ? game.aggregated_rating : null,
+          };
+          
+          res.setHeader('Content-Type', 'application/json');
+          res.json(gameData);
+        } catch (e) {
+          console.error("Error parsing IGDB response:", e);
+          res.setHeader('Content-Type', 'application/json');
+          res.status(500).json({ error: "Failed to parse IGDB response" });
+        }
+      });
+    });
+
+    igdbReq.on("error", (err) => {
+      console.error("IGDB request error:", err);
+      res.setHeader('Content-Type', 'application/json');
+      res.status(500).json({ error: "Failed to fetch game from IGDB" });
+    });
+
+    igdbReq.write(postData);
+    igdbReq.end();
+  } catch (error) {
+    console.error("Error fetching IGDB game:", error);
+    res.setHeader('Content-Type', 'application/json');
+    res.status(500).json({ error: "Failed to fetch game from IGDB" });
+  }
+});
+
 // Settings file path - stored in metadata path root
 const SETTINGS_FILE = path.join(METADATA_PATH, "settings.json");
 
