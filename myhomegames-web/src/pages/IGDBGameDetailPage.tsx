@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import Cover from "../components/games/Cover";
 import Summary from "../components/common/Summary";
 import GameCategories from "../components/games/GameCategories";
-import BackgroundManager from "../components/common/BackgroundManager";
+import LibrariesBar from "../components/layout/LibrariesBar";
 import Tooltip from "../components/common/Tooltip";
 import { buildApiUrl } from "../utils/api";
 import { API_BASE, getApiToken } from "../config";
@@ -20,51 +20,6 @@ export default function IGDBGameDetailPage() {
   const [game, setGame] = useState<IGDBGame | null>(null);
   const [loading, setLoading] = useState(false);
   const [markingAsOwned, setMarkingAsOwned] = useState(false);
-
-  // Helper function to format release date (same as GameDetail)
-  const formatReleaseDate = (game: IGDBGame): string | null => {
-    if (game.releaseDateFull) {
-      return `${game.releaseDateFull.day}/${game.releaseDateFull.month}/${game.releaseDateFull.year}`;
-    }
-    if (game.releaseDate) {
-      return game.releaseDate.toString();
-    }
-    return null;
-  };
-
-  // Helper function to format rating value (IGDB uses 0-100 scale, convert to 0-10)
-  const formatRating = (value: number | null | undefined): string | null => {
-    if (value === null || value === undefined || isNaN(value)) {
-      return null;
-    }
-    const numValue = Number(value);
-    // IGDB ratings are on 0-100 scale, convert to 0-10
-    if (numValue >= 0 && numValue <= 100) {
-      const convertedValue = numValue / 10;
-      // Format to show decimal only if present (e.g., 8.5 instead of 8.50, but 8 instead of 8.0)
-      return convertedValue % 1 === 0 ? convertedValue.toString() : convertedValue.toFixed(1);
-    }
-    return null;
-  };
-
-  // Create a temporary GameItem for GameCategories component
-  const gameItemForCategories: GameItem | null = game && game.genres && game.genres.length > 0
-    ? {
-        ratingKey: `igdb-${game.id}`,
-        title: game.name,
-        summary: game.summary,
-        cover: game.cover || "",
-        background: undefined,
-        day: game.releaseDateFull?.day || null,
-        month: game.releaseDateFull?.month || null,
-        year: game.releaseDateFull?.year || game.releaseDate || null,
-        stars: null,
-        genre: game.genres,
-        criticratings: game.criticRating || null,
-        userratings: game.userRating || null,
-        command: null,
-      }
-    : null;
 
   useEffect(() => {
     // Always fetch game details with high-res cover from dedicated endpoint
@@ -181,15 +136,116 @@ export default function IGDBGameDetailPage() {
   const coverWidth = 256;
   const coverHeight = 384;
   const coverUrl = game.cover || "";
-  const hasBackground = Boolean(game?.background && game.background.trim() !== "");
-  const backgroundUrl = game?.background || "";
+
+  // Get coverSize from localStorage (same as GameDetail)
+  const coverSize = (() => {
+    const saved = localStorage.getItem("coverSize");
+    return saved ? parseInt(saved, 10) : 150;
+  })();
+
+  const handleCoverSizeChange = (size: number) => {
+    localStorage.setItem("coverSize", size.toString());
+  };
 
   return (
-    <BackgroundManager 
-      backgroundUrl={backgroundUrl} 
-      hasBackground={hasBackground}
-      elementId={`igdb-${game.id}`}
-    >
+    <IGDBGameDetailContent
+      game={game}
+      coverUrl={coverUrl}
+      coverWidth={coverWidth}
+      coverHeight={coverHeight}
+      coverSize={coverSize}
+      handleCoverSizeChange={handleCoverSizeChange}
+      markingAsOwned={markingAsOwned}
+      onMarkAsOwned={handleMarkAsOwned}
+      t={t as any}
+    />
+  );
+}
+
+function IGDBGameDetailContent({
+  game,
+  coverUrl,
+  coverWidth,
+  coverHeight,
+  coverSize,
+  handleCoverSizeChange,
+  markingAsOwned,
+  onMarkAsOwned,
+  t,
+}: {
+  game: IGDBGame;
+  coverUrl: string;
+  coverWidth: number;
+  coverHeight: number;
+  coverSize: number;
+  handleCoverSizeChange: (size: number) => void;
+  markingAsOwned: boolean;
+  onMarkAsOwned: () => void;
+  t: (key: string, defaultValue?: string) => string;
+}) {
+  // Helper function to format release date
+  const formatReleaseDate = (game: IGDBGame): string | null => {
+    if (game.releaseDateFull) {
+      return `${game.releaseDateFull.day}/${game.releaseDateFull.month}/${game.releaseDateFull.year}`;
+    }
+    if (game.releaseDate) {
+      return game.releaseDate.toString();
+    }
+    return null;
+  };
+
+  // Helper function to format rating value (IGDB uses 0-100 scale, convert to 0-10)
+  const formatRating = (value: number | null | undefined): string | null => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return null;
+    }
+    const numValue = Number(value);
+    // IGDB ratings are on 0-100 scale, convert to 0-10
+    if (numValue >= 0 && numValue <= 100) {
+      const convertedValue = numValue / 10;
+      // Format to show decimal only if present (e.g., 8.5 instead of 8.50, but 8 instead of 8.0)
+      return convertedValue % 1 === 0 ? convertedValue.toString() : convertedValue.toFixed(1);
+    }
+    return null;
+  };
+
+  // Create a temporary GameItem for GameCategories component
+  const gameItemForCategories: GameItem | null = game && game.genres && game.genres.length > 0
+    ? {
+        ratingKey: `igdb-${game.id}`,
+        title: game.name,
+        summary: game.summary,
+        cover: game.cover || "",
+        background: undefined,
+        day: game.releaseDateFull?.day || null,
+        month: game.releaseDateFull?.month || null,
+        year: game.releaseDateFull?.year || game.releaseDate || null,
+        stars: null,
+        genre: game.genres,
+        criticratings: game.criticRating || null,
+        userratings: game.userRating || null,
+        command: null,
+      }
+    : null;
+
+  const criticRatingFormatted = formatRating(game.criticRating);
+  const userRatingFormatted = formatRating(game.userRating);
+
+  return (
+    <>
+      <div style={{ position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
+        <LibrariesBar
+          libraries={[]}
+          activeLibrary={{ key: "game", type: "game" }}
+          onSelectLibrary={() => {}}
+          loading={false}
+          error={null}
+          coverSize={coverSize}
+          onCoverSizeChange={handleCoverSizeChange}
+          viewMode="grid"
+          onViewModeChange={() => {}}
+        />
+      </div>
       <div style={{ position: 'relative', zIndex: 2, height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <div 
           className="home-page-main-container"
@@ -255,10 +311,7 @@ export default function IGDBGameDetailPage() {
                 </div>
               )}
               {gameItemForCategories && <GameCategories game={gameItemForCategories} />}
-              {(() => {
-                const criticRatingFormatted = formatRating(game.criticRating);
-                const userRatingFormatted = formatRating(game.userRating);
-                return (criticRatingFormatted !== null) || (userRatingFormatted !== null) ? (
+              {(criticRatingFormatted !== null) || (userRatingFormatted !== null) ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '8px' }}>
                     {criticRatingFormatted !== null && (
                       <Tooltip text={t("gameDetail.criticRating")}>
@@ -326,11 +379,10 @@ export default function IGDBGameDetailPage() {
                       </Tooltip>
                     )}
                   </div>
-                ) : null;
-              })()}
+                ) : null}
               <div className="game-detail-actions" style={{ marginTop: '16px' }}>
                 <button
-                  onClick={handleMarkAsOwned}
+                  onClick={onMarkAsOwned}
                   disabled={markingAsOwned}
                   style={{
                     backgroundColor: markingAsOwned ? '#666' : '#E5A00D',
@@ -386,7 +438,7 @@ export default function IGDBGameDetailPage() {
           </main>
         </div>
       </div>
-    </BackgroundManager>
+    </>
   );
 }
 
