@@ -502,6 +502,60 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       res.status(500).json({ error: "Failed to add game to library", detail: error.message });
     }
   });
+
+  // Endpoint: delete game
+  app.delete("/games/:gameId", requireToken, (req, res) => {
+    const gameId = req.params.gameId;
+    
+    // Validate game exists
+    const game = allGames[gameId];
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    
+    try {
+      // Remove game from games-library.json
+      const fileName = "games-library.json";
+      const filePath = path.join(metadataGamesDir, fileName);
+      let allLibraryGames = [];
+      
+      try {
+        const txt = fs.readFileSync(filePath, "utf8");
+        allLibraryGames = JSON.parse(txt);
+      } catch (e) {
+        console.error(`Failed to load ${fileName}:`, e.message);
+        return res.status(500).json({ error: "Failed to load games library" });
+      }
+      
+      // Find and remove the game
+      const gameIndex = allLibraryGames.findIndex((g) => g.id === gameId);
+      if (gameIndex === -1) {
+        return res.status(404).json({ error: "Game not found in library file" });
+      }
+      
+      allLibraryGames.splice(gameIndex, 1);
+      fs.writeFileSync(filePath, JSON.stringify(allLibraryGames, null, 2), "utf8");
+      
+      // Remove from in-memory cache
+      delete allGames[gameId];
+      
+      // Delete game content directory (cover, background, executable, etc.)
+      const gameContentDir = path.join(metadataPath, "content", "games", gameId);
+      if (fs.existsSync(gameContentDir)) {
+        try {
+          fs.rmSync(gameContentDir, { recursive: true, force: true });
+        } catch (rmError) {
+          console.warn(`Failed to delete game content directory for ${gameId}:`, rmError.message);
+          // Continue anyway, the game was removed from the library
+        }
+      }
+      
+      res.json({ status: "success" });
+    } catch (error) {
+      console.error(`Failed to delete game ${gameId}:`, error);
+      res.status(500).json({ error: "Failed to delete game" });
+    }
+  });
 }
 
 module.exports = {

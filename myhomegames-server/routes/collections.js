@@ -212,6 +212,18 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
     const filePath = path.join(metadataGamesDir, fileName);
     try {
       fs.writeFileSync(filePath, JSON.stringify(collectionsCache, null, 2), "utf8");
+      
+      // Delete collection content directory (cover, background, etc.)
+      const collectionContentDir = path.join(metadataPath, "content", "collections", collectionId);
+      if (fs.existsSync(collectionContentDir)) {
+        try {
+          fs.rmSync(collectionContentDir, { recursive: true, force: true });
+        } catch (rmError) {
+          console.warn(`Failed to delete collection content directory for ${collectionId}:`, rmError.message);
+          // Continue anyway, the collection was removed from the library
+        }
+      }
+      
       res.json({ status: "success" });
     } catch (e) {
       console.error(`Failed to save ${fileName}:`, e.message);

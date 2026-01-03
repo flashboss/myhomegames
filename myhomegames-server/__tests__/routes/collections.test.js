@@ -333,6 +333,45 @@ describe('DELETE /collections/:id', () => {
     }
   });
 
+  test('should delete collection content directory', async () => {
+    // First get a collection ID from the list
+    const collectionsResponse = await request(app)
+      .get('/collections')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (collectionsResponse.body.collections.length > 0) {
+      const collectionId = collectionsResponse.body.collections[0].id;
+      const { testMetadataPath } = require('../setup');
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Create a test content directory for the collection
+      const collectionContentDir = path.join(testMetadataPath, 'content', 'collections', collectionId);
+      if (!fs.existsSync(collectionContentDir)) {
+        fs.mkdirSync(collectionContentDir, { recursive: true });
+      }
+      
+      // Create a test file in the directory
+      const testFile = path.join(collectionContentDir, 'test.txt');
+      fs.writeFileSync(testFile, 'test content');
+      
+      // Verify the directory exists before deletion
+      expect(fs.existsSync(collectionContentDir)).toBe(true);
+      
+      // Delete the collection
+      const response = await request(app)
+        .delete(`/collections/${collectionId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'success');
+      
+      // Verify the directory was deleted
+      expect(fs.existsSync(collectionContentDir)).toBe(false);
+    }
+  });
+
   test('should handle URL-encoded collection IDs', async () => {
     // First get a collection ID from the list
     const collectionsResponse = await request(app)

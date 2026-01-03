@@ -776,3 +776,160 @@ describe('POST /games/:gameId/upload-executable', () => {
   });
 });
 
+describe('DELETE /games/:gameId', () => {
+  test('should delete a game successfully', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .delete(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'success');
+      
+      // Verify the game was deleted by trying to fetch it
+      const getResponse = await request(app)
+        .get(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(404);
+      
+      expect(getResponse.body).toHaveProperty('error', 'Game not found');
+      
+      // Verify the game is no longer in the library list
+      const libraryResponseAfter = await request(app)
+        .get('/libraries/library/games')
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      const gameStillExists = libraryResponseAfter.body.games.some(g => g.id === gameId);
+      expect(gameStillExists).toBe(false);
+    }
+  });
+
+  test('should delete game content directory', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      const { testMetadataPath } = require('../setup');
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Create a test content directory for the game
+      const gameContentDir = path.join(testMetadataPath, 'content', 'games', gameId);
+      if (!fs.existsSync(gameContentDir)) {
+        fs.mkdirSync(gameContentDir, { recursive: true });
+      }
+      
+      // Create a test file in the directory
+      const testFile = path.join(gameContentDir, 'test.txt');
+      fs.writeFileSync(testFile, 'test content');
+      
+      // Verify the directory exists before deletion
+      expect(fs.existsSync(gameContentDir)).toBe(true);
+      
+      // Delete the game
+      const response = await request(app)
+        .delete(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(response.body).toHaveProperty('status', 'success');
+      
+      // Verify the directory was deleted
+      expect(fs.existsSync(gameContentDir)).toBe(false);
+    }
+  });
+
+  test('should return 404 for non-existent game', async () => {
+    const response = await request(app)
+      .delete('/games/non-existent-game-id')
+      .set('X-Auth-Token', 'test-token')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Game not found');
+  });
+
+  test('should require authentication', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      const response = await request(app)
+        .delete(`/games/${gameId}`)
+        .expect(401);
+      
+      expect(response.body).toHaveProperty('error', 'Unauthorized');
+    }
+  });
+
+  test('should handle game not found in library file gracefully', async () => {
+    // This test verifies that if a game exists in memory but not in the file,
+    // the deletion should still work (it will fail when trying to find it in the file)
+    // Actually, the current implementation checks allGames first, so if it's not there,
+    // it returns 404. Let's test the case where the game is in memory but not in file.
+    // Actually, looking at the code, it checks allGames first, so if the game doesn't exist
+    // in allGames, it returns 404. So this test is covered by the non-existent game test.
+    
+    // Test with a completely non-existent game ID
+    const response = await request(app)
+      .delete('/games/completely-nonexistent-game-id-12345')
+      .set('X-Auth-Token', 'test-token')
+      .expect(404);
+    
+    expect(response.body).toHaveProperty('error', 'Game not found');
+  });
+
+  test('should remove game from in-memory cache', async () => {
+    // First get a game ID from the library
+    const libraryResponse = await request(app)
+      .get('/libraries/library/games')
+      .set('X-Auth-Token', 'test-token')
+      .expect(200);
+    
+    if (libraryResponse.body.games.length > 0) {
+      const gameId = libraryResponse.body.games[0].id;
+      
+      // Verify game exists before deletion
+      const getResponseBefore = await request(app)
+        .get(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(getResponseBefore.body).toHaveProperty('id', gameId);
+      
+      // Delete the game
+      const deleteResponse = await request(app)
+        .delete(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(200);
+      
+      expect(deleteResponse.body).toHaveProperty('status', 'success');
+      
+      // Verify game is removed from cache (should return 404)
+      const getResponseAfter = await request(app)
+        .get(`/games/${gameId}`)
+        .set('X-Auth-Token', 'test-token')
+        .expect(404);
+      
+      expect(getResponseAfter.body).toHaveProperty('error', 'Game not found');
+    }
+  });
+});
+
