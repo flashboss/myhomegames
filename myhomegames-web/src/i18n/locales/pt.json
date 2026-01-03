@@ -122,13 +122,7 @@
     "linkExecutable": "Vincular Executável",
     "unlinkExecutable": "Desvincular Executável",
     "unlinkingExecutable": "Desvinculando...",
-    "executablePath": "Caminho do Executável",
-    "executablePathHint": "Digite o caminho absoluto completo para o executável do jogo (ex. /usr/local/bin/game ou C:\\Program Files\\Game\\game.exe). Você pode incluir argumentos após o caminho.",
-    "executablePathPlaceholder": "Digite o caminho completo (ex. /usr/local/bin/game ou C:\\Program Files\\Game\\game.exe)",
-    "browseFile": "Procurar...",
-    "fileSelectionError": "Erro ao selecionar o arquivo. Digite o caminho manualmente.",
-    "fullPathNeeded": "Nota: Verifique o caminho completo. Você pode precisar digitá-lo manualmente.",
-    "gameNotInLibrary": "Este jogo não está na biblioteca principal. Por favor, adicione-o primeiro à biblioteca."
+    "invalidFileType": "Apenas arquivos .sh e .bat são permitidos"
   },
   "common": {
     "loading": "Carregando...",
@@ -145,6 +139,7 @@
     "cancel": "Cancelar",
     "save": "Salvar",
     "saving": "Salvando...",
+    "uploading": "Enviando...",
     "edit": "Editar",
     "delete": "Excluir",
     "deleteTitle": "Excluir",

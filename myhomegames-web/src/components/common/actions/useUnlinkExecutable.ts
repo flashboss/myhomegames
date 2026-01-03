@@ -49,8 +49,12 @@ export function useUnlinkExecutable({
           year: result.game.year || null,
           stars: result.game.stars || null,
           genre: result.game.genre || null,
-          command: null,
+          // command field is removed, not set to null
         };
+        // Explicitly remove command if it exists
+        if ('command' in updatedGame) {
+          delete (updatedGame as any).command;
+        }
         onGameUpdate(updatedGame);
       } else {
         console.error("Failed to unlink executable");

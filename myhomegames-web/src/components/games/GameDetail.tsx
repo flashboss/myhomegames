@@ -5,12 +5,11 @@ import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import GameCategories from "./GameCategories";
 import EditGameModal from "./EditGameModal";
-import LinkExecutableModal from "./LinkExecutableModal";
 import DropdownMenu from "../common/DropdownMenu";
 import Tooltip from "../common/Tooltip";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
-import { useEditGame } from "../common/actions";
+import { useEditGame, useExecutable } from "../common/actions";
 import type { GameItem } from "../../types";
 import { formatGameDate } from "../../utils/date";
 import { buildApiUrl } from "../../utils/api";
@@ -39,7 +38,17 @@ export default function GameDetail({
   const { setLoading } = useLoading();
   const [localGame, setLocalGame] = useState<GameItem>(game);
   const editGame = useEditGame();
-  const [isLinkExecutableModalOpen, setIsLinkExecutableModalOpen] = useState(false);
+  
+  // Use executable hook (handles both upload and unlink)
+  const executable = useExecutable({
+    game: localGame,
+    onGameUpdate: (updatedGame) => {
+      setLocalGame(updatedGame);
+      if (onGameUpdate) {
+        onGameUpdate(updatedGame);
+      }
+    },
+  });
   
   // Sync localGame when game prop changes
   useEffect(() => {
@@ -133,10 +142,8 @@ export default function GameDetail({
           }
         }}
         onGameDelete={onGameDelete}
-        isLinkExecutableModalOpen={isLinkExecutableModalOpen}
-        onLinkExecutableModalOpen={() => setIsLinkExecutableModalOpen(true)}
-        onLinkExecutableModalClose={() => setIsLinkExecutableModalOpen(false)}
-        t={t}
+        executable={executable}
+        t={t as any}
       />
     </BackgroundManager>
   );
@@ -157,9 +164,7 @@ function GameDetailContent({
   onGameUpdate,
   onGameReload,
   onGameDelete,
-  isLinkExecutableModalOpen,
-  onLinkExecutableModalOpen,
-  onLinkExecutableModalClose,
+  executable,
   t,
 }: {
   game: GameItem;
@@ -176,10 +181,8 @@ function GameDetailContent({
   onGameUpdate: (updatedGame: GameItem) => void;
   onGameReload: (updatedGame: GameItem) => void;
   onGameDelete?: (game: GameItem) => void;
-  isLinkExecutableModalOpen: boolean;
-  onLinkExecutableModalOpen: () => void;
-  onLinkExecutableModalClose: () => void;
-  t: (key: string) => string;
+  executable: ReturnType<typeof useExecutable>;
+  t: (key: string, defaultValue?: string) => string;
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
   
@@ -399,51 +402,73 @@ function GameDetailContent({
                     {t("common.play")}
                   </button>
                 ) : (
-                  <button
-                    onClick={onLinkExecutableModalOpen}
-                    style={{
-                      backgroundColor: '#E5A00D',
-                      color: '#000000',
-                      border: 'none',
-                      borderRadius: '4px',
-                      paddingTop: '6px',
-                      paddingBottom: '6px',
-                      paddingLeft: '8px',
-                      paddingRight: '12px',
-                      fontSize: '1.25rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s ease',
-                      width: 'fit-content',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      lineHeight: '1.2'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#F5B041';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#E5A00D';
-                    }}
-                  >
-                    <svg
-                      width="28"
-                      height="28"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{ display: 'block' }}
+                  <>
+                    <button
+                      onClick={executable.handleBrowseClick}
+                      disabled={executable.isUploading}
+                      style={{
+                        backgroundColor: executable.isUploading ? '#666' : '#E5A00D',
+                        color: '#000000',
+                        border: 'none',
+                        borderRadius: '4px',
+                        paddingTop: '6px',
+                        paddingBottom: '6px',
+                        paddingLeft: '8px',
+                        paddingRight: '12px',
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        cursor: executable.isUploading ? 'not-allowed' : 'pointer',
+                        transition: 'background-color 0.2s ease',
+                        width: 'fit-content',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        lineHeight: '1.2',
+                        opacity: executable.isUploading ? 0.6 : 1
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!executable.isUploading) {
+                          e.currentTarget.style.backgroundColor = '#F5B041';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!executable.isUploading) {
+                          e.currentTarget.style.backgroundColor = '#E5A00D';
+                        }
+                      }}
                     >
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                    </svg>
-                    {t("gameDetail.linkExecutable")}
-                  </button>
+                      <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ display: 'block' }}
+                      >
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                      </svg>
+                      {executable.isUploading ? t("common.uploading", "Uploading...") : t("gameDetail.linkExecutable")}
+                    </button>
+                    <input
+                      ref={executable.fileInputRef}
+                      type="file"
+                      style={{ display: "none" }}
+                      accept=".sh,.bat"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          await executable.handleFileSelect(file);
+                          // Reset the input so the same file can be selected again
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                  </>
                 )}
                 <Tooltip text={t("common.edit")} delay={200}>
                   <button
@@ -492,12 +517,6 @@ function GameDetailContent({
                   }}
                 />
               )}
-              <LinkExecutableModal
-                isOpen={isLinkExecutableModalOpen}
-                onClose={onLinkExecutableModalClose}
-                game={game}
-                onGameUpdate={onGameUpdate}
-              />
               {game.summary && <Summary summary={game.summary} />}
             </div>
           </div>

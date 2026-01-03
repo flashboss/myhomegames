@@ -154,22 +154,52 @@ app.get("/launcher", requireToken, (req, res) => {
   const entry = allGames[String(gameId)];
   if (!entry) return res.status(404).json({ error: "Game not found" });
 
-  // For safety: 'command' is an absolute path to the executable (can include arguments)
-  const command = entry.command;
+  // 'command' field contains only the extension without dot (e.g., "sh" or "bat")
+  // We need to construct the full path automatically
+  const commandExtension = entry.command;
 
-  // Validate command exists
-  if (!command || typeof command !== 'string' || command.trim() === '') {
+  // Validate command extension exists
+  if (!commandExtension || typeof commandExtension !== 'string' || commandExtension.trim() === '') {
     return res.status(400).json({
       error: "Launch failed",
       detail: "Command is missing or invalid. Please check the game configuration."
     });
   }
 
+  // Normalize extension (remove dot if present, then add it back for file path)
+  const normalizedExt = commandExtension.startsWith('.') ? commandExtension.substring(1) : commandExtension;
+  if (normalizedExt !== 'sh' && normalizedExt !== 'bat') {
+    return res.status(400).json({
+      error: "Launch failed",
+      detail: "Invalid command extension. Only 'sh' and 'bat' are allowed."
+    });
+  }
+  
+  // Construct the full path: {METADATA_PATH}/content/games/{gameId}/script.{extension}
+  const extension = `.${normalizedExt}`; // Add dot for file path
+  const scriptName = `script${extension}`;
+  const gameContentDir = path.join(METADATA_PATH, "content", "games", String(gameId));
+  const fullCommandPath = path.join(gameContentDir, scriptName);
+
+  // Validate that the script file exists
+  if (!fs.existsSync(fullCommandPath)) {
+    return res.status(404).json({
+      error: "Launch failed",
+      detail: `Script file not found: ${fullCommandPath}. Please upload the executable file first.`
+    });
+  }
+
   // Spawn process with shell to allow command with arguments
+  // Quote the path if it contains spaces to avoid shell interpretation issues
   let responseSent = false;
 
   try {
-    const child = spawn(command, {
+    // Quote the path if it contains spaces
+    const quotedPath = fullCommandPath.includes(' ') 
+      ? `"${fullCommandPath}"` 
+      : fullCommandPath;
+
+    const child = spawn(quotedPath, {
       shell: true,
       detached: true,
       stdio: "ignore",
@@ -177,12 +207,11 @@ app.get("/launcher", requireToken, (req, res) => {
 
     // Handle spawn errors (e.g., command not found) - this happens synchronously
     child.on("error", (err) => {
-      console.error("Failed to spawn process:", err);
       if (!responseSent) {
         responseSent = true;
         const errorMessage =
           err.code === "ENOENT"
-            ? `Command not found: ${command}. Please check if the executable exists.`
+            ? `Command not found: ${fullCommandPath}. Please check if the executable exists.`
             : err.message;
         return res.status(500).json({
           error: "Launch failed",
@@ -200,7 +229,6 @@ app.get("/launcher", requireToken, (req, res) => {
       }
     });
   } catch (e) {
-    console.error("Launch failed", e);
     if (!responseSent) {
       responseSent = true;
       // Include full error message and stack if available
