@@ -1,6 +1,7 @@
 const request = require('supertest');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 // Import setup first to set environment variables
 const { testMetadataPath } = require('./setup');
@@ -64,14 +65,14 @@ describe('GET /covers/:gameId', () => {
 
   test('should return cover image for existing game', async () => {
     const response = await request(app)
-      .get('/covers/test_game_1')
+      .get('/covers/1')
       .expect(200);
     
     expect(response.headers['content-type']).toContain('image/webp');
   });
 
   test('should handle URL-encoded game IDs', async () => {
-    const encodedId = encodeURIComponent('test_game_1');
+    const encodedId = encodeURIComponent('1');
     const response = await request(app)
       .get(`/covers/${encodedId}`)
       .expect(200);
@@ -101,7 +102,7 @@ describe('GET /launcher', () => {
 
   test('should launch game when command is valid', async () => {
     const response = await request(app)
-      .get('/launcher?gameId=test_game_1')
+      .get('/launcher?gameId=1')
       .set('X-Auth-Token', 'test-token');
     
     // Should either succeed (if command exists), fail with 500 (spawn error), or 400 (no command/script not found)

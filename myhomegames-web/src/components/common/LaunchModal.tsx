@@ -51,9 +51,6 @@ export default function LaunchModal({
         <div className="launch-modal-overlay" onClick={onClose}>
           <div className="launch-modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="launch-modal-spinner" />
-            <div className="launch-modal-loading-text">
-              {t("launch.launching")}
-            </div>
           </div>
         </div>,
         document.body

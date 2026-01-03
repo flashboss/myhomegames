@@ -2,11 +2,11 @@
   {
     "id": "collection_test_1",
     "title": "Test Collection 1",
-    "games": ["test_game_1", "test_game_2"]
+    "games": [1, 2]
   },
   {
     "id": "collection_test_2",
     "title": "Test Collection 2",
-    "games": ["test_game_3"]
+    "games": [3]
   }
 ]

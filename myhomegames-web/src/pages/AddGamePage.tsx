@@ -117,11 +117,7 @@ export default function AddGamePage({
             {error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
 
             <div className="flex-1 overflow-y-auto">
-              {loading ? (
-                <div className="text-center text-gray-400 py-8">
-                  Searching...
-                </div>
-              ) : results.length === 0 && searchQuery.trim().length >= 2 ? (
+              {loading ? null : results.length === 0 && searchQuery.trim().length >= 2 ? (
                 <div className="text-center text-gray-400 py-8">
                   {t("table.noGames")}
                 </div>

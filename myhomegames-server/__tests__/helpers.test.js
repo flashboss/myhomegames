@@ -178,7 +178,7 @@ describe('Helper Functions', () => {
       if (sectionWithGames && sectionWithGames.games.length > 0) {
         const game = sectionWithGames.games[0];
         expect(game.cover).toMatch(/^\/covers\//);
-        expect(game.cover).toContain(game.id);
+        expect(game.cover).toContain(String(game.id));
       }
     });
   });

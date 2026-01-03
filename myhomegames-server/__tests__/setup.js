@@ -49,10 +49,10 @@ beforeAll(() => {
   }
   
   // Create test cover image directories in content/games folder
-  const testGameId = 'test_game_1';
+  const testGameId = 1;
   const gamesContentDir = path.join(testMetadataPath, 'content', 'games');
   fs.mkdirSync(gamesContentDir, { recursive: true });
-  const coverDir = path.join(gamesContentDir, testGameId);
+  const coverDir = path.join(gamesContentDir, String(testGameId));
   fs.mkdirSync(coverDir, { recursive: true });
   // Create a dummy cover file (empty file for testing)
   fs.writeFileSync(path.join(coverDir, 'cover.webp'), 'fake webp data');

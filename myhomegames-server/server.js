@@ -37,6 +37,51 @@ const METADATA_PATH =
     "MyHomeGames"
   );
 
+// Ensure metadata directory structure exists
+function ensureMetadataDirectories() {
+  const directories = [
+    METADATA_PATH,
+    path.join(METADATA_PATH, "metadata"),
+    path.join(METADATA_PATH, "content"),
+    path.join(METADATA_PATH, "content", "games"),
+    path.join(METADATA_PATH, "content", "collections"),
+    path.join(METADATA_PATH, "content", "categories"),
+  ];
+
+  directories.forEach((dir) => {
+    if (!fs.existsSync(dir)) {
+      try {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`Created directory: ${dir}`);
+      } catch (error) {
+        console.error(`Failed to create directory ${dir}:`, error.message);
+      }
+    }
+  });
+
+  // Create initial JSON files if they don't exist
+  const jsonFiles = [
+    { file: path.join(METADATA_PATH, "metadata", "games-library.json"), default: [] },
+    { file: path.join(METADATA_PATH, "metadata", "games-collections.json"), default: [] },
+    { file: path.join(METADATA_PATH, "metadata", "games-recommended.json"), default: [] },
+    { file: path.join(METADATA_PATH, "metadata", "games-categories.json"), default: [] },
+  ];
+
+  jsonFiles.forEach(({ file, default: defaultValue }) => {
+    if (!fs.existsSync(file)) {
+      try {
+        fs.writeFileSync(file, JSON.stringify(defaultValue, null, 2), "utf8");
+        console.log(`Created initial file: ${file}`);
+      } catch (error) {
+        console.error(`Failed to create file ${file}:`, error.message);
+      }
+    }
+  });
+}
+
+// Create directory structure on startup
+ensureMetadataDirectories();
+
 // Token auth middleware - supports both development token and Twitch tokens
 function requireToken(req, res, next) {
   const token =
@@ -151,7 +196,7 @@ app.get("/launcher", requireToken, (req, res) => {
   const gameId = req.query.gameId;
   if (!gameId) return res.status(400).json({ error: "Missing gameId" });
 
-  const entry = allGames[String(gameId)];
+  const entry = allGames[Number(gameId)];
   if (!entry) return res.status(404).json({ error: "Game not found" });
 
   // 'command' field contains only the extension without dot (e.g., "sh" or "bat")

@@ -536,7 +536,7 @@ describe('POST /games/:gameId/upload-executable', () => {
       const { testMetadataPath } = require('../setup');
       const fs = require('fs');
       const path = require('path');
-      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.sh');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', String(gameId), 'script.sh');
       expect(fs.existsSync(scriptPath)).toBe(true);
       
       // Verify file content
@@ -577,7 +577,7 @@ describe('POST /games/:gameId/upload-executable', () => {
       const { testMetadataPath } = require('../setup');
       const fs = require('fs');
       const path = require('path');
-      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.bat');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', String(gameId), 'script.bat');
       expect(fs.existsSync(scriptPath)).toBe(true);
       
       // Verify file content
@@ -682,8 +682,8 @@ describe('POST /games/:gameId/upload-executable', () => {
       const { testMetadataPath } = require('../setup');
       const fs = require('fs');
       const path = require('path');
-      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.sh');
-      const customPath = path.join(testMetadataPath, 'content', 'games', gameId, 'my-custom-name.sh');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', String(gameId), 'script.sh');
+      const customPath = path.join(testMetadataPath, 'content', 'games', String(gameId), 'my-custom-name.sh');
       
       expect(fs.existsSync(scriptPath)).toBe(true);
       expect(fs.existsSync(customPath)).toBe(false);
@@ -713,8 +713,8 @@ describe('POST /games/:gameId/upload-executable', () => {
       const { testMetadataPath } = require('../setup');
       const fs = require('fs');
       const path = require('path');
-      const scriptPath = path.join(testMetadataPath, 'content', 'games', gameId, 'script.bat');
-      const customPath = path.join(testMetadataPath, 'content', 'games', gameId, 'my-custom-name.bat');
+      const scriptPath = path.join(testMetadataPath, 'content', 'games', String(gameId), 'script.bat');
+      const customPath = path.join(testMetadataPath, 'content', 'games', String(gameId), 'my-custom-name.bat');
       
       expect(fs.existsSync(scriptPath)).toBe(true);
       expect(fs.existsSync(customPath)).toBe(false);
@@ -827,7 +827,7 @@ describe('DELETE /games/:gameId', () => {
       const path = require('path');
       
       // Create a test content directory for the game
-      const gameContentDir = path.join(testMetadataPath, 'content', 'games', gameId);
+      const gameContentDir = path.join(testMetadataPath, 'content', 'games', String(gameId));
       if (!fs.existsSync(gameContentDir)) {
         fs.mkdirSync(gameContentDir, { recursive: true });
       }

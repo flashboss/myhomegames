@@ -25,10 +25,10 @@ export default function AddGame({
   const [error, setError] = useState<string | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Check if an IGDB game matches a local game (by title)
+  // Check if an IGDB game matches a local game (by ID)
   function findMatchingLocalGame(igdbGame: IGDBGame): GameItem | undefined {
     return allGames.find(
-      (localGame) => localGame.title.toLowerCase().trim() === igdbGame.name.toLowerCase().trim()
+      (localGame) => String(localGame.ratingKey) === String(igdbGame.id)
     );
   }
 

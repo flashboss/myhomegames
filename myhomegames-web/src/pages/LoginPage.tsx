@@ -16,17 +16,7 @@ export default function LoginPage() {
   }, [user, isLoading, navigate]);
 
   if (isLoading) {
-    return (
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        height: "100vh",
-        backgroundColor: "#1a1a1a"
-      }}>
-        <div style={{ color: "white" }}>Loading...</div>
-      </div>
-    );
+    return null;
   }
 
   return (

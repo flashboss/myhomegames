@@ -12,19 +12,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const DEV_TOKEN = import.meta.env.VITE_API_TOKEN || "";
   const isDevMode = DEV_TOKEN !== "";
 
-  // Show loading state while checking auth
+  // Show loading state while checking auth (spinner is handled by Header)
   if (isLoading) {
-    return (
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        height: "100vh",
-        backgroundColor: "#1a1a1a"
-      }}>
-        <div style={{ color: "white" }}>Loading...</div>
-      </div>
-    );
+    return null;
   }
 
   // In dev mode, allow access even without user (VITE_API_TOKEN will be used)

@@ -9,7 +9,7 @@ const multer = require("multer");
 
 // Helper function to check if background exists and return path if it does
 function getBackgroundPath(metadataPath, gameId) {
-  const backgroundPath = path.join(metadataPath, "content", "games", gameId, "background.webp");
+  const backgroundPath = path.join(metadataPath, "content", "games", String(gameId), "background.webp");
   if (fs.existsSync(backgroundPath)) {
     return `/backgrounds/${encodeURIComponent(gameId)}`;
   }
@@ -60,7 +60,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
 
   // Endpoint: get single game by ID
   app.get("/games/:gameId", requireToken, (req, res) => {
-    const gameId = req.params.gameId;
+    const gameId = Number(req.params.gameId);
     const game = allGames[gameId];
     
     if (!game) {
@@ -90,7 +90,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
 
   // Endpoint: update game fields
   app.put("/games/:gameId", requireToken, (req, res) => {
-    const gameId = req.params.gameId;
+    const gameId = Number(req.params.gameId);
     const updates = req.body;
     
     // Validate game exists
@@ -115,7 +115,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
     
     if (isUnlinkingCommand) {
       // Delete physical executable files (script.sh and script.bat)
-      const gameContentDir = path.join(metadataPath, "content", "games", gameId);
+      const gameContentDir = path.join(metadataPath, "content", "games", String(gameId));
       const scriptShPath = path.join(gameContentDir, "script.sh");
       const scriptBatPath = path.join(gameContentDir, "script.bat");
       
@@ -242,7 +242,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
 
   // Endpoint: reload metadata for a single game
   app.post("/games/:gameId/reload", requireToken, (req, res) => {
-    const gameId = req.params.gameId;
+    const gameId = Number(req.params.gameId);
     
     try {
       // Reload library games to refresh metadata
@@ -286,7 +286,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
 
   // Endpoint: upload executable file for a game
   app.post("/games/:gameId/upload-executable", requireToken, upload.single('file'), (req, res) => {
-    const { gameId } = req.params;
+    const gameId = Number(req.params.gameId);
     const file = req.file;
     
     if (!file) {
@@ -309,7 +309,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
     
     try {
       // Create game content directory if it doesn't exist
-      const gameContentDir = path.join(metadataPath, "content", "games", gameId);
+      const gameContentDir = path.join(metadataPath, "content", "games", String(gameId));
       if (!fs.existsSync(gameContentDir)) {
         fs.mkdirSync(gameContentDir, { recursive: true });
       }
@@ -393,8 +393,30 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
     }
 
     try {
-      // Generate a new game ID
-      const gameId = `game_${Date.now()}`;
+      // Use IGDB ID directly as game ID
+      const gameId = Number(igdbId);
+      
+      // Check if game with this IGDB ID already exists
+      const fileName = "games-library.json";
+      const filePath = path.join(metadataGamesDir, fileName);
+      let allLibraryGames = [];
+      
+      try {
+        const txt = fs.readFileSync(filePath, "utf8");
+        allLibraryGames = JSON.parse(txt);
+      } catch (e) {
+        // File doesn't exist or is invalid, start with empty array
+        console.warn(`Failed to load ${fileName}, starting with empty array:`, e.message);
+      }
+      
+      // Check if game already exists
+      const existingGame = allLibraryGames.find(g => g.id === gameId);
+      if (existingGame) {
+        return res.status(409).json({ 
+          error: "Game already exists", 
+          gameId: gameId 
+        });
+      }
       
       // Parse release date
       let year = null;
@@ -444,7 +466,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       if (cover) {
         try {
           const https = require('https');
-          const gameContentDir = path.join(metadataPath, "content", "games", gameId);
+          const gameContentDir = path.join(metadataPath, "content", "games", String(gameId));
           if (!fs.existsSync(gameContentDir)) {
             fs.mkdirSync(gameContentDir, { recursive: true });
           }
@@ -472,19 +494,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         }
       }
 
-      // Add game to games-library.json
-      const fileName = "games-library.json";
-      const filePath = path.join(metadataGamesDir, fileName);
-      let allLibraryGames = [];
-      
-      try {
-        const txt = fs.readFileSync(filePath, "utf8");
-        allLibraryGames = JSON.parse(txt);
-      } catch (e) {
-        // File doesn't exist or is invalid, start with empty array
-        console.warn(`Failed to load ${fileName}, starting with empty array:`, e.message);
-      }
-
+      // Add game to games-library.json (allLibraryGames already loaded above)
       // Add new game
       allLibraryGames.push(newGame);
       fs.writeFileSync(filePath, JSON.stringify(allLibraryGames, null, 2), "utf8");
@@ -521,7 +531,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
 
   // Endpoint: delete game
   app.delete("/games/:gameId", requireToken, (req, res) => {
-    const gameId = req.params.gameId;
+    const gameId = Number(req.params.gameId);
     
     // Validate game exists
     const game = allGames[gameId];
@@ -556,7 +566,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       delete allGames[gameId];
       
       // Delete game content directory (cover, background, executable, etc.)
-      const gameContentDir = path.join(metadataPath, "content", "games", gameId);
+      const gameContentDir = path.join(metadataPath, "content", "games", String(gameId));
       if (fs.existsSync(gameContentDir)) {
         try {
           fs.rmSync(gameContentDir, { recursive: true, force: true });
