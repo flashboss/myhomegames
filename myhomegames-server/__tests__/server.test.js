@@ -259,4 +259,26 @@ describe('GET /igdb/search', () => {
   // This is left as a placeholder for future implementation
 });
 
+describe('GET /igdb/game/:igdbId', () => {
+  test('should return 400 for invalid IGDB game ID', async () => {
+    const response = await request(app)
+      .get('/igdb/game/invalid-id')
+      .set('X-Auth-Token', 'test-token')
+      .expect(400);
+    
+    expect(response.body).toHaveProperty('error', 'Invalid IGDB game ID');
+  });
+
+  test('should require authentication', async () => {
+    const response = await request(app)
+      .get('/igdb/game/12345')
+      .expect(401);
+    
+    expect(response.body).toHaveProperty('error', 'Unauthorized');
+  });
+
+  // Note: Full IGDB integration tests would require mocking HTTP requests
+  // This is left as a placeholder for future implementation
+});
+
 
