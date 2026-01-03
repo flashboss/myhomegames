@@ -16,6 +16,42 @@ function getBackgroundPath(metadataPath, gameId) {
   return null;
 }
 
+// Helper function to download an image from a URL and save it to a file path
+function downloadImage(imageUrl, filePath, gameId, imageType = "image") {
+  return new Promise((resolve, reject) => {
+    if (!imageUrl) {
+      resolve(false);
+      return;
+    }
+
+    try {
+      const https = require('https');
+      const file = fs.createWriteStream(filePath);
+      
+      https.get(imageUrl, (response) => {
+        if (response.statusCode === 200) {
+          response.pipe(file);
+          file.on('finish', () => {
+            file.close();
+            resolve(true);
+          });
+        } else {
+          file.close();
+          fs.unlinkSync(filePath); // Delete the file on error
+          resolve(false);
+        }
+      }).on('error', (err) => {
+        fs.unlinkSync(filePath); // Delete the file on error
+        console.warn(`Failed to download ${imageType} for game ${gameId}:`, err.message);
+        resolve(false);
+      });
+    } catch (error) {
+      console.warn(`Failed to download ${imageType} for game ${gameId}:`, error.message);
+      resolve(false);
+    }
+  });
+}
+
 function loadLibraryGames(metadataGamesDir, allGames) {
   const fileName = "games-library.json";
   const filePath = path.join(metadataGamesDir, fileName);
@@ -386,7 +422,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
 
   // Endpoint: add game from IGDB to library
   app.post("/games/add-from-igdb", requireToken, async (req, res) => {
-    const { igdbId, name, summary, cover, releaseDate, genres, criticRating, userRating } = req.body;
+    const { igdbId, name, summary, cover, background, releaseDate, genres, criticRating, userRating } = req.body;
     
     if (!igdbId || !name) {
       return res.status(400).json({ error: "Missing required fields: igdbId and name" });
@@ -462,36 +498,22 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         userratings: userRating !== undefined && userRating !== null ? userRating / 10 : null, // Convert from 0-100 to 0-10
       };
 
+      // Ensure game content directory exists
+      const gameContentDir = path.join(metadataPath, "content", "games", String(gameId));
+      if (!fs.existsSync(gameContentDir)) {
+        fs.mkdirSync(gameContentDir, { recursive: true });
+      }
+
       // Download cover image if provided
       if (cover) {
-        try {
-          const https = require('https');
-          const gameContentDir = path.join(metadataPath, "content", "games", String(gameId));
-          if (!fs.existsSync(gameContentDir)) {
-            fs.mkdirSync(gameContentDir, { recursive: true });
-          }
-          
-          const coverPath = path.join(gameContentDir, "cover.jpg");
-          const file = fs.createWriteStream(coverPath);
-          
-          https.get(cover, (response) => {
-            if (response.statusCode === 200) {
-              response.pipe(file);
-              file.on('finish', () => {
-                file.close();
-              });
-            } else {
-              file.close();
-              fs.unlinkSync(coverPath); // Delete the file on error
-            }
-          }).on('error', (err) => {
-            fs.unlinkSync(coverPath); // Delete the file on error
-            console.warn(`Failed to download cover for game ${gameId}:`, err.message);
-          });
-        } catch (coverError) {
-          console.warn(`Failed to download cover for game ${gameId}:`, coverError.message);
-          // Continue without cover
-        }
+        const coverPath = path.join(gameContentDir, "cover.webp");
+        await downloadImage(cover, coverPath, gameId, "cover");
+      }
+
+      // Download background image if provided
+      if (background) {
+        const backgroundPath = path.join(gameContentDir, "background.webp");
+        await downloadImage(background, backgroundPath, gameId, "background");
       }
 
       // Add game to games-library.json (allLibraryGames already loaded above)
@@ -517,9 +539,9 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         userratings: newGame.userratings || null,
         command: newGame.command || null,
       };
-      const background = getBackgroundPath(metadataPath, newGame.id);
-      if (background) {
-        gameData.background = background;
+      const backgroundPath = getBackgroundPath(metadataPath, newGame.id);
+      if (backgroundPath) {
+        gameData.background = backgroundPath;
       }
 
       res.json({ status: "success", game: gameData, gameId: newGame.id });

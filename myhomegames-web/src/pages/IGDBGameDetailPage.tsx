@@ -88,6 +88,7 @@ export default function IGDBGameDetailPage() {
           name: game.name,
           summary: game.summary,
           cover: game.cover,
+          background: game.background,
           releaseDate: game.releaseDateFull?.timestamp || game.releaseDate,
           genres: game.genres,
           criticRating: game.criticRating,

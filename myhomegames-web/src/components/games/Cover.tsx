@@ -29,8 +29,6 @@ type CoverProps = {
   showBorder?: boolean;
   aspectRatio?: string; // e.g., "2/3" or "16/9"
   overlayContent?: React.ReactNode; // Content to overlay on the cover
-  brightness?: number; // Brightness filter (0-100 or higher, default: 100)
-  blur?: number; // Blur filter in pixels (default: 0)
   titlePosition?: "bottom" | "overlay"; // Position of title: below cover or inside image (default: "bottom")
   editButtonPosition?: "bottom-left" | "bottom-right"; // Position of edit button (default: "bottom-left")
 };
@@ -59,8 +57,6 @@ export default function Cover({
   showBorder = true,
   aspectRatio = "2/3",
   overlayContent,
-  brightness,
-  blur,
   titlePosition = "bottom",
   editButtonPosition = "bottom-left",
 }: CoverProps) {
@@ -108,20 +104,10 @@ export default function Cover({
   const shouldShowPlayButton = play && onPlay;
   const isClickable = detail || play;
 
-  // Build filter style string
-  const filterParts: string[] = [];
-  if (brightness !== undefined) {
-    filterParts.push(`brightness(${brightness}%)`);
-  }
-  if (blur !== undefined) {
-    filterParts.push(`blur(${blur}px)`);
-  }
-  const filterStyle = filterParts.length > 0 ? filterParts.join(' ') : undefined;
-
   return (
     <>
       <div
-        className={`games-list-cover relative bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} ${play ? 'games-list-cover-play' : ''} ${detail ? 'games-list-cover-detail' : ''} ${blur !== undefined && blur > 0 ? 'cover-with-blur' : ''}`}
+        className={`games-list-cover relative bg-[#2a2a2a] rounded overflow-hidden transition-all ${showBorder ? 'cover-hover-effect' : ''} ${play ? 'games-list-cover-play' : ''} ${detail ? 'games-list-cover-detail' : ''}`}
         style={{ 
           width: `${width}px`, 
           aspectRatio: aspectRatio,
@@ -169,7 +155,6 @@ export default function Cover({
             src={coverUrl}
             alt={title}
             className="object-cover w-full h-full"
-            style={filterStyle ? { filter: filterStyle } : undefined}
             onError={() => {
               setImageError(true);
             }}

@@ -55,8 +55,6 @@ function CategoryListItem({
         play={false}
         showBorder={true}
         aspectRatio="16/9"
-        brightness={40}
-        blur={1}
       />
     </div>
   );
