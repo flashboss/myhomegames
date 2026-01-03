@@ -249,7 +249,7 @@ function GameDetailContent({
               showTitle={false}
               titlePosition="overlay"
               detail={false}
-              play={true}
+              play={!!game.command}
               showBorder={false}
             />
           </div>

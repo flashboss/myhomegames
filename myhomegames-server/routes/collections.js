@@ -99,6 +99,7 @@ function registerCollectionsRoutes(app, requireToken, metadataPath, metadataGame
           month: game.month || null,
           year: game.year || null,
           stars: game.stars || null,
+          command: game.command || null,
         });
       }
     });

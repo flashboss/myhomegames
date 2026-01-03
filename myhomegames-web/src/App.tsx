@@ -158,7 +158,7 @@ function AppContent() {
     try {
       let gameId = item.ratingKey;
       
-      // If it's a collection, get the first game from the collection
+      // If it's a collection, get the first game with command from the collection
       const isCollection = allCollections.some(c => c.ratingKey === item.ratingKey);
       if (isCollection) {
         try {
@@ -172,12 +172,13 @@ function AppContent() {
           if (gamesRes.ok) {
             const gamesJson = await gamesRes.json();
             const games = gamesJson.games || [];
-            if (games.length > 0) {
-              // Use the first game's ID
-              gameId = games[0].id;
+            // Find the first game that has a command
+            const gameWithCommand = games.find((g: any) => !!g.command);
+            if (gameWithCommand) {
+              gameId = gameWithCommand.id;
             } else {
               setIsLaunching(false);
-              setLaunchError("Collection is empty");
+              setLaunchError("No game with executable found in collection");
               return;
             }
           } else {

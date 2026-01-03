@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { API_BASE } from "../../config";
-import { buildCoverUrl } from "../../utils/api";
+import { API_BASE, getApiToken } from "../../config";
+import { buildApiUrl, buildCoverUrl } from "../../utils/api";
 import Cover from "../games/Cover";
 import DropdownMenu from "../common/DropdownMenu";
 import EditGameModal from "../games/EditGameModal";
 import EditCollectionModal from "../collections/EditCollectionModal";
 import { useEditGame } from "../common/actions";
 import { useNavigate } from "react-router-dom";
+import { useCollectionHasPlayableGame } from "../common/hooks/useCollectionHasPlayableGame";
 import type { GameItem, CollectionItem, CollectionInfo } from "../../types";
 import "./SearchResultsList.css";
 
@@ -70,6 +71,13 @@ function SearchResultItem({
   const actualCoverSize = coverSize || (variant === "popup" ? POPUP_COVER_SIZE : FIXED_COVER_SIZE);
   const coverHeight = actualCoverSize * 1.5;
   const isPopup = variant === "popup";
+  
+  // Check if any game in collection has command
+  // Always enable the hook for collections, not just when onPlay is defined
+  const { hasPlayableGame } = useCollectionHasPlayableGame(
+    !isGame ? item.ratingKey : undefined,
+    !isGame // Enable for collections, disable for games
+  );
 
   const handleClick = () => {
     if (isGame) {
@@ -83,10 +91,46 @@ function SearchResultItem({
     }
   };
 
-  const handlePlayClick = (e: React.MouseEvent) => {
+  const handlePlayClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onPlay) {
+    if (!onPlay) return;
+    
+    if (isGame) {
       onPlay(item);
+    } else {
+      // For collections, fetch and play the first game that has a command
+      try {
+        const url = buildApiUrl(API_BASE, `/collections/${item.ratingKey}/games`);
+        const res = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+            "X-Auth-Token": getApiToken(),
+          },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const games = json.games || [];
+          // Find the first game that has a command (for playing)
+          const gameWithCommand = games.find((g: any) => !!g.command);
+          if (gameWithCommand) {
+            const gameItem: GameItem = {
+              ratingKey: gameWithCommand.id,
+              title: gameWithCommand.title,
+              summary: gameWithCommand.summary || "",
+              cover: gameWithCommand.cover,
+              day: gameWithCommand.day || null,
+              month: gameWithCommand.month || null,
+              year: gameWithCommand.year || null,
+              stars: gameWithCommand.stars || null,
+              genre: gameWithCommand.genre || null,
+              command: gameWithCommand.command || null,
+            };
+            onPlay(gameItem);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching collection games for play:", err);
+      }
     }
   };
 
@@ -133,7 +177,7 @@ function SearchResultItem({
       />
       {(onPlay || onEditClick) && (
         <div className="search-result-right-actions">
-          {onPlay && (
+          {onPlay && (isGame ? item.command : hasPlayableGame === true) && (
             <button
               className="search-result-play-button"
               onClick={handlePlayClick}

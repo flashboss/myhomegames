@@ -88,6 +88,7 @@ export default function RecommendedPage({
           year: v.year,
           stars: v.stars,
           genre: v.genre,
+          command: v.command || null,
         })),
       }));
       

@@ -126,6 +126,7 @@ export default function CollectionDetail({
         month: v.month,
         year: v.year,
         stars: v.stars,
+        command: v.command || null,
       }));
       // Check if the order from backend differs from year-sorted order
       // If it differs, it means there's a custom order saved
@@ -431,13 +432,14 @@ function CollectionDetailContent({
                     width={collectionCoverWidth}
                     height={collectionCoverHeight}
                     onPlay={onPlay && sortedGames.length > 0 ? () => {
-                      if (sortedGames[0]) {
-                        onPlay(sortedGames[0]);
+                      const gameWithCommand = sortedGames.find((g) => !!g.command);
+                      if (gameWithCommand) {
+                        onPlay(gameWithCommand);
                       }
                     } : undefined}
                     showTitle={false}
                     detail={false}
-                    play={true}
+                    play={sortedGames.some((g) => !!g.command)}
                     showBorder={true}
                   />
                 </div>
@@ -474,12 +476,13 @@ function CollectionDetailContent({
                     )}
                     {(onPlay && sortedGames.length > 0) || collection ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '16px' }}>
-                        {onPlay && sortedGames.length > 0 && (
+                        {onPlay && sortedGames.length > 0 && sortedGames.some((g) => !!g.command) && (
                           <button
                             onClick={() => {
-                              // Play first game in collection
-                              if (sortedGames[0]) {
-                                onPlay(sortedGames[0]);
+                              // Play first game with command in collection
+                              const gameWithCommand = sortedGames.find((g) => !!g.command);
+                              if (gameWithCommand) {
+                                onPlay(gameWithCommand);
                               }
                             }}
                             style={{

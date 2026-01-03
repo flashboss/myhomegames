@@ -74,7 +74,7 @@ function GameDetailItem({
         onPlay={onPlay ? () => onPlay(game) : undefined}
         showTitle={false}
         detail={false}
-        play={true}
+        play={!!game.command}
         showBorder={false}
       />
       <div className="games-list-detail-content">

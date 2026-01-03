@@ -382,6 +382,11 @@ export default function GamesListTable({
                 : null;
 
               const PlayIcon = () => {
+                // Only show play button if game has command
+                if (!it.command) {
+                  return null;
+                }
+
                 const handlePlayClick = (e: React.MouseEvent) => {
                   e.stopPropagation();
                   if (onPlay) {

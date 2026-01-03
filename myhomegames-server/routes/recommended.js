@@ -59,6 +59,7 @@ function registerRecommendedRoutes(app, requireToken, metadataGamesDir, allGames
           year: g.year || null,
           stars: g.stars || null,
           genre: g.genre || null,
+          command: g.command || null,
         }));
       
       return {

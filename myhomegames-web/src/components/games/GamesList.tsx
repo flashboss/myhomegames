@@ -136,7 +136,7 @@ function GameListItem({
         showTitle={true}
         subtitle={game.year}
         detail={true}
-        play={true}
+        play={!!game.command}
         showBorder={viewMode !== "detail"}
       />
     </div>
