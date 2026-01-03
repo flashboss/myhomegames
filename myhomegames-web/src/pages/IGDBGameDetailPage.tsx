@@ -132,7 +132,10 @@ export default function IGDBGameDetailPage() {
           name: game.name,
           summary: game.summary,
           cover: game.cover,
-          releaseDate: game.releaseDate,
+          releaseDate: game.releaseDateFull?.timestamp || game.releaseDate,
+          genres: game.genres,
+          criticRating: game.criticRating,
+          userRating: game.userRating,
         }),
       });
 
@@ -159,16 +162,7 @@ export default function IGDBGameDetailPage() {
   }
 
   if (loading) {
-    return (
-      <div
-        className="bg-[#1a1a1a] text-white flex items-center justify-center"
-        style={{ width: "100%", height: "100%" }}
-      >
-        <div className="text-center">
-          <div className="text-gray-400">{t("home.loadingLibraries")}</div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   if (!game) {

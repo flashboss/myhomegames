@@ -543,20 +543,20 @@ function GameDetailPage({
   }
 
   if (loading) {
+    return null;
+  }
+
+  if (!game) {
     return (
       <div
         className="bg-[#1a1a1a] text-white flex items-center justify-center"
         style={{ width: "100%", height: "100%" }}
       >
         <div className="text-center">
-          <div className="text-gray-400">{t("home.loadingLibraries")}</div>
+          <div className="text-gray-400">{t("gameDetail.notFound")}</div>
         </div>
       </div>
     );
-  }
-
-  if (!game) {
-    return null;
   }
 
   return (

@@ -99,9 +99,7 @@ export default function LibrariesBar({
           <>
             {isNarrow ? (
               <div className="mhg-libraries-combobox-container">
-                {loading && libraries.length === 0 ? (
-                  <div className="mhg-libraries-loading">{t("home.loadingLibraries")}</div>
-                ) : (
+                {loading && libraries.length === 0 ? null : (
                   <select
                     id="libraries-select"
                     name="library"
@@ -120,9 +118,7 @@ export default function LibrariesBar({
               </div>
             ) : (
               <div className="mhg-libraries-container">
-                {loading && libraries.length === 0 ? (
-                  <div className="mhg-libraries-loading">{t("home.loadingLibraries")}</div>
-                ) : (
+                {loading && libraries.length === 0 ? null : (
                   libraries.map((s) => (
                     <button
                       key={s.key}

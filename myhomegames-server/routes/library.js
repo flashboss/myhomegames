@@ -386,7 +386,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
 
   // Endpoint: add game from IGDB to library
   app.post("/games/add-from-igdb", requireToken, async (req, res) => {
-    const { igdbId, name, summary, cover, releaseDate } = req.body;
+    const { igdbId, name, summary, cover, releaseDate, genres, criticRating, userRating } = req.body;
     
     if (!igdbId || !name) {
       return res.status(400).json({ error: "Missing required fields: igdbId and name" });
@@ -402,8 +402,21 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       let day = null;
       if (releaseDate) {
         if (typeof releaseDate === 'number') {
-          // If it's just a year number
-          year = releaseDate;
+          // Check if it's a timestamp (seconds since epoch) or just a year
+          // Timestamps from IGDB are typically > 1000000000 (year 2001+)
+          // Years are typically < 10000
+          if (releaseDate > 1000000000) {
+            // It's a timestamp in seconds, convert to milliseconds
+            const date = new Date(releaseDate * 1000);
+            if (!isNaN(date.getTime())) {
+              year = date.getFullYear();
+              month = date.getMonth() + 1; // JavaScript months are 0-indexed
+              day = date.getDate();
+            }
+          } else {
+            // It's just a year number
+            year = releaseDate;
+          }
         } else {
           const date = new Date(releaseDate);
           if (!isNaN(date.getTime())) {
@@ -422,6 +435,9 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         year: year,
         month: month || null,
         day: day || null,
+        genre: genres && genres.length > 0 ? genres : null,
+        criticratings: criticRating !== undefined && criticRating !== null ? criticRating / 10 : null, // Convert from 0-100 to 0-10
+        userratings: userRating !== undefined && userRating !== null ? userRating / 10 : null, // Convert from 0-100 to 0-10
       };
 
       // Download cover image if provided

@@ -146,7 +146,6 @@ export default function AddGame({
             {loading ? (
               <div className="add-game-loading">
                 <div className="add-game-spinner"></div>
-                <div>{t("addGame.loading")}</div>
               </div>
             ) : results.length === 0 && searchQuery.trim().length >= 2 ? (
               <div className="add-game-empty-state">
