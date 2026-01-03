@@ -54,6 +54,13 @@ export default function EditCollectionModal({
     };
   }, [isOpen, onClose]);
 
+  const hasChanges = () => {
+    return (
+      title.trim() !== collection.title.trim() ||
+      summary.trim() !== (collection.summary || "").trim()
+    );
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setError(null);
@@ -62,8 +69,8 @@ export default function EditCollectionModal({
     try {
       const updates: any = {};
 
-      if (title !== collection.title) updates.title = title;
-      if (summary !== (collection.summary || "")) updates.summary = summary;
+      if (title.trim() !== collection.title.trim()) updates.title = title.trim();
+      if (summary.trim() !== (collection.summary || "").trim()) updates.summary = summary.trim();
 
       if (Object.keys(updates).length === 0) {
         onClose();
@@ -180,7 +187,7 @@ export default function EditCollectionModal({
           <button
             className="edit-collection-modal-save"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || !hasChanges()}
           >
             {saving ? t("common.saving", "Saving...") : t("common.save", "Save")}
           </button>

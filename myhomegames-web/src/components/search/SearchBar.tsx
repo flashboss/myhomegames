@@ -80,6 +80,19 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
       return;
     }
 
+    // Require at least 2 characters to perform search
+    if (searchQuery.trim().length < 2) {
+      setFilteredGames([]);
+      setFilteredCollections([]);
+      setAllFilteredGames([]);
+      setAllFilteredCollections([]);
+      // Keep dropdown open if focused to show recent searches or message
+      if (isFocused && !isClosing) {
+        setIsOpen(true);
+      }
+      return;
+    }
+
     const queryLower = searchQuery.toLowerCase();
     const filtered = games.filter((game) =>
       game.title.toLowerCase().includes(queryLower)
@@ -349,7 +362,7 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
             if (e.key === "Escape") {
               setIsOpen(false);
               setIsFocused(false);
-            } else if (e.key === "Enter" && searchQuery.trim() !== "" && (allFilteredGames.length > 0 || allFilteredCollections.length > 0)) {
+            } else if (e.key === "Enter" && searchQuery.trim().length >= 2 && (allFilteredGames.length > 0 || allFilteredCollections.length > 0)) {
               // Save search query to recent searches
               saveRecentSearch(searchQuery);
               navigate("/search-results", {
@@ -388,7 +401,7 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
         )}
       </div>
 
-      {((isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && (filteredGames.length > 0 || filteredCollections.length > 0)) || isModalOpen) && (
+      {((isOpen && !isOnSearchResultsPage && searchQuery.trim().length >= 2 && (filteredGames.length > 0 || filteredCollections.length > 0)) || isModalOpen) && (
         <div className="mhg-dropdown search-dropdown" style={{ display: isModalOpen ? 'none' : 'flex' }}>
           <div className="search-dropdown-scroll">
             <SearchResultsList
@@ -462,9 +475,15 @@ export default function SearchBar({ games, collections, onGameSelect, onPlay }: 
         </div>
       )}
 
-      {isOpen && !isOnSearchResultsPage && searchQuery.trim() !== "" && filteredGames.length === 0 && (
+      {isOpen && !isOnSearchResultsPage && searchQuery.trim().length >= 2 && filteredGames.length === 0 && filteredCollections.length === 0 && (
         <div className="mhg-dropdown search-no-results">
           {t("search.noResults", { query: searchQuery })}
+        </div>
+      )}
+
+      {isOpen && !isOnSearchResultsPage && searchQuery.trim().length > 0 && searchQuery.trim().length < 2 && (
+        <div className="mhg-dropdown search-no-results">
+          {t("search.minimumCharacters", "Please enter at least 2 characters to search")}
         </div>
       )}
 

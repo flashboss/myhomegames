@@ -6,6 +6,7 @@ import EditGameModal from "./EditGameModal";
 import DropdownMenu from "../common/DropdownMenu";
 import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
+import { useEditGame } from "../common/actions";
 import type { GameItem } from "../../types";
 import "./GamesListDetail.css";
 
@@ -151,28 +152,17 @@ export default function GamesListDetail({
   itemRefs,
 }: GamesListDetailProps) {
   const { t } = useTranslation();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
+  const editGame = useEditGame();
   
   if (games.length === 0) {
     return <div className="text-gray-400 text-center">{t("table.noGames")}</div>;
   }
 
-  const handleEditClick = (game: GameItem) => {
-    setSelectedGame(game);
-    setIsEditModalOpen(true);
-  };
-
-  const handleEditModalClose = () => {
-    setIsEditModalOpen(false);
-    setSelectedGame(null);
-  };
-
   const handleGameUpdate = (updatedGame: GameItem) => {
     if (onGameUpdate) {
       onGameUpdate(updatedGame);
     }
-    handleEditModalClose();
+    editGame.closeEditModal();
   };
 
   return (
@@ -184,7 +174,7 @@ export default function GamesListDetail({
             game={game}
             onGameClick={onGameClick}
             onPlay={onPlay}
-            onEditClick={handleEditClick}
+            onEditClick={editGame.openEditModal}
             onGameDelete={onGameDelete}
             onGameUpdate={onGameUpdate}
             buildCoverUrl={buildCoverUrl}
@@ -193,11 +183,11 @@ export default function GamesListDetail({
           />
         ))}
       </div>
-      {selectedGame && (
+      {editGame.selectedGame && (
         <EditGameModal
-          isOpen={isEditModalOpen}
-          onClose={handleEditModalClose}
-          game={selectedGame}
+          isOpen={editGame.isEditModalOpen}
+          onClose={editGame.closeEditModal}
+          game={editGame.selectedGame}
           onGameUpdate={handleGameUpdate}
         />
       )}

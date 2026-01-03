@@ -118,7 +118,17 @@
     "genre": "Genre",
     "addGenre": "Add genre...",
     "criticRating": "Critic Rating",
-    "userRating": "User Rating"
+    "userRating": "User Rating",
+    "linkExecutable": "Link Executable",
+    "unlinkExecutable": "Unlink Executable",
+    "unlinkingExecutable": "Unlinking...",
+    "executablePath": "Executable Path",
+    "executablePathHint": "Enter the full absolute path to the game executable (e.g., /usr/local/bin/game or C:\\Program Files\\Game\\game.exe). You can include arguments after the path.",
+    "executablePathPlaceholder": "Enter full path (e.g., /usr/local/bin/game or C:\\Program Files\\Game\\game.exe)",
+    "browseFile": "Browse...",
+    "fileSelectionError": "Error selecting file. Please enter the path manually.",
+    "fullPathNeeded": "Note: Please verify the full path. You may need to enter it manually.",
+    "gameNotInLibrary": "This game is not in the main library. Please add it to the library first."
   },
   "common": {
     "loading": "Loading...",

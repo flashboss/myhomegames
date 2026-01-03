@@ -5,6 +5,7 @@ import StarRating from "../common/StarRating";
 import EditGameModal from "./EditGameModal";
 import DropdownMenu from "../common/DropdownMenu";
 import Tooltip from "../common/Tooltip";
+import { useEditGame } from "../common/actions";
 import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 import type { GameItem } from "../../types";
 import { buildApiUrl } from "../../utils/api";
@@ -52,8 +53,7 @@ export default function GamesListTable({
   useScrollRestoration(actualScrollRef, "table");
   
   const [localGames, setLocalGames] = useState<GameItem[]>(games);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
+  const editGame = useEditGame();
   
   // Sync localGames when games prop changes
   useEffect(() => {
@@ -89,16 +89,6 @@ export default function GamesListTable({
     }
   };
 
-  const handleEditClick = (game: GameItem) => {
-    setSelectedGame(game);
-    setIsEditModalOpen(true);
-  };
-
-  const handleEditModalClose = () => {
-    setIsEditModalOpen(false);
-    setSelectedGame(null);
-  };
-
   const handleGameUpdate = (updatedGame: GameItem) => {
     const updatedGames = localGames.map(game =>
       game.ratingKey === updatedGame.ratingKey ? updatedGame : game
@@ -107,7 +97,7 @@ export default function GamesListTable({
     if (onGameUpdate) {
       onGameUpdate(updatedGame);
     }
-    handleEditModalClose();
+    editGame.closeEditModal();
   };
   const { t, i18n } = useTranslation();
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(
@@ -581,7 +571,7 @@ export default function GamesListTable({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleEditClick(it);
+                          editGame.openEditModal(it);
                         }}
                         className="games-table-edit-button"
                         aria-label="Edit"
@@ -624,11 +614,11 @@ export default function GamesListTable({
           </tbody>
         </table>
       </div>
-      {selectedGame && (
+      {editGame.selectedGame && (
         <EditGameModal
-          isOpen={isEditModalOpen}
-          onClose={handleEditModalClose}
-          game={selectedGame}
+          isOpen={editGame.isEditModalOpen}
+          onClose={editGame.closeEditModal}
+          game={editGame.selectedGame}
           onGameUpdate={handleGameUpdate}
         />
       )}

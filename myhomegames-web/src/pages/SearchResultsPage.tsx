@@ -103,11 +103,16 @@ export default function SearchResultsPage({
     }
   }, [gamesState, collectionsState]);
 
-  if (!searchQuery) {
+  if (!searchQuery || searchQuery.trim().length < 2) {
     return (
       <div className="bg-[#1a1a1a] text-white flex items-center justify-center search-results-page-empty">
         <div className="text-center">
-          <div className="text-gray-400">{t("searchResults.noResults")}</div>
+          <div className="text-gray-400">
+            {!searchQuery 
+              ? t("searchResults.noResults")
+              : t("search.minimumCharacters", "Please enter at least 2 characters to search")
+            }
+          </div>
         </div>
       </div>
     );

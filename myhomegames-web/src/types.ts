@@ -13,6 +13,7 @@ export type GameItem = {
   genre?: string | string[];
   criticratings?: number | null;
   userratings?: number | null;
+  command?: string | null;
 };
 
 export type CollectionItem = {

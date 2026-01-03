@@ -195,6 +195,7 @@ export default function CategoryPage({
         genre: v.genre,
         criticratings: v.criticratings,
         userratings: v.userratings,
+        command: v.command || null,
       }));
       setGames(parsed);
       onGamesLoaded(parsed);

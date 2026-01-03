@@ -52,6 +52,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         genre: g.genre || null,
         criticratings: g.criticratings || null,
         userratings: g.userratings || null,
+        command: g.command || null,
       })),
     });
   });
@@ -77,6 +78,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
       genre: game.genre || null,
       criticratings: game.criticratings || null,
       userratings: game.userratings || null,
+      command: game.command || null,
     };
     const background = getBackgroundPath(metadataPath, game.id);
     if (background) {
@@ -97,7 +99,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
     }
     
     // Define allowed fields that can be updated
-    const allowedFields = ['title', 'summary', 'year', 'month', 'day', 'stars', 'genre'];
+    const allowedFields = ['title', 'summary', 'year', 'month', 'day', 'stars', 'genre', 'command'];
     
     // Filter updates to only include allowed fields
     const filteredUpdates = Object.keys(updates)
@@ -150,6 +152,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         genre: updatedGame.genre || null,
         criticratings: updatedGame.criticratings || null,
         userratings: updatedGame.userratings || null,
+        command: updatedGame.command || null,
       };
       const background = getBackgroundPath(metadataPath, updatedGame.id);
       if (background) {
@@ -190,6 +193,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         genre: game.genre || null,
         criticratings: game.criticratings || null,
         userratings: game.userratings || null,
+        command: game.command || null,
       };
       const background = getBackgroundPath(metadataPath, game.id);
       if (background) {

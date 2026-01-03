@@ -118,7 +118,17 @@
     "genre": "类型",
     "addGenre": "添加类型...",
     "criticRating": "评论家评分",
-    "userRating": "用户评分"
+    "userRating": "用户评分",
+    "linkExecutable": "链接可执行文件",
+    "unlinkExecutable": "取消链接可执行文件",
+    "unlinkingExecutable": "取消链接中...",
+    "executablePath": "可执行文件路径",
+    "executablePathHint": "输入游戏可执行文件的完整绝对路径（例如：/usr/local/bin/game 或 C:\\Program Files\\Game\\game.exe）。可以在路径后包含参数。",
+    "executablePathPlaceholder": "输入完整路径（例如：/usr/local/bin/game 或 C:\\Program Files\\Game\\game.exe）",
+    "browseFile": "浏览...",
+    "fileSelectionError": "选择文件时出错。请手动输入路径。",
+    "fullPathNeeded": "注意：请验证完整路径。您可能需要手动输入。",
+    "gameNotInLibrary": "此游戏不在主库中。请先将其添加到库中。"
   },
   "common": {
     "loading": "加载中...",

@@ -118,7 +118,17 @@
     "genre": "ジャンル",
     "addGenre": "ジャンルを追加...",
     "criticRating": "批評家評価",
-    "userRating": "ユーザー評価"
+    "userRating": "ユーザー評価",
+    "linkExecutable": "実行ファイルをリンク",
+    "unlinkExecutable": "実行ファイルのリンクを解除",
+    "unlinkingExecutable": "解除中...",
+    "executablePath": "実行ファイルのパス",
+    "executablePathHint": "ゲームの実行ファイルへの完全な絶対パスを入力してください（例: /usr/local/bin/game または C:\\Program Files\\Game\\game.exe）。パスの後に引数を含めることができます。",
+    "executablePathPlaceholder": "完全なパスを入力してください（例: /usr/local/bin/game または C:\\Program Files\\Game\\game.exe）",
+    "browseFile": "参照...",
+    "fileSelectionError": "ファイルの選択中にエラーが発生しました。パスを手動で入力してください。",
+    "fullPathNeeded": "注: 完全なパスを確認してください。手動で入力する必要がある場合があります。",
+    "gameNotInLibrary": "このゲームはメインライブラリにありません。まずライブラリに追加してください。"
   },
   "common": {
     "loading": "読み込み中...",

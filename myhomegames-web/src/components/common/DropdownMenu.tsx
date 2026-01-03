@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
-import { API_BASE, getApiToken } from "../../config";
-import { buildApiUrl } from "../../utils/api";
-import { useLoading } from "../../contexts/LoadingContext";
+import { getApiToken } from "../../config";
+import { useDeleteGame, useReloadGame, useUnlinkExecutable } from "./actions";
 import Tooltip from "./Tooltip";
 import "./DropdownMenu.css";
 
@@ -13,6 +12,7 @@ type DropdownMenuProps = {
   onReload?: () => void;
   gameId?: string;
   gameTitle?: string;
+  gameCommand?: string | null;
   onGameDelete?: (gameId: string) => void;
   onGameUpdate?: (game: any) => void;
   collectionId?: string;
@@ -32,6 +32,7 @@ export default function DropdownMenu({
   onReload,
   gameId,
   gameTitle,
+  gameCommand,
   onGameDelete,
   onGameUpdate,
   collectionId,
@@ -45,16 +46,34 @@ export default function DropdownMenu({
   toolTipDelay = 0,
 }: DropdownMenuProps) {
   const { t } = useTranslation();
-  const { setLoading } = useLoading();
   const [isOpen, setIsOpen] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showReloadConfirmModal, setShowReloadConfirmModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isReloading, setIsReloading] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [reloadError, setReloadError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+
+  // Use action hooks
+  const deleteGame = useDeleteGame({
+    gameId,
+    collectionId,
+    onGameDelete,
+    onCollectionDelete,
+    onModalClose,
+  });
+
+  const reloadGame = useReloadGame({
+    gameId,
+    collectionId,
+    onGameUpdate,
+    onCollectionUpdate,
+    onReload,
+    onModalClose,
+  });
+
+  const unlinkExecutable = gameId && onGameUpdate
+    ? useUnlinkExecutable({
+        gameId,
+        onGameUpdate,
+      })
+    : { isUnlinking: false, handleUnlinkExecutable: async () => {} };
   
   // Check if we're in a cover (grid list) to use portal
   const isInCover = className.includes('games-list-dropdown-menu');
@@ -97,7 +116,7 @@ export default function DropdownMenu({
 
   // Block body scroll when modal is open
   useEffect(() => {
-    if (showConfirmModal || showReloadConfirmModal) {
+    if (deleteGame.showConfirmModal || reloadGame.showReloadConfirmModal) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -105,21 +124,19 @@ export default function DropdownMenu({
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showConfirmModal, showReloadConfirmModal]);
+  }, [deleteGame.showConfirmModal, reloadGame.showReloadConfirmModal]);
 
   // Handle ESC key to close modal
   useEffect(() => {
-    if (!showConfirmModal && !showReloadConfirmModal) return;
+    if (!deleteGame.showConfirmModal && !reloadGame.showReloadConfirmModal) return;
     
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        if (showConfirmModal) {
-          setShowConfirmModal(false);
-          setDeleteError(null);
+        if (deleteGame.showConfirmModal) {
+          deleteGame.handleCancelDelete();
         }
-        if (showReloadConfirmModal) {
-          setShowReloadConfirmModal(false);
-          setReloadError(null);
+        if (reloadGame.showReloadConfirmModal) {
+          reloadGame.handleCancelReload();
         }
       }
     }
@@ -128,7 +145,7 @@ export default function DropdownMenu({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showConfirmModal, showReloadConfirmModal]);
+  }, [deleteGame.showConfirmModal, reloadGame.showReloadConfirmModal, deleteGame, reloadGame]);
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -151,12 +168,11 @@ export default function DropdownMenu({
     setIsOpen(false);
     
     // If we have props to handle deletion internally (game or collection)
-    const apiToken = getApiToken();
-    if (apiToken && ((gameId && gameTitle) || (collectionId && collectionTitle))) {
+    if ((gameId && gameTitle) || (collectionId && collectionTitle)) {
       if (onModalOpen) {
         onModalOpen();
       }
-      setShowConfirmModal(true);
+      deleteGame.handleDeleteClick();
     } else if (onDelete) {
       // Fallback to previous behavior
       onDelete();
@@ -174,7 +190,7 @@ export default function DropdownMenu({
         // If there's a custom callback, use it
         onReload();
       } else {
-        executeReload();
+        reloadGame.handleConfirmReload();
       }
       return;
     }
@@ -185,181 +201,14 @@ export default function DropdownMenu({
       if (onModalOpen) {
         onModalOpen();
       }
-      setShowReloadConfirmModal(true);
+      reloadGame.handleReloadClick();
     }, 0);
   };
 
-  const executeReload = async () => {
-    const apiToken = getApiToken();
-    if (!API_BASE || !apiToken) {
-      console.error("API_BASE or API_TOKEN not available");
-      return;
-    }
-    
-    setIsReloading(true);
-    setReloadError(null);
-    setLoading(true);
-    
-    try {
-      let url: string;
-      
-      // If there's a gameId or collectionId, reload only that element
-      if (gameId) {
-        url = buildApiUrl(API_BASE, `/games/${gameId}/reload`);
-      } else if (collectionId) {
-        url = buildApiUrl(API_BASE, `/collections/${collectionId}/reload`);
-      } else {
-        // Otherwise reload all metadata
-        url = buildApiUrl(API_BASE, "/reload-games");
-      }
-      
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "X-Auth-Token": apiToken,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // If there's a gameId or collectionId, update only data without reloading page
-        if (gameId) {
-          if (onGameUpdate && data.game) {
-            // Convert game data to GameItem format
-            const updatedGame = {
-              ratingKey: data.game.id,
-              title: data.game.title,
-              summary: data.game.summary || "",
-              cover: data.game.cover,
-              background: data.game.background,
-              day: data.game.day || null,
-              month: data.game.month || null,
-              year: data.game.year || null,
-              stars: data.game.stars || null,
-              genre: data.game.genre || null,
-            };
-            onGameUpdate(updatedGame);
-            setIsReloading(false);
-            setLoading(false);
-            return; // Exit function without reloading
-          } else {
-            // If there's no callback or missing data, don't reload page anyway
-            setIsReloading(false);
-            setLoading(false);
-            return; // Don't reload page even if callback is missing
-          }
-        } else if (collectionId) {
-          if (onCollectionUpdate && data.collection) {
-            // Map collection data to CollectionInfo format
-            const updatedCollection = {
-              id: data.collection.id,
-              title: data.collection.title,
-              summary: data.collection.summary || "",
-              cover: data.collection.cover,
-              background: data.collection.background,
-            };
-            onCollectionUpdate(updatedCollection);
-            setIsReloading(false);
-            setLoading(false);
-            return; // Exit function without reloading
-          } else {
-            // If there's no callback, do nothing (or show error)
-            console.warn("onCollectionUpdate callback not provided or collection data missing");
-            setIsReloading(false);
-            setLoading(false);
-            return;
-          }
-        } else {
-          // For global reload, reload the page
-          window.location.reload();
-        }
-      } else {
-        console.error("Failed to reload metadata");
-        setReloadError(t("common.reloadError", "Failed to reload metadata"));
-        setIsReloading(false);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Error reloading metadata:", error);
-      setReloadError(t("common.reloadError", "Failed to reload metadata"));
-      setIsReloading(false);
-      setLoading(false);
-    }
-  };
-
-  const handleConfirmReload = () => {
-    // If there's a custom callback, use it after confirmation
-    if (onReload) {
-      onReload();
-    } else {
-      executeReload();
-    }
-  };
-
-  const handleCancelReload = () => {
-    setShowReloadConfirmModal(false);
-    setReloadError(null);
-    if (onModalClose) {
-      onModalClose();
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    const apiToken = getApiToken();
-    if (!apiToken) return;
-
-    setIsDeleting(true);
-    setDeleteError(null);
-    setLoading(true);
-
-    try {
-      let url: string;
-
-      // Determine if we're deleting a game or a collection
-      if (gameId) {
-        url = buildApiUrl(API_BASE, `/games/${gameId}`);
-      } else if (collectionId) {
-        url = buildApiUrl(API_BASE, `/collections/${collectionId}`);
-      } else {
-        return;
-      }
-
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "X-Auth-Token": apiToken,
-        },
-      });
-
-      if (response.ok) {
-        if (gameId && onGameDelete) {
-          onGameDelete(gameId);
-        } else if (collectionId && onCollectionDelete) {
-          onCollectionDelete(collectionId);
-        }
-        setShowConfirmModal(false);
-        if (onModalClose) {
-          onModalClose();
-        }
-      } else {
-        setDeleteError(t("common.deleteError"));
-      }
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      setDeleteError(t("common.deleteError"));
-    } finally {
-      setIsDeleting(false);
-      setLoading(false);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setShowConfirmModal(false);
-    setDeleteError(null);
-    if (onModalClose) {
-      onModalClose();
-    }
+  const handleUnlinkExecutableClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsOpen(false);
+    await unlinkExecutable.handleUnlinkExecutable();
   };
 
   const buttonContent = (
@@ -438,14 +287,28 @@ export default function DropdownMenu({
               <button
                 onClick={handleReload}
                 className="dropdown-menu-item"
-                disabled={isReloading}
+                disabled={reloadGame.isReloading}
               >
                 <span>
-                  {isReloading 
+                  {reloadGame.isReloading
                     ? t("common.reloadingMetadata", "Reloading metadata...")
                     : (gameId || collectionId)
                       ? t("common.reloadSingleMetadata", "Reload metadata")
                       : t("common.reloadMetadata", "Reload all metadata")
+                  }
+                </span>
+              </button>
+            )}
+            {gameId && gameCommand && onGameUpdate && (
+              <button
+                onClick={handleUnlinkExecutableClick}
+                className="dropdown-menu-item"
+                disabled={unlinkExecutable.isUnlinking}
+              >
+                <span>
+                  {unlinkExecutable.isUnlinking 
+                    ? t("gameDetail.unlinkingExecutable", "Unlinking...")
+                    : t("gameDetail.unlinkExecutable", "Unlink Executable")
                   }
                 </span>
               </button>
@@ -465,8 +328,8 @@ export default function DropdownMenu({
       })()}
 
       {/* Reload Confirmation Modal */}
-      {showReloadConfirmModal && createPortal(
-        <div className="dropdown-menu-confirm-overlay" onClick={handleCancelReload}>
+      {reloadGame.showReloadConfirmModal && createPortal(
+        <div className="dropdown-menu-confirm-overlay" onClick={reloadGame.handleCancelReload}>
           <div className="dropdown-menu-confirm-container" onClick={(e) => e.stopPropagation()}>
             <div className="dropdown-menu-confirm-header">
               <h2>
@@ -490,7 +353,7 @@ export default function DropdownMenu({
               </h2>
               <button
                 className="dropdown-menu-confirm-close"
-                onClick={handleCancelReload}
+                onClick={reloadGame.handleCancelReload}
                 aria-label="Close"
               >
                 ×
@@ -498,24 +361,24 @@ export default function DropdownMenu({
             </div>
             <div className="dropdown-menu-confirm-content">
               <p>{t("common.confirmReload", "Are you sure you want to reload all metadata? This will refresh all games, collections, and categories.")}</p>
-              {reloadError && (
-                <div className="dropdown-menu-confirm-error">{reloadError}</div>
+              {reloadGame.reloadError && (
+                <div className="dropdown-menu-confirm-error">{reloadGame.reloadError}</div>
               )}
             </div>
             <div className="dropdown-menu-confirm-footer">
               <button
                 className="dropdown-menu-confirm-cancel"
-                onClick={handleCancelReload}
-                disabled={isReloading}
+                onClick={reloadGame.handleCancelReload}
+                disabled={reloadGame.isReloading}
               >
                 {t("common.cancel", "Cancel")}
               </button>
               <button
                 className="dropdown-menu-confirm-reload"
-                onClick={handleConfirmReload}
-                disabled={isReloading}
+                onClick={reloadGame.handleConfirmReload}
+                disabled={reloadGame.isReloading}
               >
-                {isReloading ? t("common.reloadingMetadata", "Reloading metadata...") : t("common.reloadMetadata", "Reload all metadata")}
+                {reloadGame.isReloading ? t("common.reloadingMetadata", "Reloading metadata...") : t("common.reloadMetadata", "Reload all metadata")}
               </button>
             </div>
           </div>
@@ -524,8 +387,8 @@ export default function DropdownMenu({
       )}
 
       {/* Delete Confirmation Modal */}
-      {showConfirmModal && createPortal(
-        <div className="dropdown-menu-confirm-overlay" onClick={handleCancelDelete}>
+      {deleteGame.showConfirmModal && createPortal(
+        <div className="dropdown-menu-confirm-overlay" onClick={deleteGame.handleCancelDelete}>
           <div className="dropdown-menu-confirm-container" onClick={(e) => e.stopPropagation()}>
             <div className="dropdown-menu-confirm-header">
               <h2>
@@ -548,7 +411,7 @@ export default function DropdownMenu({
               </h2>
               <button
                 className="dropdown-menu-confirm-close"
-                onClick={handleCancelDelete}
+                onClick={deleteGame.handleCancelDelete}
                 aria-label="Close"
               >
                 ×
@@ -556,24 +419,24 @@ export default function DropdownMenu({
             </div>
             <div className="dropdown-menu-confirm-content">
               <p>{t("common.confirmDelete", { title: gameTitle || collectionTitle || "" })}</p>
-              {deleteError && (
-                <div className="dropdown-menu-confirm-error">{deleteError}</div>
+              {deleteGame.deleteError && (
+                <div className="dropdown-menu-confirm-error">{deleteGame.deleteError}</div>
               )}
             </div>
             <div className="dropdown-menu-confirm-footer">
               <button
                 className="dropdown-menu-confirm-cancel"
-                onClick={handleCancelDelete}
-                disabled={isDeleting}
+                onClick={deleteGame.handleCancelDelete}
+                disabled={deleteGame.isDeleting}
               >
                 {t("common.cancel", "Cancel")}
               </button>
               <button
                 className="dropdown-menu-confirm-delete"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
+                onClick={deleteGame.handleConfirmDelete}
+                disabled={deleteGame.isDeleting}
               >
-                {isDeleting ? t("common.deleting", "Deleting...") : t("common.delete", "Delete")}
+                {deleteGame.isDeleting ? t("common.deleting", "Deleting...") : t("common.delete", "Delete")}
               </button>
             </div>
           </div>

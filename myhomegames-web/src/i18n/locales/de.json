@@ -118,7 +118,17 @@
     "genre": "Genre",
     "addGenre": "Genre hinzufügen...",
     "criticRating": "Kritikerbewertung",
-    "userRating": "Publikumsbewertung"
+    "userRating": "Publikumsbewertung",
+    "linkExecutable": "Ausführbare Datei verknüpfen",
+    "unlinkExecutable": "Ausführbare Datei trennen",
+    "unlinkingExecutable": "Trennen...",
+    "executablePath": "Pfad zur ausführbaren Datei",
+    "executablePathHint": "Geben Sie den vollständigen absoluten Pfad zur ausführbaren Datei des Spiels ein (z.B. /usr/local/bin/game oder C:\\Program Files\\Game\\game.exe). Sie können Argumente nach dem Pfad hinzufügen.",
+    "executablePathPlaceholder": "Geben Sie den vollständigen Pfad ein (z.B. /usr/local/bin/game oder C:\\Program Files\\Game\\game.exe)",
+    "browseFile": "Durchsuchen...",
+    "fileSelectionError": "Fehler beim Auswählen der Datei. Bitte geben Sie den Pfad manuell ein.",
+    "fullPathNeeded": "Hinweis: Bitte überprüfen Sie den vollständigen Pfad. Möglicherweise müssen Sie ihn manuell eingeben.",
+    "gameNotInLibrary": "Dieses Spiel ist nicht in der Hauptbibliothek. Bitte fügen Sie es zuerst zur Bibliothek hinzu."
   },
   "common": {
     "loading": "Lädt...",

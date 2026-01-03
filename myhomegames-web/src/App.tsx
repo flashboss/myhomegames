@@ -78,6 +78,7 @@ function AppContent() {
           year: v.year,
           stars: v.stars,
           genre: v.genre,
+          command: v.command || null,
         }));
         setAllGames(parsed);
       } catch (err: any) {
@@ -512,6 +513,7 @@ function GameDetailPage({
         genre: found.genre,
         criticratings: found.criticratings,
         userratings: found.userratings,
+        command: found.command || null,
       };
       setGame(parsed);
     } catch (err: any) {

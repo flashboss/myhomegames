@@ -6,6 +6,7 @@ import Cover from "../games/Cover";
 import DropdownMenu from "../common/DropdownMenu";
 import EditGameModal from "../games/EditGameModal";
 import EditCollectionModal from "../collections/EditCollectionModal";
+import { useEditGame } from "../common/actions";
 import { useNavigate } from "react-router-dom";
 import type { GameItem, CollectionItem, CollectionInfo } from "../../types";
 import "./SearchResultsList.css";
@@ -216,9 +217,8 @@ export default function SearchResultsList({
   onModalClose,
 }: SearchResultsListProps) {
   const { t } = useTranslation();
-  const [isEditGameModalOpen, setIsEditGameModalOpen] = useState(false);
+  const editGame = useEditGame();
   const [isEditCollectionModalOpen, setIsEditCollectionModalOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
   const [selectedCollection, setSelectedCollection] = useState<CollectionInfo | null>(null);
   
   const totalResults = games.length + collections.length;
@@ -237,8 +237,7 @@ export default function SearchResultsList({
     }
     if ("year" in item) {
       // It's a game
-      setSelectedGame(item);
-      setIsEditGameModalOpen(true);
+      editGame.openEditModal(item);
     } else {
       // It's a collection
       const collectionInfo: CollectionInfo = {
@@ -256,8 +255,7 @@ export default function SearchResultsList({
     if (onGameUpdate) {
       onGameUpdate(updatedGame);
     }
-    setIsEditGameModalOpen(false);
-    setSelectedGame(null);
+    editGame.closeEditModal();
     if (onModalClose) {
       onModalClose();
     }
@@ -303,17 +301,16 @@ export default function SearchResultsList({
           />
         ))}
       </div>
-      {selectedGame && (
+      {editGame.selectedGame && (
         <EditGameModal
-          isOpen={isEditGameModalOpen}
+          isOpen={editGame.isEditModalOpen}
           onClose={() => {
-            setIsEditGameModalOpen(false);
-            setSelectedGame(null);
+            editGame.closeEditModal();
             if (onModalClose) {
               onModalClose();
             }
           }}
-          game={selectedGame}
+          game={editGame.selectedGame}
           onGameUpdate={handleGameUpdate}
         />
       )}

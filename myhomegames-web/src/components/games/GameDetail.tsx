@@ -5,10 +5,12 @@ import StarRating from "../common/StarRating";
 import Summary from "../common/Summary";
 import GameCategories from "./GameCategories";
 import EditGameModal from "./EditGameModal";
+import LinkExecutableModal from "./LinkExecutableModal";
 import DropdownMenu from "../common/DropdownMenu";
 import Tooltip from "../common/Tooltip";
 import BackgroundManager, { useBackground } from "../common/BackgroundManager";
 import LibrariesBar from "../layout/LibrariesBar";
+import { useEditGame } from "../common/actions";
 import type { GameItem } from "../../types";
 import { formatGameDate } from "../../utils/date";
 import { buildApiUrl } from "../../utils/api";
@@ -36,12 +38,17 @@ export default function GameDetail({
   const { t } = useTranslation();
   const { setLoading } = useLoading();
   const [localGame, setLocalGame] = useState<GameItem>(game);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const editGame = useEditGame();
+  const [isLinkExecutableModalOpen, setIsLinkExecutableModalOpen] = useState(false);
   
   // Sync localGame when game prop changes
   useEffect(() => {
     setLocalGame(game);
-  }, [game]);
+    // If edit modal is open and game changes, update selected game
+    if (editGame.isEditModalOpen && editGame.selectedGame?.ratingKey === game.ratingKey) {
+      editGame.openEditModal(game);
+    }
+  }, [game, editGame]);
   
   const coverWidth = 256;
   const coverHeight = 384; // 256 * 1.5
@@ -112,9 +119,7 @@ export default function GameDetail({
         coverSize={coverSize}
         handleCoverSizeChange={handleCoverSizeChange}
         onRatingChange={handleRatingChange}
-        isEditModalOpen={isEditModalOpen}
-        onEditModalOpen={() => setIsEditModalOpen(true)}
-        onEditModalClose={() => setIsEditModalOpen(false)}
+        editGame={editGame}
         onGameUpdate={(updatedGame) => {
           setLocalGame(updatedGame);
           if (onGameUpdate) {
@@ -128,6 +133,9 @@ export default function GameDetail({
           }
         }}
         onGameDelete={onGameDelete}
+        isLinkExecutableModalOpen={isLinkExecutableModalOpen}
+        onLinkExecutableModalOpen={() => setIsLinkExecutableModalOpen(true)}
+        onLinkExecutableModalClose={() => setIsLinkExecutableModalOpen(false)}
         t={t}
       />
     </BackgroundManager>
@@ -145,12 +153,13 @@ function GameDetailContent({
   coverSize,
   handleCoverSizeChange,
   onRatingChange,
-  isEditModalOpen,
-  onEditModalOpen,
-  onEditModalClose,
+  editGame,
   onGameUpdate,
   onGameReload,
   onGameDelete,
+  isLinkExecutableModalOpen,
+  onLinkExecutableModalOpen,
+  onLinkExecutableModalClose,
   t,
 }: {
   game: GameItem;
@@ -163,12 +172,13 @@ function GameDetailContent({
   coverSize: number;
   handleCoverSizeChange: (size: number) => void;
   onRatingChange?: (newStars: number) => void;
-  isEditModalOpen: boolean;
-  onEditModalOpen: () => void;
-  onEditModalClose: () => void;
+  editGame: ReturnType<typeof useEditGame>;
   onGameUpdate: (updatedGame: GameItem) => void;
   onGameReload: (updatedGame: GameItem) => void;
   onGameDelete?: (game: GameItem) => void;
+  isLinkExecutableModalOpen: boolean;
+  onLinkExecutableModalOpen: () => void;
+  onLinkExecutableModalClose: () => void;
   t: (key: string) => string;
 }) {
   const { hasBackground, isBackgroundVisible } = useBackground();
@@ -347,49 +357,97 @@ function GameDetailContent({
                 />
               </div>
               <div className="game-detail-actions" style={{ marginTop: '16px' }}>
-                <button
-                  onClick={() => onPlay(game)}
-                  style={{
-                    backgroundColor: '#E5A00D',
-                    color: '#000000',
-                    border: 'none',
-                    borderRadius: '4px',
-                    paddingTop: '6px',
-                    paddingBottom: '6px',
-                    paddingLeft: '8px',
-                    paddingRight: '12px',
-                    fontSize: '1.25rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s ease',
-                    width: 'fit-content',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    lineHeight: '1.2'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#F5B041';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#E5A00D';
-                  }}
-                >
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    style={{ display: 'block' }}
+                {game.command ? (
+                  <button
+                    onClick={() => onPlay(game)}
+                    style={{
+                      backgroundColor: '#E5A00D',
+                      color: '#000000',
+                      border: 'none',
+                      borderRadius: '4px',
+                      paddingTop: '6px',
+                      paddingBottom: '6px',
+                      paddingLeft: '8px',
+                      paddingRight: '12px',
+                      fontSize: '1.25rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease',
+                      width: 'fit-content',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      lineHeight: '1.2'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#F5B041';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#E5A00D';
+                    }}
                   >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  {t("common.play")}
-                </button>
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      style={{ display: 'block' }}
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    {t("common.play")}
+                  </button>
+                ) : (
+                  <button
+                    onClick={onLinkExecutableModalOpen}
+                    style={{
+                      backgroundColor: '#E5A00D',
+                      color: '#000000',
+                      border: 'none',
+                      borderRadius: '4px',
+                      paddingTop: '6px',
+                      paddingBottom: '6px',
+                      paddingLeft: '8px',
+                      paddingRight: '12px',
+                      fontSize: '1.25rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease',
+                      width: 'fit-content',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      lineHeight: '1.2'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#F5B041';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#E5A00D';
+                    }}
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ display: 'block' }}
+                    >
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                    {t("gameDetail.linkExecutable")}
+                  </button>
+                )}
                 <Tooltip text={t("common.edit")} delay={200}>
                   <button
-                    onClick={onEditModalOpen}
+                    onClick={() => editGame.openEditModal(game)}
                     className="game-detail-edit-button"
                   >
                     <svg
@@ -408,9 +466,10 @@ function GameDetailContent({
                   </button>
                 </Tooltip>
                 <DropdownMenu
-                  onEdit={onEditModalOpen}
+                  onEdit={() => editGame.openEditModal(game)}
                   gameId={game.ratingKey}
                   gameTitle={game.title}
+                  gameCommand={game.command}
                   onGameDelete={onGameDelete ? (gameId: string) => {
                     if (game.ratingKey === gameId && onGameDelete) {
                       onGameDelete(game);
@@ -422,9 +481,20 @@ function GameDetailContent({
                   toolTipDelay={200}
                 />
               </div>
-              <EditGameModal
-                isOpen={isEditModalOpen}
-                onClose={onEditModalClose}
+              {editGame.selectedGame && (
+                <EditGameModal
+                  isOpen={editGame.isEditModalOpen}
+                  onClose={editGame.closeEditModal}
+                  game={editGame.selectedGame}
+                  onGameUpdate={(updatedGame) => {
+                    onGameUpdate(updatedGame);
+                    editGame.closeEditModal();
+                  }}
+                />
+              )}
+              <LinkExecutableModal
+                isOpen={isLinkExecutableModalOpen}
+                onClose={onLinkExecutableModalClose}
                 game={game}
                 onGameUpdate={onGameUpdate}
               />

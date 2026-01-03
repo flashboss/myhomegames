@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { API_BASE, API_TOKEN } from "../../config";
 import Cover from "./Cover";
 import EditGameModal from "./EditGameModal";
+import { useEditGame } from "../common/actions";
 import type { GameItem } from "../../types";
 import "./GamesList.css";
 
@@ -157,10 +158,9 @@ export default function GamesList({
   viewMode,
 }: GamesListProps) {
   const { t } = useTranslation();
+  const editGame = useEditGame();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
 
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
@@ -179,21 +179,11 @@ export default function GamesList({
     setDragOverIndex(null);
   };
 
-  const handleEditClick = (game: GameItem) => {
-    setSelectedGame(game);
-    setIsEditModalOpen(true);
-  };
-
-  const handleEditModalClose = () => {
-    setIsEditModalOpen(false);
-    setSelectedGame(null);
-  };
-
   const handleGameUpdate = (updatedGame: GameItem) => {
     if (onGameUpdate) {
       onGameUpdate(updatedGame);
     }
-    handleEditModalClose();
+    editGame.closeEditModal();
   };
 
   
@@ -213,7 +203,7 @@ export default function GamesList({
             game={game}
             onGameClick={onGameClick}
             onPlay={onPlay}
-            onEditClick={handleEditClick}
+            onEditClick={editGame.openEditModal}
             onGameDelete={onGameDelete}
             onGameUpdate={onGameUpdate}
             buildCoverUrl={buildCoverUrl}
@@ -230,11 +220,11 @@ export default function GamesList({
           />
         ))}
       </div>
-      {selectedGame && API_TOKEN && (
+      {editGame.selectedGame && API_TOKEN && (
         <EditGameModal
-          isOpen={isEditModalOpen}
-          onClose={handleEditModalClose}
-          game={selectedGame}
+          isOpen={editGame.isEditModalOpen}
+          onClose={editGame.closeEditModal}
+          game={editGame.selectedGame}
           onGameUpdate={handleGameUpdate}
         />
       )}
