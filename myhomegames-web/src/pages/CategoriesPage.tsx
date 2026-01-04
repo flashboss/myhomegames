@@ -51,8 +51,8 @@ export default function CategoriesPage({
 
     // Filter categories to only those present in games
     const filteredCategories = allCategories.filter((category) => {
-      // Check if the category ID or title matches any genre in games
-      return genresInGames.has(category.ratingKey) || genresInGames.has(category.title);
+      // Check if the category title matches any genre in games
+      return genresInGames.has(category.title);
     });
 
     setCategories(filteredCategories);
@@ -83,11 +83,11 @@ export default function CategoriesPage({
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      const items = (json.categories || []) as any[];
-      const parsed = items.map((v) => ({
-        ratingKey: v.id,
-        title: v.title,
-        cover: v.cover,
+      const items = (json.categories || []) as string[];
+      const parsed = items.map((title) => ({
+        ratingKey: title,
+        title: title,
+        cover: `/category-covers/${encodeURIComponent(title)}`,
       }));
       setAllCategories(parsed);
     } catch (err: any) {

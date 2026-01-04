@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
-const { ensureCategoryExists, normalizeGenres, loadCategories, deleteCategoryIfUnused } = require("./categories");
+const { ensureCategoryExists, loadCategories, deleteCategoryIfUnused } = require("./categories");
 
 /**
  * Library routes module
@@ -520,8 +520,14 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         }
       }
 
-      // Normalize genres to lowercase (same normalization as categories)
-      const normalizedGenres = normalizeGenres(genres);
+      // Filter and validate genres
+      let validGenres = null;
+      if (genres && Array.isArray(genres) && genres.length > 0) {
+        validGenres = genres.filter((g) => g && typeof g === "string" && g.trim());
+        if (validGenres.length === 0) {
+          validGenres = null;
+        }
+      }
 
       // Create game object
       const newGame = {
@@ -531,7 +537,7 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         year: year,
         month: month || null,
         day: day || null,
-        genre: normalizedGenres && normalizedGenres.length > 0 ? normalizedGenres : null,
+        genre: validGenres && validGenres.length > 0 ? validGenres : null,
         criticratings: criticRating !== undefined && criticRating !== null ? criticRating / 10 : null, // Convert from 0-100 to 0-10
         userratings: userRating !== undefined && userRating !== null ? userRating / 10 : null, // Convert from 0-100 to 0-10
       };
@@ -554,9 +560,9 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
         await downloadImage(background, backgroundPath, gameId, "background");
       }
 
-      // Create missing categories from genres (use normalized genres)
-      if (normalizedGenres && normalizedGenres.length > 0) {
-        for (const genre of normalizedGenres) {
+      // Create missing categories from genres
+      if (validGenres && validGenres.length > 0) {
+        for (const genre of validGenres) {
           if (genre && typeof genre === "string") {
             ensureCategoryExists(metadataGamesDir, genre);
           }
@@ -656,44 +662,27 @@ function registerLibraryRoutes(app, requireToken, metadataGamesDir, allGames) {
           remainingGamesMap[g.id] = g;
         });
         
-        // Get all categories to find which ones match the game's genres
+        // Get all categories (array of strings)
         const allCategories = loadCategories(metadataGamesDir);
         
         // For each genre of the deleted game, check if the corresponding category is orphaned
         for (const genre of gameGenres) {
           if (!genre || typeof genre !== "string") continue;
           
-          // Find category by ID or title (normalized)
-          const normalizedGenre = genre.trim().toLowerCase();
-          const matchingCategory = allCategories.find((c) => 
-            c.id === genre || 
-            c.title === genre ||
-            c.id.toLowerCase() === normalizedGenre ||
-            c.title.toLowerCase() === normalizedGenre
-          );
-          
-          if (matchingCategory) {
-            // Check if category is still used by any remaining game
+          // Check if category exists (exact match)
+          if (allCategories.includes(genre)) {
+            // Check if category is still used by any remaining game (exact match)
             const isStillUsed = Object.values(remainingGamesMap).some((remainingGame) => {
               if (!remainingGame.genre) return false;
               if (Array.isArray(remainingGame.genre)) {
-                return remainingGame.genre.some((g) => 
-                  g === matchingCategory.id || 
-                  g === matchingCategory.title ||
-                  g.toLowerCase() === matchingCategory.id.toLowerCase() ||
-                  g.toLowerCase() === matchingCategory.title.toLowerCase()
-                );
+                return remainingGame.genre.includes(genre);
               }
-              const genreStr = String(remainingGame.genre);
-              return genreStr === matchingCategory.id || 
-                     genreStr === matchingCategory.title ||
-                     genreStr.toLowerCase() === matchingCategory.id.toLowerCase() ||
-                     genreStr.toLowerCase() === matchingCategory.title.toLowerCase();
+              return String(remainingGame.genre) === genre;
             });
             
             // If category is not used by any remaining game, delete it
             if (!isStillUsed) {
-              deleteCategoryIfUnused(metadataPath, metadataGamesDir, matchingCategory.id, remainingGamesMap);
+              deleteCategoryIfUnused(metadataPath, metadataGamesDir, genre, remainingGamesMap);
             }
           }
         }

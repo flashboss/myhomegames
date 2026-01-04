@@ -33,18 +33,20 @@ describe('GET /categories', () => {
     expect(Array.isArray(response.body.categories)).toBe(true);
   });
 
-  test('should return categories with correct structure', async () => {
+  test('should return categories as array of strings', async () => {
     const response = await request(app)
       .get('/categories')
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
+    expect(response.body).toHaveProperty('categories');
+    expect(Array.isArray(response.body.categories)).toBe(true);
+    
     if (response.body.categories.length > 0) {
-      const category = response.body.categories[0];
-      expect(category).toHaveProperty('id');
-      expect(category).toHaveProperty('title');
-      expect(category).toHaveProperty('cover');
-      expect(category.cover).toContain('/category-covers/');
+      // All categories should be strings
+      response.body.categories.forEach(category => {
+        expect(typeof category).toBe('string');
+      });
     }
   });
 
@@ -66,9 +68,8 @@ describe('POST /categories', () => {
       .expect(200);
     
     expect(response.body).toHaveProperty('category');
-    expect(response.body.category).toHaveProperty('id');
-    expect(response.body.category).toHaveProperty('title', 'testcategory');
-    expect(response.body.category).toHaveProperty('cover');
+    expect(typeof response.body.category).toBe('string');
+    expect(response.body.category).toBe('testcategory');
     
     // Verify category was added to the list
     const listResponse = await request(app)
@@ -76,32 +77,28 @@ describe('POST /categories', () => {
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const createdCategory = listResponse.body.categories.find(
-      c => c.id === response.body.category.id
-    );
-    expect(createdCategory).toBeDefined();
-    expect(createdCategory.title).toBe('testcategory');
+    expect(listResponse.body.categories).toContain('testcategory');
   });
 
-  test('should generate correct ID format', async () => {
+  test('should return category title as string', async () => {
     const response = await request(app)
       .post('/categories')
       .set('X-Auth-Token', 'test-token')
       .send({ title: 'New Test Category' })
       .expect(200);
     
-    expect(response.body.category.id).toMatch(/^genre_/);
-    expect(response.body.category.id).toBe('genre_new_test_category');
+    expect(typeof response.body.category).toBe('string');
+    expect(response.body.category).toBe('New Test Category');
   });
 
-  test('should normalize title to lowercase', async () => {
+  test('should preserve title case', async () => {
     const response = await request(app)
       .post('/categories')
       .set('X-Auth-Token', 'test-token')
       .send({ title: 'UPPERCASE CATEGORY' })
       .expect(200);
     
-    expect(response.body.category.title).toBe('uppercase category');
+    expect(response.body.category).toBe('UPPERCASE CATEGORY');
   });
 
   test('should return 409 if category already exists', async () => {
@@ -152,7 +149,7 @@ describe('POST /categories', () => {
   });
 });
 
-describe('DELETE /categories/:categoryId', () => {
+describe('DELETE /categories/:categoryTitle', () => {
   test('should delete unused category', async () => {
     // First create a category
     const createResponse = await request(app)
@@ -161,11 +158,11 @@ describe('DELETE /categories/:categoryId', () => {
       .send({ title: 'unusedcategory' })
       .expect(200);
     
-    const categoryId = createResponse.body.category.id;
+    const categoryTitle = createResponse.body.category;
     
     // Delete the category
     const deleteResponse = await request(app)
-      .delete(`/categories/${categoryId}`)
+      .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
@@ -177,10 +174,7 @@ describe('DELETE /categories/:categoryId', () => {
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const deletedCategory = listResponse.body.categories.find(
-      c => c.id === categoryId
-    );
-    expect(deletedCategory).toBeUndefined();
+    expect(listResponse.body.categories).not.toContain(categoryTitle);
   });
 
   test('should return 409 if category is still in use', async () => {
@@ -200,18 +194,18 @@ describe('DELETE /categories/:categoryId', () => {
         .expect(200);
       
       if (categoriesResponse.body.categories.length > 0) {
-        const categoryId = categoriesResponse.body.categories[0].id;
+        const categoryTitle = categoriesResponse.body.categories[0];
         
         // Assign category to a game
         await request(app)
           .put(`/games/${gameId}`)
           .set('X-Auth-Token', 'test-token')
-          .send({ genre: [categoryId] })
+          .send({ genre: [categoryTitle] })
           .expect(200);
         
         // Try to delete the category (should fail)
         const deleteResponse = await request(app)
-          .delete(`/categories/${categoryId}`)
+          .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
           .set('X-Auth-Token', 'test-token')
           .expect(409);
         
@@ -229,7 +223,7 @@ describe('DELETE /categories/:categoryId', () => {
 
   test('should return 404 if category does not exist', async () => {
     const response = await request(app)
-      .delete('/categories/nonexistent_category_id')
+      .delete('/categories/nonexistent_category')
       .set('X-Auth-Token', 'test-token')
       .expect(404);
     
@@ -238,7 +232,7 @@ describe('DELETE /categories/:categoryId', () => {
 
   test('should require authentication', async () => {
     const response = await request(app)
-      .delete('/categories/some_category_id')
+      .delete('/categories/some_category')
       .expect(401);
     
     expect(response.body).toHaveProperty('error', 'Unauthorized');
@@ -252,13 +246,13 @@ describe('DELETE /categories/:categoryId', () => {
       .send({ title: 'testcategoryfordeletion' })
       .expect(200);
     
-    const categoryId = createResponse.body.category.id;
+    const categoryTitle = createResponse.body.category;
     const { testMetadataPath } = require('../setup');
     const fs = require('fs');
     const path = require('path');
     
     // Create a test content directory for the category
-    const categoryContentDir = path.join(testMetadataPath, 'content', 'categories', categoryId);
+    const categoryContentDir = path.join(testMetadataPath, 'content', 'categories', categoryTitle);
     if (!fs.existsSync(categoryContentDir)) {
       fs.mkdirSync(categoryContentDir, { recursive: true });
     }
@@ -272,7 +266,7 @@ describe('DELETE /categories/:categoryId', () => {
     
     // Delete the category
     const response = await request(app)
-      .delete(`/categories/${categoryId}`)
+      .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
@@ -301,18 +295,18 @@ describe('Game update with category creation and deletion', () => {
         .send({ title: 'newtestgenre' })
         .expect(200);
       
-      const newCategoryId = createCategoryResponse.body.category.id;
+      const newCategoryTitle = createCategoryResponse.body.category;
       
       // Update game with the new genre
       const updateResponse = await request(app)
         .put(`/games/${gameId}`)
         .set('X-Auth-Token', 'test-token')
-        .send({ genre: [newCategoryId] })
+        .send({ genre: [newCategoryTitle] })
         .expect(200);
       
       expect(updateResponse.body.game).toHaveProperty('genre');
       expect(Array.isArray(updateResponse.body.game.genre)).toBe(true);
-      expect(updateResponse.body.game.genre).toContain(newCategoryId);
+      expect(updateResponse.body.game.genre).toContain(newCategoryTitle);
       
       // Verify category still exists
       const categoriesResponse = await request(app)
@@ -320,10 +314,7 @@ describe('Game update with category creation and deletion', () => {
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
-      const categoryExists = categoriesResponse.body.categories.some(
-        c => c.id === newCategoryId
-      );
-      expect(categoryExists).toBe(true);
+      expect(categoriesResponse.body.categories).toContain(newCategoryTitle);
       
       // Cleanup: remove genre from game and delete category
       await request(app)
@@ -333,7 +324,7 @@ describe('Game update with category creation and deletion', () => {
         .expect(200);
       
       await request(app)
-        .delete(`/categories/${newCategoryId}`)
+        .delete(`/categories/${encodeURIComponent(newCategoryTitle)}`)
         .set('X-Auth-Token', 'test-token')
         .expect(200);
     }
@@ -356,18 +347,18 @@ describe('Game update with category creation and deletion', () => {
         .send({ title: 'temporarygenre' })
         .expect(200);
       
-      const categoryId = createCategoryResponse.body.category.id;
+      const categoryTitle = createCategoryResponse.body.category;
       
       // Assign category to game
       await request(app)
         .put(`/games/${gameId}`)
         .set('X-Auth-Token', 'test-token')
-        .send({ genre: [categoryId] })
+        .send({ genre: [categoryTitle] })
         .expect(200);
       
       // Verify category cannot be deleted while in use
       const deleteWhileInUseResponse = await request(app)
-        .delete(`/categories/${categoryId}`)
+        .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
         .set('X-Auth-Token', 'test-token')
         .expect(409);
       
@@ -382,7 +373,7 @@ describe('Game update with category creation and deletion', () => {
       
       // Now category should be deletable
       const deleteResponse = await request(app)
-        .delete(`/categories/${categoryId}`)
+        .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
         .set('X-Auth-Token', 'test-token')
         .expect(200);
       
@@ -395,7 +386,7 @@ describe('Game update with category creation and deletion', () => {
         .expect(200);
       
       const categoryExists = categoriesResponse.body.categories.some(
-        c => c.id === categoryId
+        c => c.title === categoryTitle
       );
       expect(categoryExists).toBe(false);
     }
@@ -419,10 +410,10 @@ describe('ensureCategoryExists helper function', () => {
     const metadataGamesDir = path.join(testMetadataPath, 'metadata');
     
     // Create a new category using the helper
-    const categoryId = ensureCategoryExists(metadataGamesDir, 'Helper Test Genre');
+    const categoryTitle = ensureCategoryExists(metadataGamesDir, 'Helper Test Genre');
     
-    expect(categoryId).toBeTruthy();
-    expect(categoryId).toBe('genre_helper_test_genre');
+    expect(categoryTitle).toBeTruthy();
+    expect(categoryTitle).toBe('Helper Test Genre');
     
     // Verify category was created
     const categoriesAfter = await request(app)
@@ -432,13 +423,11 @@ describe('ensureCategoryExists helper function', () => {
     
     expect(categoriesAfter.body.categories.length).toBe(initialCount + 1);
     
-    const createdCategory = categoriesAfter.body.categories.find(c => c.id === categoryId);
-    expect(createdCategory).toBeDefined();
-    expect(createdCategory.title).toBe('helper test genre');
+    expect(categoriesAfter.body.categories).toContain('Helper Test Genre');
     
     // Cleanup: delete the category
     await request(app)
-      .delete(`/categories/${categoryId}`)
+      .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
       .set('X-Auth-Token', 'test-token')
       .expect(200);
   });
@@ -451,7 +440,7 @@ describe('ensureCategoryExists helper function', () => {
       .send({ title: 'Existing Helper Genre' })
       .expect(200);
     
-    const existingCategoryId = createResponse.body.category.id;
+    const existingCategoryTitle = createResponse.body.category;
     
     // Get categories count before calling helper
     const categoriesBefore = await request(app)
@@ -468,9 +457,9 @@ describe('ensureCategoryExists helper function', () => {
     const metadataGamesDir = path.join(testMetadataPath, 'metadata');
     
     // Try to create the same category using the helper
-    const categoryId = ensureCategoryExists(metadataGamesDir, 'Existing Helper Genre');
+    const categoryTitle = ensureCategoryExists(metadataGamesDir, 'Existing Helper Genre');
     
-    expect(categoryId).toBe(existingCategoryId);
+    expect(categoryTitle).toBe('Existing Helper Genre');
     
     // Verify no duplicate was created
     const categoriesAfter = await request(app)
@@ -482,12 +471,12 @@ describe('ensureCategoryExists helper function', () => {
     
     // Cleanup: delete the category
     await request(app)
-      .delete(`/categories/${existingCategoryId}`)
+      .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
       .set('X-Auth-Token', 'test-token')
       .expect(200);
   });
 
-  test('should normalize title to lowercase', async () => {
+  test('should preserve title case', async () => {
     // Import the helper function
     const { ensureCategoryExists } = require('../../routes/categories');
     const { testMetadataPath } = require('../setup');
@@ -495,23 +484,22 @@ describe('ensureCategoryExists helper function', () => {
     const metadataGamesDir = path.join(testMetadataPath, 'metadata');
     
     // Create category with uppercase title
-    const categoryId = ensureCategoryExists(metadataGamesDir, 'UPPERCASE HELPER GENRE');
+    const categoryTitle = ensureCategoryExists(metadataGamesDir, 'UPPERCASE HELPER GENRE');
     
-    expect(categoryId).toBeTruthy();
+    expect(categoryTitle).toBeTruthy();
+    expect(categoryTitle).toBe('UPPERCASE HELPER GENRE');
     
-    // Verify category was created with lowercase title
+    // Verify category was created with original case
     const categoriesResponse = await request(app)
       .get('/categories')
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const createdCategory = categoriesResponse.body.categories.find(c => c.id === categoryId);
-    expect(createdCategory).toBeDefined();
-    expect(createdCategory.title).toBe('uppercase helper genre');
+    expect(categoriesResponse.body.categories).toContain('UPPERCASE HELPER GENRE');
     
     // Cleanup: delete the category
     await request(app)
-      .delete(`/categories/${categoryId}`)
+      .delete(`/categories/${encodeURIComponent(categoryTitle)}`)
       .set('X-Auth-Token', 'test-token')
       .expect(200);
   });
@@ -537,70 +525,4 @@ describe('ensureCategoryExists helper function', () => {
   });
 });
 
-describe('normalizeGenre helper function', () => {
-  test('should normalize a single genre to lowercase', () => {
-    const { normalizeGenre } = require('../../routes/categories');
-    
-    expect(normalizeGenre('Action')).toBe('action');
-    expect(normalizeGenre('ADVENTURE')).toBe('adventure');
-    expect(normalizeGenre('RPG')).toBe('rpg');
-    expect(normalizeGenre('  Shooter  ')).toBe('shooter');
-    expect(normalizeGenre('Role-Playing Game')).toBe('role-playing game');
-  });
-
-  test('should return null for invalid input', () => {
-    const { normalizeGenre } = require('../../routes/categories');
-    
-    expect(normalizeGenre(null)).toBeNull();
-    expect(normalizeGenre(undefined)).toBeNull();
-    expect(normalizeGenre('')).toBeNull();
-    expect(normalizeGenre('   ')).toBeNull();
-    expect(normalizeGenre(123)).toBeNull();
-    expect(normalizeGenre([])).toBeNull();
-  });
-});
-
-describe('normalizeGenres helper function', () => {
-  test('should normalize an array of genres to lowercase', () => {
-    const { normalizeGenres } = require('../../routes/categories');
-    
-    const result = normalizeGenres(['Action', 'ADVENTURE', 'RPG']);
-    expect(result).toEqual(['action', 'adventure', 'rpg']);
-  });
-
-  test('should trim whitespace from genres', () => {
-    const { normalizeGenres } = require('../../routes/categories');
-    
-    const result = normalizeGenres(['  Action  ', '  Adventure  ', '  RPG  ']);
-    expect(result).toEqual(['action', 'adventure', 'rpg']);
-  });
-
-  test('should filter out invalid genres', () => {
-    const { normalizeGenres } = require('../../routes/categories');
-    
-    const result = normalizeGenres(['Action', '', '   ', 'Adventure', null, 'RPG']);
-    expect(result).toEqual(['action', 'adventure', 'rpg']);
-  });
-
-  test('should return null for empty array', () => {
-    const { normalizeGenres } = require('../../routes/categories');
-    
-    expect(normalizeGenres([])).toBeNull();
-    expect(normalizeGenres(null)).toBeNull();
-    expect(normalizeGenres(undefined)).toBeNull();
-  });
-
-  test('should return null if all genres are invalid', () => {
-    const { normalizeGenres } = require('../../routes/categories');
-    
-    expect(normalizeGenres(['', '   ', null])).toBeNull();
-  });
-
-  test('should handle single genre array', () => {
-    const { normalizeGenres } = require('../../routes/categories');
-    
-    const result = normalizeGenres(['Action']);
-    expect(result).toEqual(['action']);
-  });
-});
 

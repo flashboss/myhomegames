@@ -11,88 +11,49 @@ function loadCategories(metadataGamesDir) {
   const filePath = path.join(metadataGamesDir, fileName);
   try {
     const txt = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(txt);
+    const parsed = JSON.parse(txt);
+    
+    // Ensure it's an array of strings
+    if (!Array.isArray(parsed)) {
+      console.warn(`Invalid format in ${fileName}, expected array, got ${typeof parsed}`);
+      return [];
+    }
+    
+    // Filter to only strings
+    return parsed.filter(item => typeof item === "string");
   } catch (e) {
     console.error(`Failed to load ${fileName}:`, e.message);
     return [];
   }
 }
 
-/**
- * Normalize a single genre title to lowercase (same normalization as categories)
- * @param {string} genreTitle - The genre title to normalize
- * @returns {string|null} - Normalized genre title or null if invalid
- */
-function normalizeGenre(genreTitle) {
+
+// Helper function to create a category if it doesn't exist (returns category title or null)
+function ensureCategoryExists(metadataGamesDir, genreTitle) {
   if (!genreTitle || typeof genreTitle !== "string" || !genreTitle.trim()) {
     return null;
   }
-  return genreTitle.trim().toLowerCase();
-}
 
-/**
- * Normalize an array of genres to lowercase (same normalization as categories)
- * @param {string[]|null|undefined} genres - Array of genre titles to normalize
- * @returns {string[]|null} - Array of normalized genre titles or null if empty/invalid
- */
-function normalizeGenres(genres) {
-  if (!genres || !Array.isArray(genres) || genres.length === 0) {
-    return null;
-  }
-  
-  const normalized = genres
-    .filter((g) => g && typeof g === "string" && g.trim())
-    .map((g) => normalizeGenre(g))
-    .filter((g) => g !== null);
-  
-  return normalized.length > 0 ? normalized : null;
-}
-
-// Helper function to create a category if it doesn't exist (returns category ID or null)
-function ensureCategoryExists(metadataGamesDir, genreTitle) {
-  const normalizedTitle = normalizeGenre(genreTitle);
-  if (!normalizedTitle) {
-    return null;
-  }
-
+  const trimmedTitle = genreTitle.trim();
   const categories = loadCategories(metadataGamesDir);
   
-  // Check if category already exists (by title)
-  const existingCategory = categories.find(
-    (c) => c.title.toLowerCase() === normalizedTitle
-  );
-  
-  if (existingCategory) {
-    return existingCategory.id;
+  // Check if category already exists (exact match)
+  if (categories.includes(trimmedTitle)) {
+    return trimmedTitle;
   }
 
-  // Generate ID: genre_<normalized_title>
-  const newId = `genre_${normalizedTitle.replace(/\s+/g, "_")}`;
+  // Add new category
+  categories.push(trimmedTitle);
   
-  // Check if ID already exists
-  const existingById = categories.find((c) => c.id === newId);
-  if (existingById) {
-    return existingById.id;
-  }
-
-  // Create new category
-  const newCategory = {
-    id: newId,
-    title: normalizedTitle,
-  };
-
-  // Add to categories array
-  categories.push(newCategory);
-  
-  // Sort categories by title
-  categories.sort((a, b) => a.title.localeCompare(b.title));
+  // Sort categories alphabetically
+  categories.sort((a, b) => a.localeCompare(b));
 
   // Save to file
   const fileName = "games-categories.json";
   const filePath = path.join(metadataGamesDir, fileName);
   try {
     fs.writeFileSync(filePath, JSON.stringify(categories, null, 2), "utf8");
-    return newCategory.id;
+    return trimmedTitle;
   } catch (e) {
     console.error(`Failed to save ${fileName}:`, e.message);
     return null;
@@ -101,9 +62,9 @@ function ensureCategoryExists(metadataGamesDir, genreTitle) {
 
 function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGamesDir, allGames) {
   // Endpoint: serve category cover image (public, no auth required for images)
-  app.get("/category-covers/:categoryId", (req, res) => {
-    const categoryId = decodeURIComponent(req.params.categoryId);
-    const coverPath = path.join(metadataPath, "content", "categories", categoryId, "cover.webp");
+  app.get("/category-covers/:categoryTitle", (req, res) => {
+    const categoryTitle = decodeURIComponent(req.params.categoryTitle);
+    const coverPath = path.join(metadataPath, "content", "categories", categoryTitle, "cover.webp");
 
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -125,11 +86,7 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
   app.get("/categories", requireToken, (req, res) => {
     const categories = loadCategories(metadataGamesDir);
     res.json({
-      categories: categories.map((c) => ({
-        id: c.id,
-        title: c.title,
-        cover: `/category-covers/${encodeURIComponent(c.id)}`,
-      })),
+      categories: categories,
     });
   });
 
@@ -143,53 +100,37 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
 
     // Check if category already exists before creating
     const categories = loadCategories(metadataGamesDir);
-    const normalizedTitle = normalizeGenre(title);
-    const existingCategory = categories.find(
-      (c) => c.title.toLowerCase() === normalizedTitle
-    );
+    const trimmedTitle = title.trim();
     
-    if (existingCategory) {
-      return res.status(409).json({ error: "Category already exists", category: existingCategory });
+    if (categories.includes(trimmedTitle)) {
+      return res.status(409).json({ 
+        error: "Category already exists", 
+        category: trimmedTitle
+      });
     }
 
-    // Create the category (will return existing ID if somehow it exists by ID)
-    const categoryId = ensureCategoryExists(metadataGamesDir, title);
+    // Create the category
+    const categoryTitle = ensureCategoryExists(metadataGamesDir, title);
     
-    if (!categoryId) {
+    if (!categoryTitle) {
       return res.status(500).json({ error: "Failed to create category" });
-    }
-
-    // Get the created category
-    const categoriesAfter = loadCategories(metadataGamesDir);
-    const newCategory = categoriesAfter.find((c) => c.id === categoryId);
-    
-    if (!newCategory) {
-      return res.status(500).json({ error: "Category was created but not found" });
     }
     
     res.json({
-      category: {
-        id: newCategory.id,
-        title: newCategory.title,
-        cover: `/category-covers/${encodeURIComponent(newCategory.id)}`,
-      },
+      category: categoryTitle,
     });
   });
 
   // Endpoint: delete category (only if not used by any game)
-  app.delete("/categories/:categoryId", requireToken, (req, res) => {
-    const categoryId = decodeURIComponent(req.params.categoryId);
+  app.delete("/categories/:categoryTitle", requireToken, (req, res) => {
+    const categoryTitle = decodeURIComponent(req.params.categoryTitle);
     const categories = loadCategories(metadataGamesDir);
     
     // Find the category
-    const categoryIndex = categories.findIndex((c) => c.id === categoryId);
+    const categoryIndex = categories.indexOf(categoryTitle);
     if (categoryIndex === -1) {
       return res.status(404).json({ error: "Category not found" });
     }
-
-    const category = categories[categoryIndex];
-    const categoryIdToCheck = category.id;
-    const categoryTitleToCheck = category.title;
 
     // Reload games from file to ensure we have the latest data
     const libraryGamesFile = path.join(metadataGamesDir, "games-library.json");
@@ -206,22 +147,13 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
       allGamesFromFile = allGames;
     }
 
-    // Check if category is used by any game (check both ID and title)
+    // Check if category is used by any game (exact match)
     const isUsed = Object.values(allGamesFromFile).some((game) => {
       if (!game.genre) return false;
       if (Array.isArray(game.genre)) {
-        return game.genre.some((g) => 
-          g === categoryIdToCheck || 
-          g === categoryTitleToCheck ||
-          g.toLowerCase() === categoryIdToCheck.toLowerCase() ||
-          g.toLowerCase() === categoryTitleToCheck.toLowerCase()
-        );
+        return game.genre.includes(categoryTitle);
       }
-      const genreStr = String(game.genre);
-      return genreStr === categoryIdToCheck || 
-             genreStr === categoryTitleToCheck ||
-             genreStr.toLowerCase() === categoryIdToCheck.toLowerCase() ||
-             genreStr.toLowerCase() === categoryTitleToCheck.toLowerCase();
+      return String(game.genre) === categoryTitle;
     });
 
     if (isUsed) {
@@ -241,7 +173,7 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
       fs.writeFileSync(filePath, JSON.stringify(categories, null, 2), "utf8");
       
       // Delete category content directory (cover, etc.)
-      const categoryContentDir = path.join(metadataPath, "content", "categories", categoryId);
+      const categoryContentDir = path.join(metadataPath, "content", "categories", categoryTitle);
       if (fs.existsSync(categoryContentDir)) {
         try {
           fs.rmSync(categoryContentDir, { recursive: true, force: true });
@@ -263,39 +195,26 @@ function registerCategoriesRoutes(app, requireToken, metadataPath, metadataGames
  * Delete a category if it's not used by any game
  * @param {string} metadataPath - Path to metadata directory
  * @param {string} metadataGamesDir - Path to metadata/games directory
- * @param {string} categoryId - Category ID to delete
+ * @param {string} categoryTitle - Category title to delete
  * @param {Object} allGamesFromFile - Object with all games (gameId -> game object)
  * @returns {boolean} - True if category was deleted, false if it's still in use
  */
-function deleteCategoryIfUnused(metadataPath, metadataGamesDir, categoryId, allGamesFromFile) {
+function deleteCategoryIfUnused(metadataPath, metadataGamesDir, categoryTitle, allGamesFromFile) {
   const categories = loadCategories(metadataGamesDir);
   
   // Find the category
-  const categoryIndex = categories.findIndex((c) => c.id === categoryId);
+  const categoryIndex = categories.indexOf(categoryTitle);
   if (categoryIndex === -1) {
     return false; // Category not found
   }
 
-  const category = categories[categoryIndex];
-  const categoryIdToCheck = category.id;
-  const categoryTitleToCheck = category.title;
-
-  // Check if category is used by any game (check both ID and title)
+  // Check if category is used by any game (exact match)
   const isUsed = Object.values(allGamesFromFile).some((game) => {
     if (!game.genre) return false;
     if (Array.isArray(game.genre)) {
-      return game.genre.some((g) => 
-        g === categoryIdToCheck || 
-        g === categoryTitleToCheck ||
-        g.toLowerCase() === categoryIdToCheck.toLowerCase() ||
-        g.toLowerCase() === categoryTitleToCheck.toLowerCase()
-      );
+      return game.genre.includes(categoryTitle);
     }
-    const genreStr = String(game.genre);
-    return genreStr === categoryIdToCheck || 
-           genreStr === categoryTitleToCheck ||
-           genreStr.toLowerCase() === categoryIdToCheck.toLowerCase() ||
-           genreStr.toLowerCase() === categoryTitleToCheck.toLowerCase();
+    return String(game.genre) === categoryTitle;
   });
 
   if (isUsed) {
@@ -312,7 +231,7 @@ function deleteCategoryIfUnused(metadataPath, metadataGamesDir, categoryId, allG
     fs.writeFileSync(filePath, JSON.stringify(categories, null, 2), "utf8");
     
     // Delete category content directory (cover, etc.)
-    const categoryContentDir = path.join(metadataPath, "content", "categories", categoryId);
+    const categoryContentDir = path.join(metadataPath, "content", "categories", categoryTitle);
     if (fs.existsSync(categoryContentDir)) {
       try {
         fs.rmSync(categoryContentDir, { recursive: true, force: true });
@@ -331,8 +250,6 @@ function deleteCategoryIfUnused(metadataPath, metadataGamesDir, categoryId, allG
 
 module.exports = {
   loadCategories,
-  normalizeGenre,
-  normalizeGenres,
   ensureCategoryExists,
   deleteCategoryIfUnused,
   registerCategoriesRoutes,

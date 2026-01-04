@@ -1,162 +1,42 @@
 [
-  {
-      "id": "genre_action",
-      "title": "action"
-  },
-  {
-      "id": "genre_adventure",
-      "title": "adventure"
-  },
-  {
-      "id": "genre_boxing",
-      "title": "boxing"
-  },
-  {
-      "id": "genre_classbased",
-      "title": "classbased"
-  },
-  {
-      "id": "genre_combat",
-      "title": "combat"
-  },
-  {
-      "id": "genre_comedy",
-      "title": "comedy"
-  },
-  {
-      "id": "genre_competitive",
-      "title": "competitive"
-  },
-  {
-      "id": "genre_cyberpunk",
-      "title": "cyberpunk"
-  },
-  {
-      "id": "genre_fantasy",
-      "title": "fantasy"
-  },
-  {
-      "id": "genre_fighting",
-      "title": "fighting"
-  },
-  {
-      "id": "genre_flightsimulator",
-      "title": "flightsimulator"
-  },
-  {
-      "id": "genre_fps",
-      "title": "fps"
-  },
-  {
-      "id": "genre_football",
-      "title": "football"
-  },
-  {
-      "id": "genre_historical",
-      "title": "historical"
-  },
-  {
-      "id": "genre_horror",
-      "title": "horror"
-  },
-  {
-      "id": "genre_management",
-      "title": "management"
-  },
-  {
-      "id": "genre_military",
-      "title": "military"
-  },
-  {
-      "id": "genre_moba",
-      "title": "moba"
-  },
-  {
-      "id": "genre_multiplayer",
-      "title": "multiplayer"
-  },
-  {
-      "id": "genre_openworld",
-      "title": "openworld"
-  },
-  {
-      "id": "genre_party",
-      "title": "party"
-  },
-  {
-      "id": "genre_platformer",
-      "title": "platformer"
-  },
-  {
-      "id": "genre_puzzle",
-      "title": "puzzle"
-  },
-  {
-      "id": "genre_racing",
-      "title": "racing"
-  },
-  {
-      "id": "genre_rhythm",
-      "title": "rhythm"
-  },
-  {
-      "id": "genre_rpg",
-      "title": "rpg"
-  },
-  {
-      "id": "genre_sandbox",
-      "title": "sandbox"
-  },
-  {
-      "id": "genre_scifi",
-      "title": "scifi"
-  },
-  {
-      "id": "genre_simulation",
-      "title": "simulation"
-  },
-  {
-      "id": "genre_soulslike",
-      "title": "soulslike"
-  },
-  {
-      "id": "genre_sports",
-      "title": "sports"
-  },
-  {
-      "id": "genre_stealth",
-      "title": "stealth"
-  },
-  {
-      "id": "genre_strategy",
-      "title": "strategy"
-  },
-  {
-      "id": "genre_survival",
-      "title": "survival"
-  },
-  {
-      "id": "genre_survivalhorror",
-      "title": "survivalhorror"
-  },
-  {
-      "id": "genre_thirdpersonshooter",
-      "title": "thirdpersonshooter"
-  },
-  {
-      "id": "genre_trivia",
-      "title": "trivia"
-  },
-  {
-      "id": "genre_turnbased",
-      "title": "turnbased"
-  },
-  {
-      "id": "genre_visualnovel",
-      "title": "visualnovel"
-  },
-  {
-      "id": "genre_western",
-      "title": "western"
-  }
+  "Action",
+  "Adventure",
+  "Boxing",
+  "Classbased",
+  "Combat",
+  "Comedy",
+  "Competitive",
+  "Cyberpunk",
+  "Fantasy",
+  "Fighting",
+  "Flightsimulator",
+  "Fps",
+  "Football",
+  "Historical",
+  "Horror",
+  "Management",
+  "Military",
+  "Moba",
+  "Multiplayer",
+  "Openworld",
+  "Party",
+  "Platformer",
+  "Puzzle",
+  "Racing",
+  "Rhythm",
+  "Rpg",
+  "Sandbox",
+  "Scifi",
+  "Simulation",
+  "Soulslike",
+  "Sports",
+  "Stealth",
+  "Strategy",
+  "Survival",
+  "Survivalhorror",
+  "Thirdpersonshooter",
+  "Trivia",
+  "Turnbased",
+  "Visualnovel",
+  "Western"
 ]

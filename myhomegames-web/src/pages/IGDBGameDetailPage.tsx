@@ -219,15 +219,15 @@ function IGDBGameDetailContent({
     return null;
   };
 
-  // Normalize genres to lowercase (same normalization as categories)
-  const normalizedGenres = game && game.genres && Array.isArray(game.genres) && game.genres.length > 0
+  // Filter and validate genres
+  const validGenres = game && game.genres && Array.isArray(game.genres) && game.genres.length > 0
     ? game.genres
         .filter((g) => g && typeof g === "string" && g.trim())
-        .map((g) => g.trim().toLowerCase())
+        .map((g) => g.trim())
     : null;
 
   // Create a temporary GameItem for GameCategories component
-  const gameItemForCategories: GameItem | null = normalizedGenres && normalizedGenres.length > 0
+  const gameItemForCategories: GameItem | null = validGenres && validGenres.length > 0
     ? {
         ratingKey: `igdb-${game.id}`,
         title: game.name,
@@ -238,7 +238,7 @@ function IGDBGameDetailContent({
         month: game.releaseDateFull?.month || null,
         year: game.releaseDateFull?.year || game.releaseDate || null,
         stars: null,
-        genre: normalizedGenres,
+        genre: validGenres,
         criticratings: game.criticRating || null,
         userratings: game.userRating || null,
         command: null,

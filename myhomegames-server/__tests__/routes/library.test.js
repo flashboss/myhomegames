@@ -958,7 +958,8 @@ describe('DELETE /games/:gameId', () => {
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const categoryExistsBefore = categoriesBefore.body.categories.some(c => c.id === categoryId);
+    const categoryTitle = 'orphanedcategory';
+    const categoryExistsBefore = categoriesBefore.body.categories.includes(categoryTitle);
     expect(categoryExistsBefore).toBe(true);
     
     // Add a game with this category
@@ -1000,7 +1001,7 @@ describe('DELETE /games/:gameId', () => {
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const categoryExistsAfter = categoriesAfter.body.categories.some(c => c.id === categoryId);
+    const categoryExistsAfter = categoriesAfter.body.categories.includes('orphanedcategory');
     expect(categoryExistsAfter).toBe(false);
   });
 
@@ -1012,7 +1013,7 @@ describe('DELETE /games/:gameId', () => {
       .send({ title: 'sharedcategory' })
       .expect(200);
     
-    const categoryId = createCategoryResponse.body.category.id;
+    const categoryTitle = createCategoryResponse.body.category;
     
     // Add first game with this category
     const addGame1Response = await request(app)
@@ -1062,7 +1063,7 @@ describe('DELETE /games/:gameId', () => {
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const categoryExistsAfter = categoriesAfter.body.categories.some(c => c.id === categoryId);
+    const categoryExistsAfter = categoriesAfter.body.categories.includes(categoryTitle);
     expect(categoryExistsAfter).toBe(true);
     
     // Cleanup: delete second game
@@ -1077,7 +1078,7 @@ describe('DELETE /games/:gameId', () => {
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const categoryExistsFinal = categoriesFinal.body.categories.some(c => c.id === categoryId);
+    const categoryExistsFinal = categoriesFinal.body.categories.includes(categoryTitle);
     expect(categoryExistsFinal).toBe(false);
   });
 });
@@ -1116,9 +1117,9 @@ describe('POST /games/add-from-igdb', () => {
     expect(response.body.game).toHaveProperty('title', 'Test Game from IGDB');
     expect(response.body.game).toHaveProperty('genre');
     expect(Array.isArray(response.body.game.genre)).toBe(true);
-    // Genres should be normalized to lowercase
-    expect(response.body.game.genre).toContain('new genre 1');
-    expect(response.body.game.genre).toContain('new genre 2');
+    // Genres should be preserved as-is
+    expect(response.body.game.genre).toContain('New Genre 1');
+    expect(response.body.game.genre).toContain('New Genre 2');
     
     // Verify categories were created
     const categoriesAfter = await request(app)
@@ -1128,13 +1129,8 @@ describe('POST /games/add-from-igdb', () => {
     
     expect(categoriesAfter.body.categories.length).toBe(initialCategoriesCount + 2);
     
-    const newGenre1 = categoriesAfter.body.categories.find(c => c.title === 'new genre 1');
-    const newGenre2 = categoriesAfter.body.categories.find(c => c.title === 'new genre 2');
-    
-    expect(newGenre1).toBeDefined();
-    expect(newGenre2).toBeDefined();
-    expect(newGenre1.id).toBe('genre_new_genre_1');
-    expect(newGenre2.id).toBe('genre_new_genre_2');
+    expect(categoriesAfter.body.categories).toContain('New Genre 1');
+    expect(categoriesAfter.body.categories).toContain('New Genre 2');
     
     // Cleanup: delete the test game
     await request(app)
@@ -1178,10 +1174,10 @@ describe('POST /games/add-from-igdb', () => {
     
     expect(response.body).toHaveProperty('status', 'success');
     
-    // Verify genre was normalized to lowercase
+    // Verify genre was preserved
     expect(response.body.game).toHaveProperty('genre');
     expect(Array.isArray(response.body.game.genre)).toBe(true);
-    expect(response.body.game.genre).toContain('existing genre');
+    expect(response.body.game.genre).toContain('Existing Genre');
     
     // Verify category count didn't increase
     const categoriesAfter = await request(app)
@@ -1276,7 +1272,7 @@ describe('POST /games/add-from-igdb', () => {
     expect(response.body).toHaveProperty('error', 'Unauthorized');
   });
 
-  test('should normalize genres to lowercase', async () => {
+  test('should preserve genre case', async () => {
     // Add a game with uppercase genres
     const response = await request(app)
       .post('/games/add-from-igdb')
@@ -1296,29 +1292,20 @@ describe('POST /games/add-from-igdb', () => {
     expect(response.body.game).toHaveProperty('genre');
     expect(Array.isArray(response.body.game.genre)).toBe(true);
     
-    // Verify genres are normalized to lowercase
-    expect(response.body.game.genre).toContain('action');
-    expect(response.body.game.genre).toContain('adventure');
-    expect(response.body.game.genre).toContain('rpg');
+    // Verify genres are preserved as-is
+    expect(response.body.game.genre).toContain('ACTION');
+    expect(response.body.game.genre).toContain('ADVENTURE');
+    expect(response.body.game.genre).toContain('RPG');
     
-    // Verify no uppercase genres exist
-    expect(response.body.game.genre).not.toContain('ACTION');
-    expect(response.body.game.genre).not.toContain('ADVENTURE');
-    expect(response.body.game.genre).not.toContain('RPG');
-    
-    // Verify categories were created with lowercase titles
+    // Verify categories were created with original case
     const categoriesResponse = await request(app)
       .get('/categories')
       .set('X-Auth-Token', 'test-token')
       .expect(200);
     
-    const actionCategory = categoriesResponse.body.categories.find(c => c.title === 'action');
-    const adventureCategory = categoriesResponse.body.categories.find(c => c.title === 'adventure');
-    const rpgCategory = categoriesResponse.body.categories.find(c => c.title === 'rpg');
-    
-    expect(actionCategory).toBeDefined();
-    expect(adventureCategory).toBeDefined();
-    expect(rpgCategory).toBeDefined();
+    expect(categoriesResponse.body.categories).toContain('ACTION');
+    expect(categoriesResponse.body.categories).toContain('ADVENTURE');
+    expect(categoriesResponse.body.categories).toContain('RPG');
     
     // Cleanup: delete the test game
     await request(app)

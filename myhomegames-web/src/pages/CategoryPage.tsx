@@ -91,10 +91,10 @@ export default function CategoryPage({
   // Set genre filter when categoryId changes
   useEffect(() => {
     if (categoryId && allGenres.length > 0) {
-      // Find the genre by ID or title
-      const genre = allGenres.find((g) => g.id === categoryId || g.title === categoryId);
+      // Find the genre by title (categoryId is the title)
+      const genre = allGenres.find((g) => g.title === categoryId);
       if (genre) {
-        setSelectedGenre(genre.id);
+        setSelectedGenre(genre.title);
         setFilterField("genre");
       }
     }
@@ -111,10 +111,10 @@ export default function CategoryPage({
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      const items = (json.categories || []) as any[];
-      const parsed = items.map((v) => ({
-        id: v.id,
-        title: v.title,
+      const items = (json.categories || []) as string[];
+      const parsed = items.map((title) => ({
+        id: title,
+        title: title,
       }));
       setAllGenres(parsed);
     } catch (err: any) {
@@ -213,38 +213,35 @@ export default function CategoryPage({
   useEffect(() => {
     if (games.length === 0 || allGenres.length === 0) return;
 
-    // Helper function to normalize genre titles
-    const normalizeGenre = (g: string) => g.trim().toLowerCase();
-
-    // Extract unique genre IDs and titles from games (normalized)
+    // Extract unique genre IDs and titles from games
     const genresInGames = new Set<string>();
     games.forEach((game) => {
       if (game.genre) {
         if (Array.isArray(game.genre)) {
           game.genre.forEach((g) => {
             if (typeof g === "string") {
-              genresInGames.add(normalizeGenre(g));
-            } else {
               genresInGames.add(g);
+            } else {
+              genresInGames.add(String(g));
             }
           });
         } else if (typeof game.genre === "string") {
-          genresInGames.add(normalizeGenre(game.genre));
+          genresInGames.add(game.genre);
         }
       }
     });
 
     // Filter all genres to only those present in games
     const filteredGenres = allGenres.filter((genre) => {
-      // Check if the genre ID or normalized title matches any genre in games
-      return genresInGames.has(genre.id) || genresInGames.has(normalizeGenre(genre.title));
+      // Check if the genre title matches any genre in games (exact match)
+      return genresInGames.has(genre.title);
     });
 
     setAvailableGenres(filteredGenres);
 
     // Validate selected genre - if it's no longer available, reset it
     if (selectedGenre !== null && filterField === "genre") {
-      const genreExists = filteredGenres.some((g) => g.id === selectedGenre);
+      const genreExists = filteredGenres.some((g) => g.title === selectedGenre);
       if (!genreExists) {
         setSelectedGenre(null);
         setFilterField("all");
@@ -262,21 +259,14 @@ export default function CategoryPage({
         switch (filterField) {
           case "genre":
             if (selectedGenre !== null) {
-              // Find the genre object to get both id and title
-              const selectedGenreObj = availableGenres.find((g) => g.id === selectedGenre);
-              if (!selectedGenreObj) return false;
-              
-              // Filter games that have the selected genre
-              // Normalize comparison to handle both normalized and non-normalized genres
-              const normalizeGenre = (g: string) => g.trim().toLowerCase();
+              // Filter games that have the selected genre (exact match)
               if (Array.isArray(game.genre)) {
                 return game.genre.some((g) => {
-                  const normalized = typeof g === "string" ? normalizeGenre(g) : g;
-                  return normalized === selectedGenreObj.id || normalized === normalizeGenre(selectedGenreObj.title);
+                  const genreStr = typeof g === "string" ? g : String(g);
+                  return genreStr === selectedGenre;
                 });
               } else if (typeof game.genre === "string") {
-                const normalized = normalizeGenre(game.genre);
-                return normalized === selectedGenreObj.id || normalized === normalizeGenre(selectedGenreObj.title);
+                return game.genre === selectedGenre;
               }
               return false;
             }
